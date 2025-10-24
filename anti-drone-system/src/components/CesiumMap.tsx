@@ -222,8 +222,8 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive }) => {
   const centerLng = 72.9877674;
   const centerPosition: [number, number] = [centerLat, centerLng];
 
-  // Calculate 5KM and 3KM radius in meters
-  const radius5km = 5000; // 5 kilometers in meters
+  // Calculate 10km and 3KM radius in meters
+  const radius10km = 5000; // 5 kilometers in meters
   const radius3km = 3000; // 3 kilometers in meters
 
   useEffect(() => {
@@ -239,7 +239,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive }) => {
           centerLat, centerLng,
           drone.position[1], drone.position[0]
         );
-        if (distance <= radius5km) {
+        if (distance <= radius10km) {
           detected.push(drone.id);
         }
       });
@@ -247,7 +247,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive }) => {
     } else {
       setDetectedThreats([]);
     }
-  }, [drones, radarActive, systemActive, centerLat, centerLng, radius5km]);
+  }, [drones, radarActive, systemActive, centerLat, centerLng, radius10km]);
 
   // Toggle radar scanning
   const toggleRadar = () => {
@@ -265,7 +265,16 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive }) => {
   };
 
   return (
-    <Box sx={{ position: 'relative', width: '100%', height: '600px', overflow: 'hidden' }}>
+    <Box sx={{
+      position: 'relative',
+      width: '100%',
+      height: {
+        xs: 'calc(100vh - 45px)', // Small mobile
+        sm: 'calc(100vh - 50px)', // Mobile
+        md: 'calc(100vh - 60px)', // Desktop
+      },
+      overflow: 'hidden'
+    }}>
       {/* Leaflet Map with Satellite Imagery */}
       <MapContainer
         center={centerPosition}
@@ -284,10 +293,10 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive }) => {
           <RadarSweep center={centerPosition} />
         )}
 
-        {/* GEOGRAPHICALLY FIXED 5KM Coverage Circle */}
+        {/* GEOGRAPHICALLY FIXED 10km Coverage Circle */}
         <Circle
           center={centerPosition}
-          radius={radius5km}
+          radius={radius10km}
           pathOptions={{
             color: '#00E676',
             fillColor: '#00E676',
@@ -319,7 +328,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive }) => {
               <strong>LNG:</strong> {centerLng}<br/>
               <strong>STATUS:</strong> {systemActive ? 'ONLINE' : 'OFFLINE'}<br/>
               <strong>RADAR:</strong> {radarActive ? 'SCANNING' : 'OFFLINE'}<br/>
-              <strong>COVERAGE:</strong> 5KM RADIUS
+              <strong>COVERAGE:</strong> 10km RADIUS
             </div>
           </Popup>
         </Marker>
@@ -497,7 +506,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive }) => {
           MODE: SATELLITE VIEW
         </Typography>
         <Typography variant="caption" display="block" sx={{ color: '#333' }}>
-          COVERAGE: 5KM RADIUS
+          COVERAGE: 10km RADIUS
         </Typography>
         <Typography variant="caption" display="block" sx={{ color: '#00E676', fontWeight: 'bold' }}>
           GEOGRAPHIC POSITIONING: ACTIVE
@@ -528,7 +537,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive }) => {
           📍 COORDINATES: {centerLat.toFixed(4)}, {centerLng.toFixed(4)}
         </Typography>
         <Typography variant="caption" display="block" sx={{ fontWeight: 'bold' }}>
-          🎯 GEOGRAPHIC 5KM COVERAGE
+          🎯 GEOGRAPHIC 10km COVERAGE
         </Typography>
         <Typography variant="caption" display="block" sx={{ fontWeight: 'bold', color: '#00E676' }}>
           🏢 COMMAND CENTER: GEOGRAPHICALLY FIXED
