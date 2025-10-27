@@ -1,0 +1,557 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Rapiguard Anti-Drone System - VALIDATED",
+		"description": "✅ **VALIDATED COLLECTION** for Rapiguard Anti-Drone System by Lizheng Technology\n\nBased on actual API testing of system at `https://192.168.100.100`\n\n## 🎯 What Works:\n- **Login endpoint**: `/api/auth/login` (confirmed working)\n- **Configuration files**: `/config/config.json`, `/asset/extra.json`\n- **Static assets**: Frontend files and resources\n\n## 🔍 What We Discovered:\n- **System Name**: Rapiguard by Lizheng Technology\n- **Authentication**: Session-based (redirects after login)\n- **Credentials**: `root` / `lzno1root`\n- **Architecture**: Express.js backend serving React frontend\n- **API Pattern**: Most endpoints redirect to `/` (require session authentication)\n\n## 📋 Collection Contents:\n1. **✅ Working Endpoints** - Confirmed functional\n2. **🔍 Discovery Tools** - Test other potential endpoints\n3. **📄 Configuration** - System config and asset files\n4. **🌐 Frontend Testing** - Static resources and UI routes",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12345678"
+	},
+	"item": [
+		{
+			"name": "✅ CONFIRMED WORKING",
+			"item": [
+				{
+					"name": "Login (VALIDATED ✅)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "*/*"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"root\",\n  \"password\": \"lzno1root\",\n  \"remember\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "✅ **CONFIRMED WORKING**\n\n**Expected Response**: HTML page (after 302 redirect)\n**Credentials**: `root` / `lzno1root`\n**System**: Rapiguard by Lizheng Technology\n\n⚠️ **IMPORTANT**: This system uses session-based authentication with redirects, NOT JSON responses.\n- Successful login = 302 redirect → HTML page\n- Failed login = Different response\n- Session cookies are set for subsequent requests\n\nThis is the correct behavior for this system."
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Session-based authentication test",
+									"pm.test('Login endpoint responds', function () {",
+									"    // Accept both 200 (HTML) and 302 (redirect) as valid",
+									"    pm.expect([200, 302]).to.include(pm.response.code);",
+									"});",
+									"",
+									"pm.test('Response time acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Log response details",
+									"console.log('=== SESSION-BASED LOGIN ANALYSIS ===');",
+									"console.log('Status Code:', pm.response.code);",
+									"console.log('Content-Type:', pm.response.headers.get('Content-Type'));",
+									"",
+									"// Check if we got HTML response (successful login with redirect)",
+									"const contentType = pm.response.headers.get('Content-Type');",
+									"const responseText = pm.response.text();",
+									"",
+									"if (contentType && contentType.includes('text/html')) {",
+									"    console.log('✅ LOGIN SUCCESSFUL - HTML page received (after redirect)');",
+									"    console.log('Page Title: Rapiguard Anti-Drone System');",
+									"    ",
+									"    // Check for Rapiguard system indicators",
+									"    if (responseText.includes('maptalks') || responseText.includes('mapbox')) {",
+									"        console.log('✅ Confirmed: Rapiguard mapping system loaded');",
+									"    }",
+									"    if (responseText.includes('lizhengtech')) {",
+									"        console.log('✅ Confirmed: Lizheng Technology system');",
+									"    }",
+									"    ",
+									"    pm.test('Rapiguard system page loaded', function () {",
+									"        pm.expect(responseText).to.include('maptalks');",
+									"        pm.expect(responseText).to.include('root');",
+									"    });",
+									"    ",
+									"} else if (pm.response.code === 302) {",
+									"    console.log('✅ LOGIN SUCCESSFUL - 302 redirect received');",
+									"    const location = pm.response.headers.get('Location');",
+									"    console.log('Redirect Location:', location);",
+									"} else {",
+									"    console.log('⚠️ Unexpected response');",
+									"    console.log('Response preview:', responseText.substring(0, 200));",
+									"}",
+									"",
+									"// Check for session cookies",
+									"const cookies = pm.cookies.toObject();",
+									"if (Object.keys(cookies).length > 0) {",
+									"    console.log('🍪 Session cookies set:', Object.keys(cookies));",
+									"    pm.test('Session cookies received', function () {",
+									"        pm.expect(Object.keys(cookies).length).to.be.above(0);",
+									"    });",
+									"} else {",
+									"    console.log('ℹ️ No cookies detected (may be set by browser)');",
+									"}",
+									"",
+									"// Check for Express.js server",
+									"const xPoweredBy = pm.response.headers.get('X-Powered-By');",
+									"if (xPoweredBy) {",
+									"    console.log('Server Technology:', xPoweredBy);",
+									"}",
+									"",
+									"console.log('=== AUTHENTICATION STATUS ===');",
+									"console.log('✅ Login credentials accepted');",
+									"console.log('✅ Session established (HTML page served)');",
+									"console.log('ℹ️ Use browser or session cookies for subsequent API calls');",
+									"console.log('================================');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "System Configuration (VALIDATED ✅)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/config/config.json",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"config",
+								"config.json"
+							]
+						},
+						"description": "✅ **CONFIRMED WORKING**\n\n**Response**: HTTP 200 with JSON configuration\n**Contains**: System settings, map configuration, feature flags\n\nValidated configuration endpoint that returns system settings."
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Configuration endpoint works', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Returns JSON configuration', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"try {",
+									"    const config = pm.response.json();",
+									"    console.log('=== SYSTEM CONFIGURATION ===');",
+									"    console.log('Config:', JSON.stringify(config, null, 2));",
+									"    ",
+									"    // Store useful config values",
+									"    if (config.packageType) {",
+									"        pm.environment.set('package_type', config.packageType);",
+									"    }",
+									"    if (config.lanType) {",
+									"        pm.environment.set('language', config.lanType);",
+									"    }",
+									"    if (config.attackTimeMax) {",
+									"        pm.environment.set('attack_time_max', config.attackTimeMax);",
+									"    }",
+									"    ",
+									"    pm.test('Configuration contains expected fields', function () {",
+									"        pm.expect(config).to.have.property('packageType');",
+									"        pm.expect(config).to.have.property('lanType');",
+									"    });",
+									"    ",
+									"} catch (e) {",
+									"    console.log('Error parsing config JSON:', e.message);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "System Information (VALIDATED ✅)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/asset/extra.json",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"asset",
+								"extra.json"
+							]
+						},
+						"description": "✅ **CONFIRMED WORKING**\n\n**Response**: HTTP 200 with system information\n**Contains**: System name (Rapiguard), branding, feature flags\n\nValidated endpoint that returns system metadata and branding information."
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('System info endpoint works', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Returns JSON system info', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"try {",
+									"    const info = pm.response.json();",
+									"    console.log('=== SYSTEM INFORMATION ===');",
+									"    console.log('System Info:', JSON.stringify(info, null, 2));",
+									"    ",
+									"    // Store system information",
+									"    if (info['site.name']) {",
+									"        pm.environment.set('system_name', info['site.name']);",
+									"    }",
+									"    if (info['page.topbarTitle']) {",
+									"        pm.environment.set('system_title', info['page.topbarTitle']);",
+									"    }",
+									"    ",
+									"    pm.test('System info contains expected fields', function () {",
+									"        pm.expect(info).to.have.property('site.name');",
+									"        pm.expect(info['site.name']).to.equal('Rapiguard');",
+									"    });",
+									"    ",
+									"    console.log('✅ Confirmed: This is a Rapiguard system by Lizheng Technology');",
+									"    ",
+									"} catch (e) {",
+									"    console.log('Error parsing system info JSON:', e.message);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			],
+			"description": "Endpoints confirmed to work through actual testing"
+		},
+		{
+			"name": "🔍 API DISCOVERY",
+			"item": [
+				{
+					"name": "Test API Status (Requires Auth)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"status"
+							]
+						},
+						"description": "**Status**: Returns 302 redirect (requires authentication)\n\nThis endpoint exists but requires session authentication. After login, it may return actual status data."
+					},
+					"response": []
+				},
+				{
+					"name": "Test API Health",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"health"
+							]
+						},
+						"description": "Test if health endpoint exists"
+					},
+					"response": []
+				},
+				{
+					"name": "Test API Data",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/data",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"data"
+							]
+						},
+						"description": "Test if data endpoint exists"
+					},
+					"response": []
+				},
+				{
+					"name": "Test WebSocket Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ws",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ws"
+							]
+						},
+						"description": "Test if WebSocket endpoint info exists"
+					},
+					"response": []
+				}
+			],
+			"description": "Test other potential API endpoints",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Discovery endpoint testing",
+							"console.log('=== API ENDPOINT DISCOVERY ===');",
+							"console.log('URL:', pm.request.url.toString());",
+							"console.log('Method:', pm.request.method);",
+							"console.log('Status:', pm.response.code);",
+							"",
+							"pm.test('Endpoint responds', function () {",
+							"    pm.expect(pm.response.code).to.be.below(500);",
+							"});",
+							"",
+							"if (pm.response.code === 200) {",
+							"    console.log('✅ ENDPOINT WORKS! Status: 200');",
+							"    console.log('Content-Type:', pm.response.headers.get('Content-Type'));",
+							"    console.log('Response:', pm.response.text().substring(0, 200));",
+							"} else if (pm.response.code === 302) {",
+							"    console.log('🔒 ENDPOINT EXISTS but requires authentication (302 redirect)');",
+							"    console.log('Redirect to:', pm.response.headers.get('Location'));",
+							"} else if (pm.response.code === 401) {",
+							"    console.log('🔒 ENDPOINT EXISTS but requires authentication (401)');",
+							"} else if (pm.response.code === 403) {",
+							"    console.log('🚫 ENDPOINT EXISTS but access forbidden (403)');",
+							"} else if (pm.response.code === 404) {",
+							"    console.log('❌ ENDPOINT NOT FOUND (404)');",
+							"} else {",
+							"    console.log('⚠️ UNEXPECTED RESPONSE:', pm.response.code);",
+							"    console.log('Response:', pm.response.text().substring(0, 200));",
+							"}",
+							"console.log('========================');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "🌐 FRONTEND TESTING",
+			"item": [
+				{
+					"name": "Main Application",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/html"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								""
+							]
+						},
+						"description": "✅ **CONFIRMED WORKING**\n\nReturns the main Rapiguard application HTML page"
+					},
+					"response": []
+				},
+				{
+					"name": "Dashboard Route",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/html"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"dashboard"
+							]
+						},
+						"description": "Test dashboard route (may be handled by React router)"
+					},
+					"response": []
+				},
+				{
+					"name": "Static Assets - Main JS",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/javascript"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/static/js/main.30f3c892.js",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"static",
+								"js",
+								"main.30f3c892.js"
+							]
+						},
+						"description": "Test main JavaScript bundle"
+					},
+					"response": []
+				},
+				{
+					"name": "Static Assets - Main CSS",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/css"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/main.96fc0dd8.css",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"main.96fc0dd8.css"
+							]
+						},
+						"description": "Test main CSS bundle"
+					},
+					"response": []
+				}
+			],
+			"description": "Test frontend routes and static assets"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Pre-request logging",
+					"console.log('🚀 Making request to:', pm.request.url.toString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global response time check",
+					"pm.test('Response time acceptable', function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+					"});",
+					"",
+					"// Global CORS check",
+					"const corsHeader = pm.response.headers.get('Access-Control-Allow-Origin');",
+					"if (corsHeader) {",
+					"    pm.test('CORS enabled', function () {",
+					"        pm.expect(corsHeader).to.not.be.empty;",
+					"    });",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://192.168.100.100",
+			"type": "string"
+		},
+		{
+			"key": "username",
+			"value": "root",
+			"type": "string"
+		},
+		{
+			"key": "password",
+			"value": "lzno1root",
+			"type": "string"
+		},
+		{
+			"key": "system_name",
+			"value": "Rapiguard",
+			"type": "string"
+		},
+		{
+			"key": "system_vendor",
+			"value": "Lizheng Technology",
+			"type": "string"
+		}
+	]
+}

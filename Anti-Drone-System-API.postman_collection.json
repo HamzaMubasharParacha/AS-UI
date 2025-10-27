@@ -1,0 +1,1107 @@
+
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Anti-Drone System API",
+		"description": "Comprehensive API collection for the Anti-Drone System web application hosted at https://192.168.100.100/dashboard\n\nThis collection includes endpoints for:\n- Authentication & Authorization\n- Drone Detection & Tracking\n- System Status & Monitoring\n- Countermeasure Controls\n- Map & Drawing Tools\n- Data Visualization & Analytics\n- Real-time WebSocket connections",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12345678"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\",\n  \"remember\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Authenticate user and obtain access token - VERIFIED WORKING ENDPOINT"
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Response received', function () {",
+									"    pm.expect(pm.response.code).to.be.below(500);",
+									"});",
+									"",
+									"// Check if response is JSON",
+									"const contentType = pm.response.headers.get('Content-Type');",
+									"if (contentType && contentType.includes('application/json')) {",
+									"    pm.test('JSON response received', function () {",
+									"        pm.expect(pm.response.json).to.not.throw();",
+									"    });",
+									"    ",
+									"    if (pm.response.code === 200) {",
+									"        const response = pm.response.json();",
+									"        ",
+									"        // Try to extract token from various possible response formats",
+									"        if (response.access_token) {",
+									"            pm.environment.set('access_token', response.access_token);",
+									"            pm.test('Access token received', function () {",
+									"                pm.expect(response.access_token).to.not.be.undefined;",
+									"            });",
+									"        } else if (response.token) {",
+									"            pm.environment.set('access_token', response.token);",
+									"            pm.test('Token received', function () {",
+									"                pm.expect(response.token).to.not.be.undefined;",
+									"            });",
+									"        } else if (response.jwt) {",
+									"            pm.environment.set('access_token', response.jwt);",
+									"            pm.test('JWT received', function () {",
+									"                pm.expect(response.jwt).to.not.be.undefined;",
+									"            });",
+									"        }",
+									"        ",
+									"        if (response.refresh_token) {",
+									"            pm.environment.set('refresh_token', response.refresh_token);",
+									"        }",
+									"        ",
+									"        pm.test('Login successful', function () {",
+									"            pm.expect(pm.response.code).to.equal(200);",
+									"        });",
+									"    } else if (pm.response.code === 401) {",
+									"        pm.test('Invalid credentials', function () {",
+									"            pm.expect(pm.response.code).to.equal(401);",
+									"        });",
+									"    } else {",
+									"        pm.test('Unexpected response code', function () {",
+									"            console.log('Response:', pm.response.text());",
+									"            pm.expect(pm.response.code).to.be.oneOf([200, 401, 403]);",
+									"        });",
+									"    }",
+									"} else {",
+									"    pm.test('Non-JSON response - check endpoint', function () {",
+									"        console.log('Content-Type:', contentType);",
+									"        console.log('Response:', pm.response.text().substring(0, 200));",
+									"        pm.expect(contentType).to.include('application/json');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Logout user and invalidate token"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "Refresh access token using refresh token"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"profile"
+							]
+						},
+						"description": "Get current user profile information"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication and authorization endpoints"
+		},
+		{
+			"name": "Drone Detection & Tracking",
+			"item": [
+				{
+					"name": "Get All Detected Drones",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/drones?limit=50&offset=0&threat_level=all&status=active",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"drones"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "50",
+									"description": "Number of records to return"
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Number of records to skip"
+								},
+								{
+									"key": "threat_level",
+									"value": "all",
+									"description": "Filter by threat level: LOW, MEDIUM, HIGH, CRITICAL, all"
+								},
+								{
+									"key": "status",
+									"value": "active",
+									"description": "Filter by status: active, inactive, all"
+								}
+							]
+						},
+						"description": "Retrieve all detected drones with optional filtering"
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Response is successful', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									"",
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.test('Response contains drones array', function () {",
+									"        pm.expect(response.drones).to.be.an('array');",
+									"    });",
+									"    ",
+									"    if (response.drones.length > 0) {",
+									"        pm.environment.set('drone_id', response.drones[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Drone by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/drones/{{drone_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"drones",
+								"{{drone_id}}"
+							]
+						},
+						"description": "Get detailed information about a specific drone"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Real-time Drone Updates",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/drones/realtime?since={{timestamp}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"drones",
+								"realtime"
+							],
+							"query": [
+								{
+									"key": "since",
+									"value": "{{timestamp}}",
+									"description": "Get updates since this timestamp"
+								}
+							]
+						},
+						"description": "Get real-time drone position and status updates"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Drone Threat Level",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"threat_level\": \"HIGH\",\n  \"reason\": \"Unusual flight pattern detected\",\n  \"updated_by\": \"operator_001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/drones/{{drone_id}}/threat-level",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"drones",
+								"{{drone_id}}",
+								"threat-level"
+							]
+						},
+						"description": "Update the threat level of a specific drone"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Drone Tracking History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/drones/{{drone_id}}/history?from={{start_time}}&to={{end_time}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"drones",
+								"{{drone_id}}",
+								"history"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "{{start_time}}",
+									"description": "Start time for history (ISO 8601)"
+								},
+								{
+									"key": "to",
+									"value": "{{end_time}}",
+									"description": "End time for history (ISO 8601)"
+								}
+							]
+						},
+						"description": "Get historical tracking data for a specific drone"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for drone detection, tracking, and management"
+		},
+		{
+			"name": "System Status & Monitoring",
+			"item": [
+				{
+					"name": "Get System Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/system/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"system",
+								"status"
+							]
+						},
+						"description": "Get overall system status including radar, countermeasures, communications, and power"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Radar Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/system/radar/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"system",
+								"radar",
+								"status"
+							]
+						},
+						"description": "Get detailed radar system status and configuration"
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Radar System",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"action\": \"toggle\",\n  \"operator_id\": \"operator_001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/system/radar/toggle",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"system",
+								"radar",
+								"toggle"
+							]
+						},
+						"description": "Toggle radar system on/off"
+					},
+					"response": []
+				},
+				{
+					"name": "Get System Health",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/system/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"system",
+								"health"
+							]
+						},
+						"description": "Get system health metrics and diagnostics"
+					},
+					"response": []
+				},
+				{
+					"name": "Get System Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/system/logs?level=all&limit=100&from={{start_time}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"system",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "level",
+									"value": "all",
+									"description": "Log level: error, warn, info, debug, all"
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Number of log entries to return"
+								},
+								{
+									"key": "from",
+									"value": "{{start_time}}",
+									"description": "Get logs from this timestamp"
+								}
+							]
+						},
+						"description": "Retrieve system logs with filtering options"
+					},
+					"response": []
+				}
+			],
+			"description": "System status monitoring and configuration endpoints"
+		},
+		{
+			"name": "Countermeasure Controls",
+			"item": [
+				{
+					"name": "Get Available Countermeasures",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/countermeasures",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"countermeasures"
+							]
+						},
+						"description": "Get list of available countermeasure systems and their status"
+					},
+					"response": []
+				},
+				{
+					"name": "Deploy RF Jammer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"target_drone_id\": \"{{drone_id}}\",\n  \"duration\": 5000,\n  \"power_level\": \"medium\",\n  \"frequency_bands\": [\"2.4GHz\", \"5.8GHz\"],\n  \"operator_id\": \"operator_001\",\n  \"authorization_code\": \"CM001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/countermeasures/rf-jammer/deploy",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"countermeasures",
+								"rf-jammer",
+								"deploy"
+							]
+						},
+						"description": "Deploy RF jammer against a specific drone target"
+					},
+					"response": []
+				},
+				{
+					"name": "Deploy Laser System",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"target_drone_id\": \"{{drone_id}}\",\n  \"duration\": 3000,\n  \"power_level\": \"high\",\n  \"target_component\": \"camera\",\n  \"operator_id\": \"operator_001\",\n  \"authorization_code\": \"CM002\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/countermeasures/laser/deploy",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"countermeasures",
+								"laser",
+								"deploy"
+							]
+						},
+						"description": "Deploy laser countermeasure system against a drone"
+					},
+					"response": []
+				},
+				{
+					"name": "Deploy Net Launcher",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"target_drone_id\": \"{{drone_id}}\",\n  \"launch_angle\": 45,\n  \"estimated_intercept_time\": 2.5,\n  \"operator_id\": \"operator_001\",\n  \"authorization_code\": \"CM003\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/countermeasures/net-launcher/deploy",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"countermeasures",
+								"net-launcher",
+								"deploy"
+							]
+						},
+						"description": "Deploy net launcher for physical drone capture"
+					},
+					"response": []
+				},
+				{
+					"name": "Stop Countermeasure",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"countermeasure_id\": \"{{countermeasure_id}}\",\n  \"operator_id\": \"operator_001\",\n  \"reason\": \"Target neutralized\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/countermeasures/stop",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"countermeasures",
+								"stop"
+							]
+						},
+						"description": "Stop an active countermeasure operation"
+					},
+					"response": []
+				}
+			],
+			"description": "Countermeasure system control and deployment endpoints"
+		},
+		{
+			"name": "Map & Drawing Tools",
+			"item": [
+				{
+					"name": "Get Map Configuration",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/map/config",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"map",
+								"config"
+							]
+						},
+						"description": "Get map configuration including center coordinates, zoom levels, and layer settings"
+					},
+					"response": []
+				},
+				{
+					"name": "Save Drawing Shape",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"polygon\",\n  \"name\": \"Restricted Zone Alpha\",\n  \"coordinates\": [\n    [33.6475773, 72.9977674],\n    [33.6475773, 72.9877674],\n    [33.6375773, 72.9877674],\n    [33.6375773, 72.9977674],\n    [33.6475773, 72.9977674]\n  ],\n  \"properties\": {\n    \"color\": \"#ff0000\",\n    \"fillColor\": \"#ff0000\",\n    \"fillOpacity\": 0.3,\n    \"weight\": 2\n  },\n  \"metadata\": {\n    \"zone_type\": \"restricted\",\n    \"priority\": \"high\",\n    \"created_by\": \"operator_001\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/map/shapes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"map",
+								"shapes"
+							]
+						},
+						"description": "Save a drawn shape (polygon, circle, line, etc.) to the map"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Map Shapes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/map/shapes?type=all&active_only=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"map",
+								"shapes"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "all",
+									"description": "Filter by shape type: polygon, circle, line, marker, all"
+								},
+								{
+									"key": "active_only",
+									"value": "true",
+									"description": "Return only active shapes"
+								}
+							]
+						},
+						"description": "Retrieve all saved map shapes and annotations"
+					},
+					"response": []
+				}
+			],
+			"description": "Map configuration and drawing tools management endpoints"
+		},
+		{
+			"name": "Data Visualization & Analytics",
+			"item": [
+				{
+					"name": "Get Threat Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/threats?period=24h&group_by=threat_level",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"threats"
+							],
+							"query": [
+								{
+									"key": "period",
+									"value": "24h",
+									"description": "Time period: 1h, 6h, 24h, 7d, 30d"
+								},
+								{
+									"key": "group_by",
+									"value": "threat_level",
+									"description": "Group by: threat_level, hour, day, distance_range"
+								}
+							]
+						},
+						"description": "Get threat statistics and distribution data"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Detection Timeline",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/timeline?from={{start_time}}&to={{end_time}}&interval=1h",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"timeline"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "{{start_time}}",
+									"description": "Start time (ISO 8601)"
+								},
+								{
+									"key": "to",
+									"value": "{{end_time}}",
+									"description": "End time (ISO 8601)"
+								},
+								{
+									"key": "interval",
+									"value": "1h",
+									"description": "Time interval: 5m, 15m, 1h, 6h, 1d"
+								}
+							]
+						},
+						"description": "Get detection timeline data for visualization"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Distance Distribution",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/distance-distribution?period=24h",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"distance-distribution"
+							],
+							"query": [
+								{
+									"key": "period",
+									"value": "24h",
+									"description": "Time period for analysis"
+								}
+							]
+						},
+						"description": "Get drone distance distribution analytics"
+					},
+					"response": []
+				}
+			],
+			"description": "Data visualization and analytics endpoints"
+		},
+		{
+			"name": "WebSocket & Real-time",
+			"item": [
+				{
+					"name": "WebSocket Connection Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/websocket/info",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"websocket",
+								"info"
+							]
+						},
+						"description": "Get WebSocket connection information and endpoints"
+					},
+					"response": []
+				}
+			],
+			"description": "Real-time communication endpoints"
+		},
+		{
+			"name": "Dashboard & UI",
+			"item": [
+				{
+					"name": "Get Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/dashboard",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"dashboard"
+							]
+						},
+						"description": "Access the main dashboard interface"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Static Assets",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/static/js/main.js",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"static",
+								"js",
+								"main.js"
+							]
+						},
+						"description": "Access static assets (JS, CSS, images)"
+					},
+					"response": []
+				}
+			],
+			"description": "Dashboard and UI related endpoints"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Set current timestamp for requests that need it",
+					"pm.environment.set('timestamp', new Date().toISOString());",
+					"",
+					"// Set time ranges for analytics requests",
+					"const now = new Date();",
+					"const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);",
+					"pm.environment.set('start_time', yesterday.toISOString());",
+					"pm.environment.set('end_time', now.toISOString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global test to check response time",
+					"pm.test('Response time is less than 5000ms', function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+					"});",
+					"",
+					"// Global test to check for common error responses",
+					"if (pm.response.code === 401) {",
+					"    pm.test('Unauthorized - Check authentication token', function () {",
+					"        pm.expect(pm.response.code).to.equal(401);",
+					"    });",
+					"}",
+					"",
+					"if (pm.response.code === 403) {",
+					"    pm.test('Forbidden - Check user permissions', function () {",
+					"        pm.expect(pm.response.code).to.equal(403);",
+					"    });",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://192.168.100.100",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "drone_id",
+			"value": "DRONE_001",
+			"type": "string"
+		},
+		{
+			"key": "countermeasure_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "shape_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "timestamp",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "start_time",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "end_time",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

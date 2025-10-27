@@ -1,0 +1,588 @@
+{
+	"info": {
+		"_postman_id": "f1g2h3i4-j5k6-7890-cdef-g34567890123",
+		"name": "Anti-Drone System - Frontend Testing",
+		"description": "Collection for testing the Anti-Drone System React frontend application and discovering actual API endpoints.\n\nThis collection focuses on:\n- Frontend application access\n- Static resource loading\n- Network traffic analysis\n- Real API endpoint discovery",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23456789"
+	},
+	"item": [
+		{
+			"name": "Frontend Application",
+			"item": [
+				{
+					"name": "Access Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+							},
+							{
+								"key": "User-Agent",
+								"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"dashboard"
+							]
+						},
+						"description": "Access the main dashboard interface - should return HTML"
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Dashboard loads successfully', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 301, 302]);",
+									"});",
+									"",
+									"pm.test('Response is HTML', function () {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.include('text/html');",
+									"});",
+									"",
+									"if (pm.response.code === 200) {",
+									"    pm.test('Contains React app root', function () {",
+									"        pm.expect(pm.response.text()).to.include('root');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Access Root Path",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								""
+							]
+						},
+						"description": "Access the root path to see if it redirects to dashboard"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Main JavaScript Bundle",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/javascript, text/javascript, */*"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/static/js/main.js",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"static",
+								"js",
+								"main.js"
+							]
+						},
+						"description": "Try to access the main JavaScript bundle"
+					},
+					"response": []
+				},
+				{
+					"name": "Get CSS Styles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/css,*/*;q=0.1"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/static/css/main.css",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"static",
+								"css",
+								"main.css"
+							]
+						},
+						"description": "Try to access the main CSS file"
+					},
+					"response": []
+				}
+			],
+			"description": "Test frontend application access and static resources"
+		},
+		{
+			"name": "API Discovery",
+			"item": [
+				{
+					"name": "Try Common API Paths",
+					"item": [
+						{
+							"name": "Test /api",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api"
+									]
+								},
+								"description": "Test if /api endpoint exists"
+							},
+							"response": []
+						},
+						{
+							"name": "Test /api/v1",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1"
+									]
+								},
+								"description": "Test if versioned API exists"
+							},
+							"response": []
+						},
+						{
+							"name": "Test /health",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/health",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"health"
+									]
+								},
+								"description": "Test for health check endpoint"
+							},
+							"response": []
+						},
+						{
+							"name": "Test /status",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/status",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"status"
+									]
+								},
+								"description": "Test for status endpoint"
+							},
+							"response": []
+						}
+					],
+					"description": "Try common API endpoint patterns"
+				},
+				{
+					"name": "WebSocket Discovery",
+					"item": [
+						{
+							"name": "Test WebSocket Info",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/ws",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"ws"
+									]
+								},
+								"description": "Test for WebSocket endpoint"
+							},
+							"response": []
+						},
+						{
+							"name": "Test Socket.IO",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/socket.io/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"socket.io",
+										""
+									]
+								},
+								"description": "Test for Socket.IO endpoint"
+							},
+							"response": []
+						}
+					],
+					"description": "Discover WebSocket endpoints"
+				}
+			],
+			"description": "Discover actual API endpoints that might exist"
+		},
+		{
+			"name": "Network Analysis",
+			"item": [
+				{
+					"name": "Check Server Headers",
+					"request": {
+						"method": "HEAD",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/dashboard",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"dashboard"
+							]
+						},
+						"description": "Get server information from headers"
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Server responds', function () {",
+									"    pm.expect(pm.response.code).to.be.below(500);",
+									"});",
+									"",
+									"// Log server information",
+									"const server = pm.response.headers.get('Server');",
+									"const poweredBy = pm.response.headers.get('X-Powered-By');",
+									"",
+									"if (server) {",
+									"    console.log('Server:', server);",
+									"    pm.environment.set('server_type', server);",
+									"}",
+									"",
+									"if (poweredBy) {",
+									"    console.log('Powered by:', poweredBy);",
+									"    pm.environment.set('powered_by', poweredBy);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Check CORS Headers",
+					"request": {
+						"method": "OPTIONS",
+						"header": [
+							{
+								"key": "Origin",
+								"value": "https://example.com"
+							},
+							{
+								"key": "Access-Control-Request-Method",
+								"value": "POST"
+							},
+							{
+								"key": "Access-Control-Request-Headers",
+								"value": "Content-Type, Authorization"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api"
+							]
+						},
+						"description": "Check CORS configuration"
+					},
+					"response": []
+				}
+			],
+			"description": "Analyze server configuration and capabilities"
+		},
+		{
+			"name": "Mock Data Simulation",
+			"item": [
+				{
+					"name": "Simulate Login Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Try different login endpoint patterns"
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Check if we get JSON response or HTML",
+									"const contentType = pm.response.headers.get('Content-Type');",
+									"",
+									"pm.test('Response received', function () {",
+									"    pm.expect(pm.response.code).to.be.below(500);",
+									"});",
+									"",
+									"if (contentType && contentType.includes('application/json')) {",
+									"    pm.test('JSON response received', function () {",
+									"        pm.expect(pm.response.json).to.not.throw();",
+									"    });",
+									"} else {",
+									"    console.log('Non-JSON response - likely frontend routing');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Try Alternative Login Paths",
+					"item": [
+						{
+							"name": "POST /login",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "POST /api/login",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "POST /api/auth/login",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"description": "Test various authentication endpoints to find working API"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Set timestamp for requests",
+					"pm.environment.set('timestamp', new Date().toISOString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global response time check",
+					"pm.test('Response time acceptable', function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+					"});",
+					"",
+					"// Log response details for analysis",
+					"const contentType = pm.response.headers.get('Content-Type');",
+					"console.log('Response Code:', pm.response.code);",
+					"console.log('Content-Type:', contentType);",
+					"",
+					"// Check if response is HTML (frontend) or JSON (API)",
+					"if (contentType && contentType.includes('text/html')) {",
+					"    console.log('HTML Response - Frontend Application');",
+					"} else if (contentType && contentType.includes('application/json')) {",
+					"    console.log('JSON Response - API Endpoint Found!');",
+					"} else {",
+					"    console.log('Other Response Type:', contentType);",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://192.168.100.100",
+			"type": "string"
+		},
+		{
+			"key": "server_type",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "powered_by",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "timestamp",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

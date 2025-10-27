@@ -1,0 +1,444 @@
+{
+	"info": {
+		"_postman_id": "c1d2e3f4-g5h6-7890-ijkl-m78901234567",
+		"name": "Anti-Drone System - Working API",
+		"description": "Verified working API endpoints for the Anti-Drone System.\n\nStarting with the confirmed working login endpoint: /api/auth/login\n\nUse this collection to:\n1. Test the working login endpoint\n2. Discover other actual API endpoints\n3. Build a collection of real, working endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34567890"
+	},
+	"item": [
+		{
+			"name": "✅ Working Endpoints",
+			"item": [
+				{
+					"name": "Login (VERIFIED)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"root\",\n  \"password\": \"lzno1root\",\n  \"remember\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "✅ VERIFIED WORKING - This endpoint has been confirmed to work with the provided curl command"
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Login endpoint responds', function () {",
+									"    pm.expect(pm.response.code).to.be.below(500);",
+									"});",
+									"",
+									"// Log the full response for analysis",
+									"console.log('Response Status:', pm.response.code);",
+									"console.log('Response Headers:', JSON.stringify(pm.response.headers.toJSON(), null, 2));",
+									"console.log('Response Body:', pm.response.text());",
+									"",
+									"// Check content type",
+									"const contentType = pm.response.headers.get('Content-Type');",
+									"console.log('Content-Type:', contentType);",
+									"",
+									"if (contentType && contentType.includes('application/json')) {",
+									"    try {",
+									"        const response = pm.response.json();",
+									"        console.log('Parsed JSON Response:', JSON.stringify(response, null, 2));",
+									"        ",
+									"        // Store any tokens found",
+									"        if (response.access_token || response.token || response.jwt) {",
+									"            const token = response.access_token || response.token || response.jwt;",
+									"            pm.environment.set('access_token', token);",
+									"            pm.test('Authentication token received', function () {",
+									"                pm.expect(token).to.not.be.empty;",
+									"            });",
+									"            console.log('Token stored in environment');",
+									"        }",
+									"        ",
+									"        if (response.refresh_token) {",
+									"            pm.environment.set('refresh_token', response.refresh_token);",
+									"        }",
+									"        ",
+									"        pm.test('Valid JSON response', function () {",
+									"            pm.expect(response).to.be.an('object');",
+									"        });",
+									"        ",
+									"    } catch (e) {",
+									"        pm.test('JSON parsing failed', function () {",
+									"            console.log('JSON Parse Error:', e.message);",
+									"            pm.expect.fail('Response is not valid JSON');",
+									"        });",
+									"    }",
+									"} else {",
+									"    console.log('Non-JSON response received');",
+									"    pm.test('Expected JSON response', function () {",
+									"        pm.expect(contentType).to.include('application/json');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			],
+			"description": "Confirmed working API endpoints"
+		},
+		{
+			"name": "🔍 Endpoint Discovery",
+			"item": [
+				{
+					"name": "Test Other Auth Endpoints",
+					"item": [
+						{
+							"name": "GET /api/auth/profile",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/auth/profile",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"profile"
+									]
+								},
+								"description": "Test if profile endpoint exists"
+							},
+							"response": []
+						},
+						{
+							"name": "POST /api/auth/logout",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/auth/logout",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"logout"
+									]
+								},
+								"description": "Test if logout endpoint exists"
+							},
+							"response": []
+						},
+						{
+							"name": "POST /api/auth/refresh",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/refresh",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"refresh"
+									]
+								},
+								"description": "Test if token refresh endpoint exists"
+							},
+							"response": []
+						}
+					],
+					"description": "Test other authentication-related endpoints"
+				},
+				{
+					"name": "Test System Endpoints",
+					"item": [
+						{
+							"name": "GET /api/system/status",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/system/status",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"system",
+										"status"
+									]
+								},
+								"description": "Test if system status endpoint exists"
+							},
+							"response": []
+						},
+						{
+							"name": "GET /api/health",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/health",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"health"
+									]
+								},
+								"description": "Test if health check endpoint exists"
+							},
+							"response": []
+						},
+						{
+							"name": "GET /api/status",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/status",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"status"
+									]
+								},
+								"description": "Test alternative status endpoint"
+							},
+							"response": []
+						}
+					],
+					"description": "Test system and health endpoints"
+				},
+				{
+					"name": "Test Data Endpoints",
+					"item": [
+						{
+							"name": "GET /api/drones",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/drones",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"drones"
+									]
+								},
+								"description": "Test if drones endpoint exists"
+							},
+							"response": []
+						},
+						{
+							"name": "GET /api/data",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/data",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"data"
+									]
+								},
+								"description": "Test if general data endpoint exists"
+							},
+							"response": []
+						}
+					],
+					"description": "Test data-related endpoints"
+				}
+			],
+			"description": "Discover other working endpoints",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Global test for endpoint discovery",
+							"const contentType = pm.response.headers.get('Content-Type');",
+							"",
+							"pm.test('Endpoint responds', function () {",
+							"    pm.expect(pm.response.code).to.be.below(500);",
+							"});",
+							"",
+							"// Log response details",
+							"console.log('=== ENDPOINT DISCOVERY ===');",
+							"console.log('URL:', pm.request.url.toString());",
+							"console.log('Method:', pm.request.method);",
+							"console.log('Status:', pm.response.code);",
+							"console.log('Content-Type:', contentType);",
+							"",
+							"if (pm.response.code === 200) {",
+							"    console.log('✅ ENDPOINT WORKS!');",
+							"    if (contentType && contentType.includes('application/json')) {",
+							"        try {",
+							"            const response = pm.response.json();",
+							"            console.log('Response:', JSON.stringify(response, null, 2));",
+							"        } catch (e) {",
+							"            console.log('Response (text):', pm.response.text());",
+							"        }",
+							"    } else {",
+							"        console.log('Response (first 200 chars):', pm.response.text().substring(0, 200));",
+							"    }",
+							"} else if (pm.response.code === 401) {",
+							"    console.log('🔒 Endpoint exists but requires authentication');",
+							"} else if (pm.response.code === 403) {",
+							"    console.log('🚫 Endpoint exists but access forbidden');",
+							"} else if (pm.response.code === 404) {",
+							"    console.log('❌ Endpoint not found');",
+							"} else {",
+							"    console.log('⚠️ Unexpected response:', pm.response.code);",
+							"    console.log('Response:', pm.response.text().substring(0, 200));",
+							"}",
+							"console.log('========================');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Log request details",
+					"console.log('Making request to:', pm.request.url.toString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global response time check",
+					"pm.test('Response time acceptable', function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://192.168.100.100",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

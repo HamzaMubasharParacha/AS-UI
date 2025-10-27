@@ -16,6 +16,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Close as CloseIcon,
+  Edit,
+  Polyline,
+  CropFree,
+  Room,
+  Straighten,
 } from '@mui/icons-material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -96,8 +101,7 @@ interface CardLog {
 function App() {
   const [systemActive] = useState(true);
   const [detectedDrones, setDetectedDrones] = useState<DroneData[]>([]);
-  const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
-  const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
+  const [drawingToolsEnabled, setDrawingToolsEnabled] = useState(false);
   
   const [dragState, setDragState] = useState<{
     isDragging: boolean;
@@ -147,6 +151,16 @@ function App() {
       title: 'Countermeasures',
       component: 'CountermeasureControls',
       position: { x: 450, y: 350 },
+      visible: false,
+      minimized: false,
+      lastActivity: new Date().toLocaleTimeString(),
+      status: 'inactive',
+    },
+    {
+      id: 'drawing-tools',
+      title: 'Map Drawing Tools',
+      component: 'DrawingTools',
+      position: { x: 200, y: 200 },
       visible: false,
       minimized: false,
       lastActivity: new Date().toLocaleTimeString(),
@@ -392,6 +406,51 @@ function App() {
         return <ThreatAssessment drones={detectedDrones} />;
       case 'CountermeasureControls':
         return <CountermeasureControls activeThreat={activeThreat} systemActive={systemActive} />;
+      case 'DrawingTools':
+        return (
+          <Box sx={{ p: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, color: '#00ff41' }}>
+              Map Drawing Tools
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Box
+                sx={{
+                  p: 1,
+                  border: '1px solid #00ff41',
+                  borderRadius: 1,
+                  cursor: 'pointer',
+                  '&:hover': { backgroundColor: 'rgba(0, 255, 65, 0.1)' }
+                }}
+                onClick={() => setDrawingToolsEnabled(!drawingToolsEnabled)}
+              >
+                <Typography variant="body2">
+                  Drawing Tools: {drawingToolsEnabled ? 'ENABLED' : 'DISABLED'}
+                </Typography>
+              </Box>
+              <Typography variant="caption" sx={{ color: '#888', mt: 1 }}>
+                Available Tools:
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Polyline sx={{ fontSize: 16 }} />
+                  <Typography variant="caption">Polygon</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <CropFree sx={{ fontSize: 16 }} />
+                  <Typography variant="caption">Rectangle</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Room sx={{ fontSize: 16 }} />
+                  <Typography variant="caption">Circle</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Straighten sx={{ fontSize: 16 }} />
+                  <Typography variant="caption">Line</Typography>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        );
       case 'DataVisualization':
         return <DataVisualization drones={detectedDrones} />;
       default:
@@ -431,6 +490,14 @@ function App() {
       lastActivity: floatingCards.find(c => c.id === 'countermeasures')?.lastActivity || '',
       description: systemActive ? 'Systems armed and ready' : 'Systems offline',
       icon: <Security />,
+    },
+    {
+      id: 'drawing-tools',
+      title: 'Drawing Tools',
+      status: drawingToolsEnabled ? 'active' : 'inactive',
+      lastActivity: floatingCards.find(c => c.id === 'drawing-tools')?.lastActivity || '',
+      description: drawingToolsEnabled ? 'Drawing tools enabled' : 'Drawing tools disabled',
+      icon: <Edit />,
     },
   ];
 
@@ -488,7 +555,7 @@ function App() {
 
           {/* Full Screen Map */}
           <div className="map-container">
-            <CesiumMap drones={detectedDrones} systemActive={systemActive} />
+            <CesiumMap drones={detectedDrones} systemActive={systemActive} drawingToolsEnabled={drawingToolsEnabled} />
           </div>
 
 
@@ -535,134 +602,76 @@ function App() {
             </Box>
           ))}
 
-          {/* Left Drawer Toggle */}
-          <div
-            className={`drawer-toggle left ${leftDrawerOpen ? 'open' : ''}`}
-            onClick={() => setLeftDrawerOpen(!leftDrawerOpen)}
-            title="Control Panels"
-          >
-            <div className="drawer-toggle-content">
-              <Dashboard className="drawer-toggle-icon" />
-              <span className="drawer-toggle-label">CTRL</span>
-              <div className="drawer-toggle-indicator">
-                {leftDrawerOpen ? <ChevronLeft /> : <ChevronRight />}
-              </div>
+          {/* Left Fixed Column */}
+          <div className="fixed-column left">
+            <div className="column-header">
+              <Dashboard className="column-icon" />
+              <h3 className="column-title">CONTROL</h3>
             </div>
-          </div>
-
-          {/* Right Drawer Toggle */}
-          <div
-            className={`drawer-toggle right ${rightDrawerOpen ? 'open' : ''}`}
-            onClick={() => setRightDrawerOpen(!rightDrawerOpen)}
-            title="Analytics & Data"
-          >
-            <div className="drawer-toggle-content">
-              <BarChart className="drawer-toggle-icon" />
-              <span className="drawer-toggle-label">DATA</span>
-              <div className="drawer-toggle-indicator">
-                {rightDrawerOpen ? <ChevronRight /> : <ChevronLeft />}
-              </div>
-            </div>
-          </div>
-
-          {/* Left Side Drawer */}
-          <div className={`side-drawer left ${leftDrawerOpen ? 'open' : ''}`}>
-            <div className="drawer-header">
-              <h3 className="drawer-title">Control Panels</h3>
-              <button
-                className="drawer-close"
-                onClick={() => setLeftDrawerOpen(false)}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="drawer-content">
-              <div className="drawer-section">
-                <div className="drawer-section-header">System Components</div>
-                {leftCardLogs.map((log) => (
-                  <div
-                    key={log.id}
-                    className={`card-log-item ${floatingCards.find(c => c.id === log.id)?.visible ? 'active' : ''}`}
-                    onClick={() => toggleCard(log.id)}
-                  >
-                    <div className="card-log-header">
-                      <div className="card-log-icon">
-                        {log.icon}
-                      </div>
-                      <div className="card-log-info">
-                        <div className="card-log-title">
-                          {log.title}
-                        </div>
-                        <div className="card-log-status">
-                          <span className={`status-indicator ${log.status}`}></span>
-                          {log.description}
-                        </div>
-                      </div>
-                      <div className="card-log-action">
-                        {floatingCards.find(c => c.id === log.id)?.visible ?
-                          <ChevronLeft className="action-icon" /> :
-                          <ChevronRight className="action-icon" />
-                        }
-                      </div>
-                    </div>
-                    <div className="card-log-time">
-                      Last Update: {log.lastActivity}
+            <div className="column-content">
+              {leftCardLogs.map((log) => (
+                <div
+                  key={log.id}
+                  className={`column-item ${floatingCards.find(c => c.id === log.id)?.visible ? 'active' : ''}`}
+                  onClick={() => toggleCard(log.id)}
+                  title={log.description}
+                >
+                  <div className="column-item-icon">
+                    {log.icon}
+                  </div>
+                  <div className="column-item-info">
+                    <div className="column-item-title">{log.title}</div>
+                    <div className="column-item-status">
+                      <span className={`status-dot ${log.status}`}></span>
+                      <span className="status-text">{log.status.toUpperCase()}</span>
                     </div>
                   </div>
-                ))}
-              </div>
+                  <div className="column-item-action">
+                    {floatingCards.find(c => c.id === log.id)?.visible ?
+                      <ChevronLeft className="action-icon active" /> :
+                      <ChevronRight className="action-icon" />
+                    }
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Right Side Drawer */}
-          <div className={`side-drawer right ${rightDrawerOpen ? 'open' : ''}`}>
-            <div className="drawer-header">
-              <h3 className="drawer-title">Analytics & Data</h3>
-              <button
-                className="drawer-close"
-                onClick={() => setRightDrawerOpen(false)}
-              >
-                ✕
-              </button>
+          {/* Right Fixed Column */}
+          <div className="fixed-column right">
+            <div className="column-header">
+              <BarChart className="column-icon" />
+              <h3 className="column-title">DATA</h3>
             </div>
-            <div className="drawer-content">
-              <div className="drawer-section">
-                <div className="drawer-section-header">Data Visualization</div>
-                {rightCardLogs.map((log) => (
-                  <div
-                    key={log.id}
-                    className={`card-log-item ${floatingCards.find(c => c.id === log.id)?.visible ? 'active' : ''} ${log.id !== 'data-visualization' ? 'disabled' : ''}`}
-                    onClick={() => log.id === 'data-visualization' ? toggleCard(log.id) : null}
-                  >
-                    <div className="card-log-header">
-                      <div className="card-log-icon">
-                        {log.icon}
-                      </div>
-                      <div className="card-log-info">
-                        <div className="card-log-title">
-                          {log.title}
-                        </div>
-                        <div className="card-log-status">
-                          <span className={`status-indicator ${log.status}`}></span>
-                          {log.description}
-                        </div>
-                      </div>
-                      <div className="card-log-action">
-                        {log.id === 'data-visualization' ? (
-                          floatingCards.find(c => c.id === log.id)?.visible ?
-                            <ChevronLeft className="action-icon" /> :
-                            <ChevronRight className="action-icon" />
-                        ) : (
-                          <span className="action-icon disabled">•••</span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="card-log-time">
-                      Last Update: {log.lastActivity}
+            <div className="column-content">
+              {rightCardLogs.map((log) => (
+                <div
+                  key={log.id}
+                  className={`column-item ${floatingCards.find(c => c.id === log.id)?.visible ? 'active' : ''} ${log.id !== 'data-visualization' ? 'disabled' : ''}`}
+                  onClick={() => log.id === 'data-visualization' ? toggleCard(log.id) : null}
+                  title={log.description}
+                >
+                  <div className="column-item-icon">
+                    {log.icon}
+                  </div>
+                  <div className="column-item-info">
+                    <div className="column-item-title">{log.title}</div>
+                    <div className="column-item-status">
+                      <span className={`status-dot ${log.status}`}></span>
+                      <span className="status-text">{log.status.toUpperCase()}</span>
                     </div>
                   </div>
-                ))}
-              </div>
+                  <div className="column-item-action">
+                    {log.id === 'data-visualization' ? (
+                      floatingCards.find(c => c.id === log.id)?.visible ?
+                        <ChevronLeft className="action-icon active" /> :
+                        <ChevronRight className="action-icon" />
+                    ) : (
+                      <span className="action-icon disabled">•••</span>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

@@ -1,8 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { MapContainer, TileLayer, Circle, Marker, Popup } from 'react-leaflet';
+import { MapContainer, Circle, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import MapDrawingTools from './MapDrawingTools';
+import { createESRISatelliteOfflineLayer } from '../utils/OfflineTileLayer';
+import OfflineMapControl from './OfflineMapControl';
 
 // Custom Radar Component for animated scanning
 const RadarSweep: React.FC<{ center: [number, number] }> = ({ center }) => {
@@ -63,7 +66,39 @@ interface DroneData {
 interface CesiumMapProps {
   drones: DroneData[];
   systemActive: boolean;
+  drawingToolsEnabled?: boolean;
 }
+
+// Custom component to add offline tile layer
+const OfflineTileLayerComponent: React.FC<{ offlineFirst: boolean }> = ({ offlineFirst }) => {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (!map) return;
+
+    // Remove existing tile layers
+    map.eachLayer((layer) => {
+      if (layer instanceof L.TileLayer) {
+        map.removeLayer(layer);
+      }
+    });
+
+    // Add offline tile layer
+    const offlineLayer = createESRISatelliteOfflineLayer({
+      offlineFirst: offlineFirst
+    });
+    
+    offlineLayer.addTo(map);
+
+    return () => {
+      if (map.hasLayer(offlineLayer)) {
+        map.removeLayer(offlineLayer);
+      }
+    };
+  }, [map, offlineFirst]);
+
+  return null;
+};
 
 // Fix Leaflet default markers
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -210,11 +245,13 @@ const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: numbe
   return R * c;
 };
 
-const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive }) => {
+const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive, drawingToolsEnabled = false }) => {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [radarActive, setRadarActive] = useState(true);
   const [detectedThreats, setDetectedThreats] = useState<string[]>([]);
   const [selectedThreat, setSelectedThreat] = useState<DroneData | null>(null);
+  const [offlineMode, setOfflineMode] = useState(true);
+  const [showOfflineControl, setShowOfflineControl] = useState(false);
   const mapRef = useRef<L.Map>(null);
 
   // Updated coordinates as requested by user (Islamabad/Rawalpindi area)
@@ -282,11 +319,8 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive }) => {
         style={{ height: '100%', width: '100%', borderRadius: '8px', border: '2px solid #00ff41' }}
         ref={mapRef}
       >
-        {/* Satellite Tile Layer */}
-        <TileLayer
-          attribution='&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-        />
+        {/* Offline Tile Layer */}
+        <OfflineTileLayerComponent offlineFirst={offlineMode} />
         
         {/* Animated Radar Sweep - GEOGRAPHICALLY FIXED */}
         {radarActive && systemActive && (
@@ -378,6 +412,9 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive }) => {
             </Marker>
           );
         })}
+
+        {/* Map Drawing Tools */}
+        {drawingToolsEnabled && <MapDrawingTools />}
       </MapContainer>
       
       {/* Overlay information */}
@@ -417,6 +454,9 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive }) => {
         <Typography variant="caption" display="block">
           SOURCE: GEOGRAPHIC POSITIONING
         </Typography>
+        <Typography variant="caption" display="block" sx={{ color: offlineMode ? '#00ff41' : '#ff9800' }}>
+          MODE: {offlineMode ? 'OFFLINE FIRST' : 'ONLINE ONLY'}
+        </Typography>
       </Box>
 
       {/* Radar Control Panel */}
@@ -446,6 +486,9 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive }) => {
         </Typography>
         <Typography variant="caption" display="block" sx={{ fontSize: '10px', opacity: 0.8 }}>
           CLICK TO TOGGLE
+        </Typography>
+        <Typography variant="caption" display="block" sx={{ fontWeight: 'bold', color: '#00ff41' }}>
+          📱 CLICK MAP CONTROLS FOR OFFLINE OPTIONS
         </Typography>
       </Box>
 
@@ -578,6 +621,11 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive }) => {
         </Typography>
         <Typography variant="caption" display="block" sx={{ color: radarActive && systemActive ? '#00ff41' : '#ff9800' }}>
           RADAR: {radarActive && systemActive ? 'SCANNING' : 'STANDBY'}
+        </Typography>
+        <Typography variant="caption" display="block" sx={{ fontSize: '10px', cursor: 'pointer', color: '#00ff41' }}
+          onClick={() => setShowOfflineControl(!showOfflineControl)}
+        >
+          {showOfflineControl ? '🔽 HIDE OFFLINE CONTROLS' : '🔼 SHOW OFFLINE CONTROLS'}
         </Typography>
       </Box>
 
@@ -784,6 +832,35 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive }) => {
           }}
           onClick={closeThreatDetails}
         />
+      )}
+
+      {/* Offline Map Control Panel */}
+      {showOfflineControl && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 10,
+            right: 200,
+            width: 350,
+            maxHeight: 'calc(100vh - 100px)',
+            overflowY: 'auto',
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            borderRadius: 2,
+            border: '2px solid #00ff41',
+            zIndex: 2000,
+          }}
+        >
+          <OfflineMapControl
+            onOfflineModeChange={setOfflineMode}
+            currentBounds={mapRef.current ? {
+              north: mapRef.current.getBounds().getNorth(),
+              south: mapRef.current.getBounds().getSouth(),
+              east: mapRef.current.getBounds().getEast(),
+              west: mapRef.current.getBounds().getWest()
+            } : undefined}
+            currentZoom={mapRef.current?.getZoom()}
+          />
+        </Box>
       )}
     </Box>
   );
