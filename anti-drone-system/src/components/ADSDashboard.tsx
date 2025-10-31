@@ -94,7 +94,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
 
         try {
             const token = sessionStorage.getItem('authToken');
-            console.log("🔑 Logging out with token:", token);
+            console.log("Logging out with token (encrypted):", token);
 
             if (!token) {
                 setError('No authentication token found');
@@ -108,11 +108,10 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                credentials: 'include', // include cookies if backend uses them
             });
 
             if (response.ok) {
-                console.log("✅ Logout successful");
+                console.log("Logout successful");
                 sessionStorage.removeItem('authToken');
                 setToken(null); // triggers re-render → redirects to LoginPage
             }    else {
@@ -122,7 +121,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
         
         } catch (err) {
         
-            console.error('❌ Logout error:', err);
+            console.error('Logout error:', err);
             setError('Failed to connect to server');
         
         } finally {
