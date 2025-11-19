@@ -70,6 +70,37 @@ interface CesiumMapProps {
 }
 
 // Custom component to add offline tile layer
+// const OfflineTileLayerComponent: React.FC<{ offlineFirst: boolean }> = ({ offlineFirst }) => {
+//   const map = useMap();
+  
+//   useEffect(() => {
+//     if (!map) return;
+
+//     // Remove existing tile layers
+//     map.eachLayer((layer) => {
+//       if (layer instanceof L.TileLayer) {
+//         map.removeLayer(layer);
+//       }
+//     });
+
+//     // Add offline tile layer
+//     const offlineLayer = createESRISatelliteOfflineLayer({
+//       offlineFirst: offlineFirst
+//     });
+    
+//     offlineLayer.addTo(map);
+
+//     return () => {
+//       if (map.hasLayer(offlineLayer)) {
+//         map.removeLayer(offlineLayer);
+//       }
+//     };
+//   }, [map, offlineFirst]);
+
+//   return null;
+// };
+
+// Custom component to add offline tile layer
 const OfflineTileLayerComponent: React.FC<{ offlineFirst: boolean }> = ({ offlineFirst }) => {
   const map = useMap();
   
@@ -83,11 +114,15 @@ const OfflineTileLayerComponent: React.FC<{ offlineFirst: boolean }> = ({ offlin
       }
     });
 
-    // Add offline tile layer
-    const offlineLayer = createESRISatelliteOfflineLayer({
-      offlineFirst: offlineFirst
+    // Add offline tile layer from local folder
+    const offlineLayer = L.tileLayer('/NUST_TILES_2/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      minZoom: 0,
+      tileSize: 256,
+      noWrap: true,
+      errorTileUrl: '/NUST_TILES_2/error.png', // optional fallback
     });
-    
+
     offlineLayer.addTo(map);
 
     return () => {
@@ -99,6 +134,7 @@ const OfflineTileLayerComponent: React.FC<{ offlineFirst: boolean }> = ({ offlin
 
   return null;
 };
+
 
 // Fix Leaflet default markers
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -316,6 +352,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive, drawingTool
       <MapContainer
         center={centerPosition}
         zoom={13}
+        attributionControl={false}
         style={{ height: '100%', width: '100%', borderRadius: '8px', border: '2px solid #00ff41' }}
         ref={mapRef}
       >
@@ -463,8 +500,8 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive, drawingTool
       <Box
         sx={{
           position: 'absolute',
-          top: 10,
-          left: 200,
+          bottom: 10,
+          left: 10,
           backgroundColor: 'rgba(0, 0, 0, 0.85)',
           color: '#00ff41',
           padding: 1.5,
