@@ -6,13 +6,14 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
   overflow: hidden;
-  font-family: 'Roboto Mono', monospace;
+  font-family: "Roboto Mono", monospace;
   background-color: #0a0a0a;
   color: #ffffff;
 }
@@ -62,7 +63,11 @@ html, body {
   left: 0;
   right: 0;
   height: 60px;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.95) 0%,
+    rgba(10, 10, 10, 0.9) 100%
+  );
   backdrop-filter: blur(20px);
   border-bottom: 2px solid rgba(0, 255, 65, 0.3);
   z-index: 3000;
@@ -357,7 +362,11 @@ html, body {
 }
 
 .floating-card-header {
-  background: linear-gradient(135deg, rgba(0, 255, 65, 0.15) 0%, rgba(0, 255, 65, 0.05) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 65, 0.15) 0%,
+    rgba(0, 255, 65, 0.05) 100%
+  );
   padding: 16px 20px;
   border-bottom: 2px solid rgba(0, 255, 65, 0.2);
   display: flex;
@@ -387,7 +396,11 @@ html, body {
 }
 
 .floating-card-dragging .floating-card-header {
-  background: linear-gradient(135deg, rgba(0, 255, 65, 0.3) 0%, rgba(0, 255, 65, 0.1) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 65, 0.3) 0%,
+    rgba(0, 255, 65, 0.1) 100%
+  ) !important;
   cursor: grabbing !important;
 }
 
@@ -399,15 +412,15 @@ html, body {
     width: 520px;
     min-height: 300px;
   }
-  
+
   .side-drawer {
     width: 350px;
   }
-  
+
   .side-drawer.left {
     transform: translateX(-330px);
   }
-  
+
   .side-drawer.right {
     transform: translateX(330px);
   }
@@ -419,15 +432,15 @@ html, body {
     width: 600px;
     min-height: 350px;
   }
-  
+
   .side-drawer {
     width: 380px;
   }
-  
+
   .side-drawer.left {
     transform: translateX(-360px);
   }
-  
+
   .side-drawer.right {
     transform: translateX(360px);
   }
@@ -440,24 +453,24 @@ html, body {
     min-height: 280px;
     max-height: 55vh;
   }
-  
+
   .side-drawer {
     width: 300px;
   }
-  
+
   .side-drawer.left {
     transform: translateX(-280px);
   }
-  
+
   .side-drawer.right {
     transform: translateX(280px);
   }
-  
+
   .drawer-toggle {
     width: 45px;
     height: 80px;
   }
-  
+
   .floating-card-content {
     padding: 16px;
     font-size: 14px;
@@ -470,21 +483,21 @@ html, body {
     height: 50px;
     padding: 0 15px;
   }
-  
+
   .app-title {
     font-size: 18px !important;
     letter-spacing: 1px !important;
   }
-  
+
   .status-text {
     font-size: 12px;
   }
-  
+
   .map-container {
     top: 50px;
     height: calc(100vh - 50px);
   }
-  
+
   .leaflet-container {
     height: calc(100vh - 50px) !important;
   }
@@ -496,7 +509,7 @@ html, body {
     min-height: 180px;
     max-height: 40vh;
   }
-  
+
   .side-drawer {
     width: calc(100vw - 40px);
     left: 20px !important;
@@ -505,18 +518,18 @@ html, body {
     height: 70vh;
     top: 30vh;
   }
-  
+
   .side-drawer.left,
   .side-drawer.right {
     transform: translateY(100%);
     border: 2px solid rgba(0, 255, 65, 0.3);
     border-bottom: none;
   }
-  
+
   .side-drawer.open {
     transform: translateY(0);
   }
-  
+
   .drawer-toggle {
     width: 60px;
     height: 40px;
@@ -525,36 +538,36 @@ html, body {
     transform: none;
     border-radius: 20px;
   }
-  
+
   .drawer-toggle.left {
     left: 20px;
     border: 2px solid rgba(0, 255, 65, 0.3);
   }
-  
+
   .drawer-toggle.right {
     right: 20px;
     border: 2px solid rgba(0, 255, 65, 0.3);
   }
-  
+
   .floating-card-content {
     padding: 12px;
     font-size: 12px;
   }
-  
+
   .floating-card-header {
     padding: 12px 16px;
     font-size: 14px;
   }
-  
+
   /* Mobile card stacking */
   .floating-card:nth-child(1) {
     top: 20px !important;
   }
-  
+
   .floating-card:nth-child(2) {
     top: 220px !important;
   }
-  
+
   .floating-card:nth-child(3) {
     top: 420px !important;
   }
@@ -567,53 +580,53 @@ html, body {
     left: 10px !important;
     max-height: 35vh;
   }
-  
+
   .side-drawer {
     width: calc(100vw - 20px);
     left: 10px !important;
     right: 10px !important;
   }
-  
+
   .drawer-toggle {
     width: 60px;
     height: 45px;
     font-size: 12px;
   }
-  
+
   .drawer-toggle-content {
     flex-direction: row;
     gap: 4px;
     padding: 6px;
   }
-  
+
   .drawer-toggle-icon {
     font-size: 16px !important;
     margin-bottom: 0;
   }
-  
+
   .drawer-toggle-label {
     font-size: 7px;
     margin: 0;
   }
-  
+
   .drawer-toggle-indicator {
     font-size: 12px !important;
     margin-top: 0;
   }
-  
+
   .drawer-toggle.left {
     left: 10px;
   }
-  
+
   .drawer-toggle.right {
     right: 10px;
   }
-  
+
   .floating-card-content {
     padding: 10px;
     font-size: 11px;
   }
-  
+
   .floating-card-header {
     padding: 10px 12px;
     font-size: 13px;
@@ -651,17 +664,17 @@ html, body {
     width: 520px;
     min-height: 300px;
   }
-  
+
   .fixed-column {
     width: 160px;
   }
-  
+
   .map-container {
     left: 160px;
     right: 160px;
     width: calc(100vw - 320px);
   }
-  
+
   .leaflet-container {
     width: calc(100vw - 320px) !important;
   }
@@ -673,17 +686,17 @@ html, body {
     width: 600px;
     min-height: 350px;
   }
-  
+
   .fixed-column {
     width: 180px;
   }
-  
+
   .map-container {
     left: 180px;
     right: 180px;
     width: calc(100vw - 360px);
   }
-  
+
   .leaflet-container {
     width: calc(100vw - 360px) !important;
   }
@@ -696,40 +709,40 @@ html, body {
     min-height: 280px;
     max-height: 55vh;
   }
-  
+
   .fixed-column {
     width: 120px;
   }
-  
+
   .map-container {
     left: 120px;
     right: 120px;
     width: calc(100vw - 240px);
   }
-  
+
   .leaflet-container {
     width: calc(100vw - 240px) !important;
   }
-  
+
   .floating-card-content {
     padding: 16px;
     font-size: 14px;
   }
-  
+
   .column-content {
     padding: 8px;
   }
-  
+
   .column-item {
     padding: 8px;
     margin-bottom: 8px;
   }
-  
+
   .column-item-icon {
     width: 35px;
     height: 35px;
   }
-  
+
   .column-item-title {
     font-size: 12px;
   }
@@ -741,16 +754,16 @@ html, body {
     height: 50px;
     padding: 0 15px;
   }
-  
+
   .app-title {
     font-size: 18px !important;
     letter-spacing: 1px !important;
   }
-  
+
   .status-text {
     font-size: 12px;
   }
-  
+
   .map-container {
     top: 50px;
     left: 0;
@@ -758,7 +771,7 @@ html, body {
     width: 100vw;
     height: calc(100vh - 50px);
   }
-  
+
   .leaflet-container {
     height: calc(100vh - 50px) !important;
     width: 100vw !important;
@@ -771,30 +784,30 @@ html, body {
     min-height: 180px;
     max-height: 40vh;
   }
-  
+
   .fixed-column {
     display: none;
   }
-  
+
   .floating-card-content {
     padding: 12px;
     font-size: 12px;
   }
-  
+
   .floating-card-header {
     padding: 12px 16px;
     font-size: 14px;
   }
-  
+
   /* Mobile card stacking */
   .floating-card:nth-child(1) {
     top: 20px !important;
   }
-  
+
   .floating-card:nth-child(2) {
     top: 220px !important;
   }
-  
+
   .floating-card:nth-child(3) {
     top: 420px !important;
   }
@@ -807,16 +820,16 @@ html, body {
     left: 10px !important;
     max-height: 35vh;
   }
-  
+
   .fixed-column {
     display: none;
   }
-  
+
   .floating-card-content {
     padding: 10px;
     font-size: 11px;
   }
-  
+
   .floating-card-header {
     padding: 10px 12px;
     font-size: 13px;
@@ -826,7 +839,8 @@ html, body {
 /* ===== ANIMATIONS ===== */
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -839,7 +853,8 @@ html, body {
 }
 
 @keyframes glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
   }
   50% {
@@ -877,18 +892,18 @@ html, body {
     min-height: 70px;
     padding: 20px;
   }
-  
+
   .column-item-icon {
     width: 50px;
     height: 50px;
     font-size: 24px;
   }
-  
+
   .floating-card-header {
     min-height: 60px;
     padding: 20px;
   }
-  
+
   .floating-card-dragging {
     transform: scale(1.05) !important;
     box-shadow: 0 30px 90px rgba(0, 255, 65, 0.5) !important;
@@ -902,7 +917,7 @@ html, body {
   .floating-card {
     display: none !important;
   }
-  
+
   .map-container {
     position: static !important;
     height: auto !important;
