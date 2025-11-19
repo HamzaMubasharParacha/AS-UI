@@ -70,37 +70,6 @@ interface CesiumMapProps {
 }
 
 // Custom component to add offline tile layer
-// const OfflineTileLayerComponent: React.FC<{ offlineFirst: boolean }> = ({ offlineFirst }) => {
-//   const map = useMap();
-  
-//   useEffect(() => {
-//     if (!map) return;
-
-//     // Remove existing tile layers
-//     map.eachLayer((layer) => {
-//       if (layer instanceof L.TileLayer) {
-//         map.removeLayer(layer);
-//       }
-//     });
-
-//     // Add offline tile layer
-//     const offlineLayer = createESRISatelliteOfflineLayer({
-//       offlineFirst: offlineFirst
-//     });
-    
-//     offlineLayer.addTo(map);
-
-//     return () => {
-//       if (map.hasLayer(offlineLayer)) {
-//         map.removeLayer(offlineLayer);
-//       }
-//     };
-//   }, [map, offlineFirst]);
-
-//   return null;
-// };
-
-// Custom component to add offline tile layer
 const OfflineTileLayerComponent: React.FC<{ offlineFirst: boolean }> = ({ offlineFirst }) => {
   const map = useMap();
   
@@ -114,9 +83,25 @@ const OfflineTileLayerComponent: React.FC<{ offlineFirst: boolean }> = ({ offlin
       }
     });
 
-    // Add offline tile layer from local folder
+  //   // Add offline tile layer
+  //   const offlineLayer = createESRISatelliteOfflineLayer({
+  //     offlineFirst: offlineFirst
+  //   });
+    
+  //   offlineLayer.addTo(map);
+
+  //   return () => {
+  //     if (map.hasLayer(offlineLayer)) {
+  //       map.removeLayer(offlineLayer);
+  //     }
+  //   };
+  // }, [map, offlineFirst]);
+
+  // return null;
+
+      // Add offline tile layer from local folder
     const offlineLayer = L.tileLayer('/NUST_TILES_2/{z}/{x}/{y}.png', {
-      maxZoom: 18,
+      maxZoom: 21,
       minZoom: 0,
       tileSize: 256,
       noWrap: true,
@@ -134,6 +119,41 @@ const OfflineTileLayerComponent: React.FC<{ offlineFirst: boolean }> = ({ offlin
 
   return null;
 };
+
+// // Custom component to add offline tile layer
+// const OfflineTileLayerComponent: React.FC<{ offlineFirst: boolean }> = ({ offlineFirst }) => {
+//   const map = useMap();
+  
+//   useEffect(() => {
+//     if (!map) return;
+
+//     // Remove existing tile layers
+//     map.eachLayer((layer) => {
+//       if (layer instanceof L.TileLayer) {
+//         map.removeLayer(layer);
+//       }
+//     });
+
+//     // Add offline tile layer from local folder
+//     const offlineLayer = L.tileLayer('../../NUST_TILES_2/{z}/{x}/{y}.png', {
+//       maxZoom: 21,
+//       minZoom: 0,
+//       tileSize: 256,
+//       noWrap: true,
+//       errorTileUrl: '/NUST_TILES_2/error.png', // optional fallback
+//     });
+
+//     offlineLayer.addTo(map);
+
+//     return () => {
+//       if (map.hasLayer(offlineLayer)) {
+//         map.removeLayer(offlineLayer);
+//       }
+//     };
+//   }, [map, offlineFirst]);
+
+//   return null;
+// };
 
 
 // Fix Leaflet default markers
