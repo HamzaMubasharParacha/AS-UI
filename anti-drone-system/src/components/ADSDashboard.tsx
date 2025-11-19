@@ -102,7 +102,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
                 return;
             }
 
-            const response = await fetch('http://localhost:9090/auth/logout', {
+            const response = await fetch('http://192.168.21.121:8080/api/auth/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -274,7 +274,8 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
             },
         ];
     
-        setDetectedDrones(initialDrones);
+        // setDetectedDrones(initialDrones);
+        setDetectedDrones([]);
 
     }, []);
 

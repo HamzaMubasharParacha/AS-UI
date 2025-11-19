@@ -7,6 +7,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 interface DrawnShape {
   id: string;
   type: string;
+  name: string;
   layer: L.Layer;
   coordinates: any;
   properties: {
@@ -154,6 +155,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
       const shape: DrawnShape = {
         id: shapeId,
         type: layerType,
+        name: `${layerType}_${shapeId}`,    // <-- default name
         layer: layer,
         coordinates: getCoordinates(layer, layerType),
         properties: {
@@ -163,7 +165,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
           weight: 2,
           opacity: 0.8
         },
-        measurements
+        measurements,
       };
 
       // Store shape ID in layer
@@ -339,30 +341,83 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
     }
   };
 
+  // const addShapePopup = (layer: any, shape: DrawnShape) => {
+  //   let popupContent = `<div style="color: #00ff41; font-family: 'Courier New', monospace;">`;
+  //   popupContent += `<strong>${shape.type.toUpperCase()}</strong><br/>`;
+  //   popupContent += `<strong>ID:</strong> ${shape.id}<br/>`;
+    
+  //   if (shape.measurements) {
+  //     if (shape.measurements.area !== undefined) {
+  //       popupContent += `<strong>Area:</strong> ${formatMeasurement(shape.measurements.area, 'area')}<br/>`;
+  //     }
+  //     if (shape.measurements.perimeter !== undefined) {
+  //       popupContent += `<strong>Perimeter:</strong> ${formatMeasurement(shape.measurements.perimeter, 'distance')}<br/>`;
+  //     }
+  //     if (shape.measurements.distance !== undefined) {
+  //       popupContent += `<strong>Distance:</strong> ${formatMeasurement(shape.measurements.distance, 'distance')}<br/>`;
+  //     }
+  //   }
+    
+  //   popupContent += `</div>`;
+    
+  //   layer.bindPopup(popupContent, {
+  //     className: 'drawing-popup',
+  //     maxWidth: 300
+  //   });
+  // };
+
   const addShapePopup = (layer: any, shape: DrawnShape) => {
-    let popupContent = `<div style="color: #00ff41; font-family: 'Courier New', monospace;">`;
-    popupContent += `<strong>${shape.type.toUpperCase()}</strong><br/>`;
-    popupContent += `<strong>ID:</strong> ${shape.id}<br/>`;
-    
-    if (shape.measurements) {
-      if (shape.measurements.area !== undefined) {
-        popupContent += `<strong>Area:</strong> ${formatMeasurement(shape.measurements.area, 'area')}<br/>`;
-      }
-      if (shape.measurements.perimeter !== undefined) {
-        popupContent += `<strong>Perimeter:</strong> ${formatMeasurement(shape.measurements.perimeter, 'distance')}<br/>`;
-      }
-      if (shape.measurements.distance !== undefined) {
-        popupContent += `<strong>Distance:</strong> ${formatMeasurement(shape.measurements.distance, 'distance')}<br/>`;
-      }
-    }
-    
-    popupContent += `</div>`;
-    
-    layer.bindPopup(popupContent, {
-      className: 'drawing-popup',
-      maxWidth: 300
+  const popupDiv = document.createElement("div");
+  popupDiv.style.color = "#00ff41";
+  popupDiv.style.fontFamily = "Courier New, monospace";
+
+  popupDiv.innerHTML = `
+      <strong>${shape.type.toUpperCase()}</strong><br/>
+      <strong>ID:</strong> ${shape.id}<br/>
+      <strong>Name:</strong><br/>
+      <input 
+          type="text" 
+          id="shape-name-input" 
+          value="${shape.name}" 
+          style="width: 100%; margin-bottom: 8px; background: black; color: #00ff41; border: 1px solid #00ff41; padding: 4px;"
+      />
+  `;
+
+  // Measurements
+  if (shape.measurements) {
+    if (shape.measurements.area !== undefined)
+      popupDiv.innerHTML += `<strong>Area:</strong> ${formatMeasurement(shape.measurements.area, 'area')}<br/>`;
+
+    if (shape.measurements.perimeter !== undefined)
+      popupDiv.innerHTML += `<strong>Perimeter:</strong> ${formatMeasurement(shape.measurements.perimeter, 'distance')}<br/>`;
+
+    if (shape.measurements.distance !== undefined)
+      popupDiv.innerHTML += `<strong>Distance:</strong> ${formatMeasurement(shape.measurements.distance, 'distance')}<br/>`;
+  }
+
+  // Attach update behavior
+  setTimeout(() => {
+    const input = popupDiv.querySelector("#shape-name-input") as HTMLInputElement;
+
+    input.addEventListener("change", () => {
+      const newName = input.value;
+
+      setShapes(prev =>
+        prev.map(s => s.id === shape.id ? { ...s, name: newName } : s)
+      );
+
+      // Rebind popup so name persists
+      shape.name = newName;
+      addShapePopup(layer, shape);
     });
-  };
+  }, 10);
+
+  layer.bindPopup(popupDiv, {
+    className: 'drawing-popup',
+    maxWidth: 300
+  });
+};
+
 
   // Public methods for external control
   const enableDrawingTool = (toolType: string) => {
@@ -405,6 +460,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
         type: 'Feature',
         properties: {
           id: shape.id,
+          name:shape.name,
           type: shape.type,
           ...shape.properties,
           measurements: shape.measurements

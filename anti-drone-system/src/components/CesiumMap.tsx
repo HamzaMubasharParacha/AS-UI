@@ -418,7 +418,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive, drawingTool
       </MapContainer>
       
       {/* Overlay information */}
-      <Box
+      {/* <Box
         sx={{
           position: 'absolute',
           top: 10,
@@ -457,7 +457,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive, drawingTool
         <Typography variant="caption" display="block" sx={{ color: offlineMode ? '#00ff41' : '#ff9800' }}>
           MODE: {offlineMode ? 'OFFLINE FIRST' : 'ONLINE ONLY'}
         </Typography>
-      </Box>
+      </Box> */}
 
       {/* Radar Control Panel */}
       <Box
@@ -493,7 +493,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive, drawingTool
       </Box>
 
       {/* Map legend */}
-      <Box
+      {/* <Box
         sx={{
           position: 'absolute',
           top: 10,
@@ -524,10 +524,10 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive, drawingTool
         <Typography variant="caption" display="block" sx={{ color: '#00E676', fontWeight: 'bold' }}>
           🏢 COMMAND CENTER
         </Typography>
-      </Box>
+      </Box> */}
 
       {/* Status indicator */}
-      <Box
+      {/* <Box
         sx={{
           position: 'absolute',
           bottom: 10,
@@ -554,10 +554,10 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive, drawingTool
         <Typography variant="caption" display="block" sx={{ color: '#00E676', fontWeight: 'bold' }}>
           GEOGRAPHIC POSITIONING: ACTIVE
         </Typography>
-      </Box>
+      </Box> */}
 
       {/* Navigation Instructions */}
-      <Box
+      {/* <Box
         sx={{
           position: 'absolute',
           bottom: 10,
@@ -588,10 +588,10 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive, drawingTool
         <Typography variant="caption" display="block" sx={{ fontWeight: 'bold', color: radarActive && systemActive ? '#00ff41' : '#ff9800' }}>
           📡 RADAR: {radarActive && systemActive ? 'ACTIVE SCANNING' : 'STANDBY'}
         </Typography>
-      </Box>
+      </Box> */}
 
       {/* Coordinates Display */}
-      <Box
+      {/* <Box
         sx={{
           position: 'absolute',
           top: 150,
@@ -627,7 +627,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({ drones, systemActive, drawingTool
         >
           {showOfflineControl ? '🔽 HIDE OFFLINE CONTROLS' : '🔼 SHOW OFFLINE CONTROLS'}
         </Typography>
-      </Box>
+      </Box> */}
 
       {/* Detailed Threat Information Panel */}
       {selectedThreat && (
