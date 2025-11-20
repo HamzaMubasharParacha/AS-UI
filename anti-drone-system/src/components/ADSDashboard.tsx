@@ -85,31 +85,31 @@ interface CardLog {
 
 const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
 
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-
-    const handleLogout = async () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+   
+ const handleLogout = async () => {
         setLoading(true);
         setError('');
-
+ 
         try {
             const token = sessionStorage.getItem('authToken');
             console.log("Logging out with token (encrypted):", token);
-
+ 
             if (!token) {
                 setError('No authentication token found');
                 setLoading(false);
                 return;
             }
-
-            const response = await fetch('http://localhost:9090/auth/logout', {
+ 
+            const response = await fetch('http://192.168.21.54:8080/api/auth/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
             });
-
+ 
             if (response.ok) {
                 console.log("Logout successful");
                 sessionStorage.removeItem('authToken');
@@ -118,14 +118,14 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
                 const data = await response.json();
                 setError(data.message || 'Logout failed');
             }
-        
+       
         } catch (err) {
-        
+       
             console.error('Logout error:', err);
             setError('Failed to connect to server');
-        
+       
         } finally {
-      
+     
             setLoading(false);
         }
     };
@@ -138,7 +138,52 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     const [systemActive] = useState(true);
     const [detectedDrones, setDetectedDrones] = useState<DroneData[]>([]);
     const [drawingToolsEnabled, setDrawingToolsEnabled] = useState(false);
+    const Drones = async () =>{
+      try{
+        const response = await fetch("http://192.168.21.54:8080/api/drone-detection/drones/1?extended=true", {
+        method: 'GET',
+        headers: {
+        Authorization: `Bearer ${localStorage.getItem("token") || "0c48a652-4232-4742-8052-4e35b314f562"}`,
+      },
+    });
+
+const data = await response.json(); // First await the JSON parsing
+
+// Then map over the data array (assuming data.data contains the drones array based on your API response)
+const drones: DroneData[] = data.data.map((drone: any) => ({
+  id: drone.name,
+  position: [
+    drone.longitude || 0,
+    drone.latitude || 0,
+    drone.height || 0,
+  ],
+  threat_level: "HIGH", // Use a function to determine threat level
+  distance: drone.distance || 0,
+  speed: drone.speed || 0,
+  heading: Number(drone.direction) || 0, 
+  detected_at: drone.created_time || new Date().toISOString(),
+}));
+
+setDetectedDrones(drones);
+console.log(drones)
+        
+      }
+      catch (error){
+        console.error("error")
+      }
+    }
+
+useEffect(() => {
+  // Fetch immediately
+  Drones();
   
+  // Set up interval
+  const intervalId = setInterval(Drones, 2000);
+  
+  // Cleanup
+  return () => clearInterval(intervalId);
+}, []);
+
     const [dragState, setDragState] = useState<{
         isDragging: boolean;
         draggedCardId: string | null;
@@ -223,121 +268,120 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     });
 
     // Initialize with sample drone data
-    useEffect(() => {
+    // useEffect(() => {
 
-        const initialDrones: DroneData[] = [
+    //     const initialDrones: DroneData[] = [
             
-            {
-                id: 'DRONE_001',
-                position: [72.9977674, 33.6475773, 150],
-                threat_level: 'HIGH',
-                distance: 1100,
-                speed: 25,
-                heading: 45,
-                detected_at: new Date().toISOString(),
-            },
-            {
-                id: 'DRONE_002',
-                position: [72.9777674, 33.6275773, 200],
-                threat_level: 'MEDIUM',
-                distance: 2200,
-                speed: 18,
-                heading: 180,
-                detected_at: new Date().toISOString(),
-            },
-            {
-                id: 'DRONE_003',
-                position: [72.9827674, 33.6425773, 100],
-                threat_level: 'CRITICAL',
-                distance: 600,
-                speed: 35,
-                heading: 270,
-                detected_at: new Date().toISOString(),
-            },
-            {
-                id: 'DRONE_004',
-                position: [73.0077674, 33.6375773, 300],
-                threat_level: 'LOW',
-                distance: 2000,
-                speed: 15,
-                heading: 90,
-                detected_at: new Date().toISOString(),
-            },
-            {
-                id: 'DRONE_005',
-                position: [72.9877674, 33.6575773, 250],
-                threat_level: 'MEDIUM',
-                distance: 2200,
-                speed: 22,
-                heading: 315,
-                detected_at: new Date().toISOString(),
-            },
-        ];
+    //         {
+    //             id: 'DRONE_001',
+    //             position: [72.9977674, 33.6475773, 150],
+    //             threat_level: 'HIGH',
+    //             distance: 1100,
+    //             speed: 25,
+    //             heading: 45,
+    //             detected_at: new Date().toISOString(),
+    //         },
+    //         {
+    //             id: 'DRONE_002',
+    //             position: [72.9777674, 33.6275773, 200],
+    //             threat_level: 'MEDIUM',
+    //             distance: 2200,
+    //             speed: 18,
+    //             heading: 180,
+    //             detected_at: new Date().toISOString(),
+    //         },
+    //         {
+    //             id: 'DRONE_003',
+    //             position: [72.9827674, 33.6425773, 100],
+    //             threat_level: 'CRITICAL',
+    //             distance: 600,
+    //             speed: 35,
+    //             heading: 270,
+    //             detected_at: new Date().toISOString(),
+    //         },
+    //         {
+    //             id: 'DRONE_004',
+    //             position: [73.0077674, 33.6375773, 300],
+    //             threat_level: 'LOW',
+    //             distance: 2000,
+    //             speed: 15,
+    //             heading: 90,
+    //             detected_at: new Date().toISOString(),
+    //         },
+    //         {
+    //             id: 'DRONE_005',
+    //             position: [72.9877674, 33.6575773, 250],
+    //             threat_level: 'MEDIUM',
+    //             distance: 2200,
+    //             speed: 22,
+    //             heading: 315,
+    //             detected_at: new Date().toISOString(),
+    //         },
+    //     ];
     
-        setDetectedDrones(initialDrones);
-
-    }, []);
+    //     setDetectedDrones(initialDrones);
+    // }, []);
 
     // Simulate drone detection updates
-    useEffect(() => {
+    // useEffect(() => {
         
-        if (!systemActive) return;
+    //     if (!systemActive) return;
 
-        const interval = setInterval(() => {
+    //     const interval = setInterval(() => {
       
-            setDetectedDrones(prev => {
+    //         setDetectedDrones(prev => {
         
-                const updated = prev.map(drone => ({
+    //             const updated = prev.map(drone => ({
           
-                    ...drone,
-                    position: [
-                        drone.position[0] + (Math.random() - 0.5) * 0.001,
-                        drone.position[1] + (Math.random() - 0.5) * 0.001,
-                        drone.position[2] + (Math.random() - 0.5) * 10,
-                    ] as [number, number, number],
+    //                 ...drone,
+    //                 position: [
+    //                     drone.position[0] + (Math.random() - 0.5) * 0.001,
+    //                     drone.position[1] + (Math.random() - 0.5) * 0.001,
+    //                     drone.position[2] + (Math.random() - 0.5) * 10,
+    //                 ] as [number, number, number],
           
-                    distance: Math.max(50, drone.distance + (Math.random() - 0.5) * 100),
-                    speed: Math.max(5, drone.speed + (Math.random() - 0.5) * 5),
-                    heading: (drone.heading + (Math.random() - 0.5) * 20) % 360,
+    //                 distance: Math.max(50, drone.distance + (Math.random() - 0.5) * 100),
+    //                 speed: Math.max(5, drone.speed + (Math.random() - 0.5) * 5),
+    //                 heading: (drone.heading + (Math.random() - 0.5) * 20) % 360,
         
-                }));
+    //             }));
 
-                if (Math.random() < 0.2 && updated.length < 10) {
+    //             if (Math.random() < 0.2 && updated.length < 10) {
           
-                    const newDrone: DroneData = {
+    //                 const newDrone: DroneData = {
         
-                        id: `DRONE_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+    //                     id: `DRONE_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
             
-                        position: [
-                            72.9877674 + (Math.random() - 0.5) * 0.08,
-                            33.6375773 + (Math.random() - 0.5) * 0.08,
-                            Math.random() * 400 + 50,
-                        ],
+    //                     position: [
+    //                         72.9877674 + (Math.random() - 0.5) * 0.08,
+    //                         33.6375773 + (Math.random() - 0.5) * 0.08,
+    //                         Math.random() * 400 + 50,
+    //                     ],
 
-                        threat_level: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'][Math.floor(Math.random() * 4)] as any,
-                        distance: Math.random() * 4500 + 200,
-                        speed: Math.random() * 40 + 10,
-                        heading: Math.random() * 360,
-                        detected_at: new Date().toISOString(),
-                    };
+    //                     threat_level: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'][Math.floor(Math.random() * 4)] as any,
+    //                     distance: Math.random() * 4500 + 200,
+    //                     speed: Math.random() * 40 + 10,
+    //                     heading: Math.random() * 360,
+    //                     detected_at: new Date().toISOString(),
+    //                 };
           
-                    updated.push(newDrone);
-                }
-                return updated;
-            });
+    //                 updated.push(newDrone);
+    //             }
+    //             return updated;
+    //         });
 
-            // Update card activity timestamps
-            setFloatingCards(prev => prev.map(card => ({
-                ...card,
-                lastActivity: new Date().toLocaleTimeString(),
-                status: card.visible ? 'active' : card.status,
-            })));
+    //         // Update card activity timestamps
+    //         setFloatingCards(prev => prev.map(card => ({
+    //             ...card,
+    //             lastActivity: new Date().toLocaleTimeString(),
+    //             status: card.visible ? 'active' : card.status,
+    //         })));
     
-        }, 3000);
+    //     }, 3000);
     
-        return () => clearInterval(interval);
+    //     return () => clearInterval(interval);
   
-    }, [systemActive]);
+    // }, [systemActive]);
 
     const activeThreat = detectedDrones.find(drone => 
         drone.threat_level === 'HIGH' || drone.threat_level === 'CRITICAL'
@@ -704,6 +748,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
               <div className="status-dot active"></div>
               <span className="status-text">OPERATIONAL</span>
             </div>
+            {/* <button onClick={Drones}>click</button> */}
             <Button
               onClick={handleLogout}
               variant="outlined"

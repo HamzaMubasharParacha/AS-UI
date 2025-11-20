@@ -8,7 +8,7 @@ const App: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // Retrieve token from memory (if available)
+    // Retrieve token from session storage on initial load
     const storedToken = sessionStorage.getItem('authToken');
     if (storedToken) setToken(storedToken);
   }, []);
@@ -21,12 +21,16 @@ const App: React.FC = () => {
           path="/login"
           element={
             token ? (
+              // If user already has token, redirect to dashboard
               <Navigate to="/dashboard" replace />
             ) : (
-              <LoginPage onLoginSuccess={(token) => {
-                sessionStorage.setItem('authToken', token);
-                setToken(token);
-              }} />
+              // Otherwise, show login page
+              <LoginPage
+                onLoginSuccess={(newToken: string) => {
+                  sessionStorage.setItem('authToken', newToken);
+                  setToken(newToken);
+                }}
+              />
             )
           }
         />
@@ -41,7 +45,7 @@ const App: React.FC = () => {
           }
         />
 
-        {/* Default redirect */}
+        {/* Catch-all route: redirect to login if path doesn't match */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
