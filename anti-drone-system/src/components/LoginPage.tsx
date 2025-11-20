@@ -25,22 +25,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     setError("");
 
     try {
-<<<<<<< HEAD
-      const response = await fetch('http://192.168.21.121:8080/api/auth/login', {
+      const response = await fetch('http://192.168.21.54:8080/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
-=======
-      const response = await fetch(
-        "http://192.168.21.121:8080/api/auth/login",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password }),
-        }
-      );
->>>>>>> 57a24505b915e2b272d910ebc77b281407795872
 
       const data = await response.json();
 

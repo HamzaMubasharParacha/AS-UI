@@ -103,50 +103,6 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-<<<<<<< HEAD
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-   
- const handleLogout = async () => {
-        setLoading(true);
-        setError('');
- 
-        try {
-            const token = sessionStorage.getItem('authToken');
-            console.log("Logging out with token (encrypted):", token);
- 
-            if (!token) {
-                setError('No authentication token found');
-                setLoading(false);
-                return;
-            }
- 
-            const response = await fetch('http://192.168.21.54:8080/api/auth/logout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
- 
-            if (response.ok) {
-                console.log("Logout successful");
-                sessionStorage.removeItem('authToken');
-                setToken(null); // triggers re-render → redirects to LoginPage
-            }    else {
-                const data = await response.json();
-                setError(data.message || 'Logout failed');
-            }
-       
-        } catch (err) {
-       
-            console.error('Logout error:', err);
-            setError('Failed to connect to server');
-       
-        } finally {
-     
-            setLoading(false);
-=======
   const handleLogout = async () => {
     setLoading(true);
     setError("");
@@ -162,14 +118,13 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       }
 
       const response = await fetch(
-        "http://192.168.21.121:8080/api/auth/logout",
+        "http://192.168.21.54:8080/api/auth/logout",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
->>>>>>> 57a24505b915e2b272d910ebc77b281407795872
         }
       );
 
@@ -189,7 +144,6 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     }
   };
 
-<<<<<<< HEAD
     const [systemActive] = useState(true);
     const [detectedDrones, setDetectedDrones] = useState<DroneData[]>([]);
     const [drawingToolsEnabled, setDrawingToolsEnabled] = useState(false);
@@ -239,27 +193,8 @@ useEffect(() => {
   return () => clearInterval(intervalId);
 }, []);
 
-    const [dragState, setDragState] = useState<{
-        isDragging: boolean;
-        draggedCardId: string | null;
-        dragOffset: { x: number; y: number };
-        startPosition: { x: number; y: number };
-    }>({
-        isDragging: false,
-        draggedCardId: null,
-        dragOffset: { x: 0, y: 0 },
-        startPosition: { x: 0, y: 0 }
-    });
-=======
-  useEffect(() => {
-    const storedToken = localStorage.getItem("authToken");
-    if (storedToken) setToken(storedToken);
-  }, []);
->>>>>>> 57a24505b915e2b272d910ebc77b281407795872
 
-  const [systemActive] = useState(true);
-  const [detectedDrones, setDetectedDrones] = useState<DroneData[]>([]);
-  const [drawingToolsEnabled, setDrawingToolsEnabled] = useState(false);
+
 
   const [dragState, setDragState] = useState<{
     isDragging: boolean;
@@ -273,123 +208,6 @@ useEffect(() => {
     startPosition: { x: 0, y: 0 },
   });
 
-<<<<<<< HEAD
-    // Initialize with sample drone data
-    // useEffect(() => {
-
-    //     const initialDrones: DroneData[] = [
-            
-    //         {
-    //             id: 'DRONE_001',
-    //             position: [72.9977674, 33.6475773, 150],
-    //             threat_level: 'HIGH',
-    //             distance: 1100,
-    //             speed: 25,
-    //             heading: 45,
-    //             detected_at: new Date().toISOString(),
-    //         },
-    //         {
-    //             id: 'DRONE_002',
-    //             position: [72.9777674, 33.6275773, 200],
-    //             threat_level: 'MEDIUM',
-    //             distance: 2200,
-    //             speed: 18,
-    //             heading: 180,
-    //             detected_at: new Date().toISOString(),
-    //         },
-    //         {
-    //             id: 'DRONE_003',
-    //             position: [72.9827674, 33.6425773, 100],
-    //             threat_level: 'CRITICAL',
-    //             distance: 600,
-    //             speed: 35,
-    //             heading: 270,
-    //             detected_at: new Date().toISOString(),
-    //         },
-    //         {
-    //             id: 'DRONE_004',
-    //             position: [73.0077674, 33.6375773, 300],
-    //             threat_level: 'LOW',
-    //             distance: 2000,
-    //             speed: 15,
-    //             heading: 90,
-    //             detected_at: new Date().toISOString(),
-    //         },
-    //         {
-    //             id: 'DRONE_005',
-    //             position: [72.9877674, 33.6575773, 250],
-    //             threat_level: 'MEDIUM',
-    //             distance: 2200,
-    //             speed: 22,
-    //             heading: 315,
-    //             detected_at: new Date().toISOString(),
-    //         },
-    //     ];
-    
-    //     setDetectedDrones(initialDrones);
-    // }, []);
-
-    // Simulate drone detection updates
-    // useEffect(() => {
-        
-    //     if (!systemActive) return;
-
-    //     const interval = setInterval(() => {
-      
-    //         setDetectedDrones(prev => {
-        
-    //             const updated = prev.map(drone => ({
-          
-    //                 ...drone,
-    //                 position: [
-    //                     drone.position[0] + (Math.random() - 0.5) * 0.001,
-    //                     drone.position[1] + (Math.random() - 0.5) * 0.001,
-    //                     drone.position[2] + (Math.random() - 0.5) * 10,
-    //                 ] as [number, number, number],
-          
-    //                 distance: Math.max(50, drone.distance + (Math.random() - 0.5) * 100),
-    //                 speed: Math.max(5, drone.speed + (Math.random() - 0.5) * 5),
-    //                 heading: (drone.heading + (Math.random() - 0.5) * 20) % 360,
-        
-    //             }));
-
-    //             if (Math.random() < 0.2 && updated.length < 10) {
-          
-    //                 const newDrone: DroneData = {
-        
-    //                     id: `DRONE_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
-            
-    //                     position: [
-    //                         72.9877674 + (Math.random() - 0.5) * 0.08,
-    //                         33.6375773 + (Math.random() - 0.5) * 0.08,
-    //                         Math.random() * 400 + 50,
-    //                     ],
-
-    //                     threat_level: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'][Math.floor(Math.random() * 4)] as any,
-    //                     distance: Math.random() * 4500 + 200,
-    //                     speed: Math.random() * 40 + 10,
-    //                     heading: Math.random() * 360,
-    //                     detected_at: new Date().toISOString(),
-    //                 };
-          
-    //                 updated.push(newDrone);
-    //             }
-    //             return updated;
-    //         });
-
-    //         // Update card activity timestamps
-    //         setFloatingCards(prev => prev.map(card => ({
-    //             ...card,
-    //             lastActivity: new Date().toLocaleTimeString(),
-    //             status: card.visible ? 'active' : card.status,
-    //         })));
-    
-    //     }, 3000);
-    
-    //     return () => clearInterval(interval);
-  
-    // }, [systemActive]);
-=======
   const [floatingCards, setFloatingCards] = useState<FloatingCard[]>([
     {
       id: "system-status",
@@ -537,7 +355,6 @@ useEffect(() => {
             id: `DRONE_${Date.now()}_${Math.random()
               .toString(36)
               .substr(2, 5)}`,
->>>>>>> 57a24505b915e2b272d910ebc77b281407795872
 
             position: [
               72.9877674 + (Math.random() - 0.5) * 0.08,
