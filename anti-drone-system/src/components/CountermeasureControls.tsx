@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Paper,
   Typography,
@@ -7,18 +7,18 @@ import {
   Alert,
   LinearProgress,
   Chip,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Shield,
   RadioButtonChecked,
   FlashOn,
   Block,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 
 interface DroneData {
   id: string;
   position: [number, number, number];
-  threat_level: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  threat_level: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   distance: number;
   speed: number;
   heading: number;
@@ -30,26 +30,28 @@ interface CountermeasureControlsProps {
   systemActive: boolean;
 }
 
-const CountermeasureControls: React.FC<CountermeasureControlsProps> = ({ 
-  activeThreat, 
-  systemActive 
+const CountermeasureControls: React.FC<CountermeasureControlsProps> = ({
+  activeThreat,
+  systemActive,
 }) => {
-  const [activeCountermeasure, setActiveCountermeasure] = useState<string | null>(null);
+  const [activeCountermeasure, setActiveCountermeasure] = useState<
+    string | null
+  >(null);
   const [jammerActive, setJammerActive] = useState(false);
   const [laserActive, setLaserActive] = useState(false);
 
   const handleCountermeasure = (type: string) => {
     if (!systemActive || !activeThreat) return;
-    
+
     setActiveCountermeasure(type);
-    
-    if (type === 'jammer') {
+
+    if (type === "jammer") {
       setJammerActive(true);
       setTimeout(() => {
         setJammerActive(false);
         setActiveCountermeasure(null);
       }, 5000);
-    } else if (type === 'laser') {
+    } else if (type === "laser") {
       setLaserActive(true);
       setTimeout(() => {
         setLaserActive(false);
@@ -60,36 +62,36 @@ const CountermeasureControls: React.FC<CountermeasureControlsProps> = ({
 
   const countermeasures = [
     {
-      id: 'jammer',
-      name: 'RF JAMMER',
+      id: "jammer",
+      name: "RF JAMMER",
       icon: <RadioButtonChecked />,
-      description: 'Disrupt drone communications',
-      color: '#ffaa00',
+      description: "Disrupt drone communications",
+      color: "#ffaa00",
       disabled: !activeThreat || jammerActive,
     },
     {
-      id: 'laser',
-      name: 'LASER SYSTEM',
+      id: "laser",
+      name: "LASER SYSTEM",
       icon: <FlashOn />,
-      description: 'Disable drone sensors',
-      color: '#ff4444',
+      description: "Disable drone sensors",
+      color: "#ff4444",
       disabled: !activeThreat || laserActive,
     },
     {
-      id: 'net',
-      name: 'NET LAUNCHER',
+      id: "net",
+      name: "NET LAUNCHER",
       icon: <Block />,
-      description: 'Physical capture system',
-      color: '#00ff41',
+      description: "Physical capture system",
+      color: "#00ff41",
       disabled: !activeThreat || (activeThreat && activeThreat.distance > 100),
     },
   ];
 
   return (
-    <Paper sx={{ p: 2, height: '300px' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <Shield sx={{ mr: 1, color: '#00ff41' }} />
-        <Typography variant="h6" sx={{ color: '#00ff41' }}>
+    <Paper sx={{ p: 2, height: "300px" }}>
+      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+        <Shield sx={{ mr: 1, color: "#00ff41" }} />
+        <Typography variant="h6" sx={{ color: "#00ff41" }}>
           COUNTERMEASURES
         </Typography>
       </Box>
@@ -107,20 +109,20 @@ const CountermeasureControls: React.FC<CountermeasureControlsProps> = ({
       )}
 
       {activeThreat && (
-        <Box sx={{ mb: 2, p: 1, backgroundColor: '#1a1a1a', borderRadius: 1 }}>
-          <Typography variant="caption" sx={{ color: '#666' }}>
+        <Box sx={{ mb: 2, p: 1, backgroundColor: "#1a1a1a", borderRadius: 1 }}>
+          <Typography variant="caption" sx={{ color: "#666" }}>
             TARGET LOCKED
           </Typography>
-          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+          <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
             {activeThreat.id}
           </Typography>
-          <Typography variant="caption" sx={{ color: '#ff4444' }}>
+          <Typography variant="caption" sx={{ color: "#ff4444" }}>
             {activeThreat.threat_level} - {activeThreat.distance.toFixed(0)}m
           </Typography>
         </Box>
       )}
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         {countermeasures.map((countermeasure) => (
           <Button
             key={countermeasure.id}
@@ -128,23 +130,23 @@ const CountermeasureControls: React.FC<CountermeasureControlsProps> = ({
             disabled={countermeasure.disabled}
             onClick={() => handleCountermeasure(countermeasure.id)}
             sx={{
-              justifyContent: 'flex-start',
-              textAlign: 'left',
+              justifyContent: "flex-start",
+              textAlign: "left",
               borderColor: countermeasure.color,
-              color: countermeasure.disabled ? '#666' : countermeasure.color,
-              '&:hover': {
+              color: countermeasure.disabled ? "#666" : countermeasure.color,
+              "&:hover": {
                 borderColor: countermeasure.color,
                 backgroundColor: `${countermeasure.color}20`,
               },
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+            <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
               {countermeasure.icon}
               <Box sx={{ ml: 1, flexGrow: 1 }}>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                   {countermeasure.name}
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#666' }}>
+                <Typography variant="caption" sx={{ color: "#666" }}>
                   {countermeasure.description}
                 </Typography>
               </Box>
@@ -158,24 +160,24 @@ const CountermeasureControls: React.FC<CountermeasureControlsProps> = ({
 
       {activeCountermeasure && (
         <Box sx={{ mt: 2 }}>
-          <Typography variant="caption" sx={{ color: '#666' }}>
+          <Typography variant="caption" sx={{ color: "#666" }}>
             COUNTERMEASURE ACTIVE
           </Typography>
           <LinearProgress
             sx={{
               mt: 1,
-              backgroundColor: '#333',
-              '& .MuiLinearProgress-bar': {
-                backgroundColor: '#ff4444',
+              backgroundColor: "#333",
+              "& .MuiLinearProgress-bar": {
+                backgroundColor: "#ff4444",
               },
             }}
           />
         </Box>
       )}
 
-      <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid #333' }}>
-        <Typography variant="caption" sx={{ color: '#666' }}>
-          Status: {systemActive ? 'READY' : 'OFFLINE'}
+      <Box sx={{ mt: 2, pt: 2, borderTop: "1px solid #333" }}>
+        <Typography variant="caption" sx={{ color: "#666" }}>
+          Status: {systemActive ? "READY" : "OFFLINE"}
         </Typography>
       </Box>
     </Paper>

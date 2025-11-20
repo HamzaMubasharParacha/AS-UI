@@ -1,5 +1,5 @@
-import L from 'leaflet';
-import { offlineTileManager } from './OfflineTileManager';
+import L from "leaflet";
+import { offlineTileManager } from "./OfflineTileManager";
 
 export interface OfflineTileLayerOptions extends L.TileLayerOptions {
   onlineUrl: string;
@@ -15,25 +15,34 @@ export class OfflineTileLayer extends L.TileLayer {
 
   constructor(options: OfflineTileLayerOptions) {
     // Initialize with a placeholder URL
-    super('', options);
-    
+    super("", options);
+
     this.onlineUrl = options.onlineUrl;
     this.offlineFirst = options.offlineFirst ?? true;
     this.showOfflineIndicator = options.showOfflineIndicator ?? true;
   }
 
   createTile(coords: L.Coords, done: L.DoneCallback): HTMLElement {
-    const tile = document.createElement('img') as HTMLImageElement;
-    
-    L.DomEvent.on(tile, 'load', L.Util.bind(this._tileOnLoad, this, done, tile));
-    L.DomEvent.on(tile, 'error', L.Util.bind(this._tileOnError, this, done, tile));
+    const tile = document.createElement("img") as HTMLImageElement;
 
-    if (this.options.crossOrigin || this.options.crossOrigin === '') {
-      tile.crossOrigin = this.options.crossOrigin === true ? '' : this.options.crossOrigin;
+    L.DomEvent.on(
+      tile,
+      "load",
+      L.Util.bind(this._tileOnLoad, this, done, tile)
+    );
+    L.DomEvent.on(
+      tile,
+      "error",
+      L.Util.bind(this._tileOnError, this, done, tile)
+    );
+
+    if (this.options.crossOrigin || this.options.crossOrigin === "") {
+      tile.crossOrigin =
+        this.options.crossOrigin === true ? "" : this.options.crossOrigin;
     }
 
-    tile.alt = '';
-    tile.setAttribute('role', 'presentation');
+    tile.alt = "";
+    tile.setAttribute("role", "presentation");
 
     // Try to load tile (offline first if enabled)
     this._loadTile(tile, coords);
@@ -41,13 +50,20 @@ export class OfflineTileLayer extends L.TileLayer {
     return tile;
   }
 
-  private async _loadTile(tile: HTMLImageElement, coords: L.Coords): Promise<void> {
+  private async _loadTile(
+    tile: HTMLImageElement,
+    coords: L.Coords
+  ): Promise<void> {
     const tileKey = `${coords.z}/${coords.x}/${coords.y}`;
-    
+
     try {
       if (this.offlineFirst) {
         // Try offline first
-        const offlineUrl = await offlineTileManager.getOfflineTileUrl(coords.x, coords.y, coords.z);
+        const offlineUrl = await offlineTileManager.getOfflineTileUrl(
+          coords.x,
+          coords.y,
+          coords.z
+        );
         if (offlineUrl) {
           tile.src = offlineUrl;
           this._addOfflineIndicator(tile);
@@ -58,12 +74,11 @@ export class OfflineTileLayer extends L.TileLayer {
       // Fall back to online
       const onlineUrl = this._getOnlineTileUrl(coords);
       tile.src = onlineUrl;
-      
+
       // Cache the tile for future offline use
       this._cacheOnlineTile(coords, onlineUrl);
-      
     } catch (error) {
-      console.error('Error loading tile:', error);
+      console.error("Error loading tile:", error);
       // Try online as fallback
       tile.src = this._getOnlineTileUrl(coords);
     }
@@ -71,9 +86,9 @@ export class OfflineTileLayer extends L.TileLayer {
 
   private _getOnlineTileUrl(coords: L.Coords): string {
     return this.onlineUrl
-      .replace('{x}', coords.x.toString())
-      .replace('{y}', coords.y.toString())
-      .replace('{z}', coords.z.toString());
+      .replace("{x}", coords.x.toString())
+      .replace("{y}", coords.y.toString())
+      .replace("{z}", coords.z.toString());
   }
 
   private async _cacheOnlineTile(coords: L.Coords, url: string): Promise<void> {
@@ -81,7 +96,7 @@ export class OfflineTileLayer extends L.TileLayer {
       // This will be handled by the browser's cache and our service worker
       // For now, we'll let the OfflineTileManager handle explicit caching
     } catch (error) {
-      console.error('Error caching tile:', error);
+      console.error("Error caching tile:", error);
     }
   }
 
@@ -89,22 +104,22 @@ export class OfflineTileLayer extends L.TileLayer {
     if (!this.showOfflineIndicator) return;
 
     // Add a small indicator that this tile is loaded from offline cache
-    const indicator = document.createElement('div');
-    indicator.style.position = 'absolute';
-    indicator.style.top = '2px';
-    indicator.style.right = '2px';
-    indicator.style.width = '8px';
-    indicator.style.height = '8px';
-    indicator.style.backgroundColor = '#00ff41';
-    indicator.style.borderRadius = '50%';
-    indicator.style.zIndex = '1000';
-    indicator.style.pointerEvents = 'none';
-    indicator.title = 'Offline tile';
+    const indicator = document.createElement("div");
+    indicator.style.position = "absolute";
+    indicator.style.top = "2px";
+    indicator.style.right = "2px";
+    indicator.style.width = "8px";
+    indicator.style.height = "8px";
+    indicator.style.backgroundColor = "#00ff41";
+    indicator.style.borderRadius = "50%";
+    indicator.style.zIndex = "1000";
+    indicator.style.pointerEvents = "none";
+    indicator.title = "Offline tile";
 
     // Add indicator to tile's parent when tile is added to DOM
     const addIndicator = () => {
       if (tile.parentElement) {
-        tile.parentElement.style.position = 'relative';
+        tile.parentElement.style.position = "relative";
         tile.parentElement.appendChild(indicator);
       }
     };
@@ -141,7 +156,7 @@ export class OfflineTileLayer extends L.TileLayer {
       north: bounds.getNorth(),
       south: bounds.getSouth(),
       east: bounds.getEast(),
-      west: bounds.getWest()
+      west: bounds.getWest(),
     };
 
     await offlineTileManager.downloadTilesForArea(
@@ -164,18 +179,23 @@ export class OfflineTileLayer extends L.TileLayer {
 }
 
 // Factory function to create offline tile layer
-export function createOfflineTileLayer(options: OfflineTileLayerOptions): OfflineTileLayer {
+export function createOfflineTileLayer(
+  options: OfflineTileLayerOptions
+): OfflineTileLayer {
   return new OfflineTileLayer(options);
 }
 
 // ESRI Satellite offline tile layer
-export function createESRISatelliteOfflineLayer(options: Partial<OfflineTileLayerOptions> = {}): OfflineTileLayer {
+export function createESRISatelliteOfflineLayer(
+  options: Partial<OfflineTileLayerOptions> = {}
+): OfflineTileLayer {
   return new OfflineTileLayer({
-    onlineUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution: '&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+    onlineUrl: "/NUST_TILES_2/{z}/{x}/{y}.png",
+    // onlineUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    // attribution: '&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
     maxZoom: 19,
     offlineFirst: true,
     showOfflineIndicator: true,
-    ...options
+    ...options,
   });
 }

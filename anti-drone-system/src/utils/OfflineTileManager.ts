@@ -1,4 +1,4 @@
-import localforage from 'localforage';
+import localforage from "localforage";
 
 export interface TileInfo {
   x: number;
@@ -33,18 +33,18 @@ export class OfflineTileManager {
       tileSize: 256,
       maxCacheSize: 500, // 500MB
       cacheDuration: 7 * 24 * 60 * 60 * 1000, // 7 days
-      ...config
+      ...config,
     };
 
     // Initialize storage
     this.tileStore = localforage.createInstance({
-      name: 'OfflineMapTiles',
-      storeName: 'tiles'
+      name: "OfflineMapTiles",
+      storeName: "tiles",
     });
 
     this.metadataStore = localforage.createInstance({
-      name: 'OfflineMapTiles',
-      storeName: 'metadata'
+      name: "OfflineMapTiles",
+      storeName: "metadata",
     });
   }
 
@@ -69,7 +69,7 @@ export class OfflineTileManager {
             y,
             z,
             url: this.getTileUrl(x, y, z),
-            timestamp: Date.now()
+            timestamp: Date.now(),
           });
         }
       }
@@ -81,11 +81,17 @@ export class OfflineTileManager {
   /**
    * Convert latitude/longitude to tile coordinates
    */
-  private latLngToTile(lat: number, lng: number, zoom: number): { x: number; y: number } {
+  private latLngToTile(
+    lat: number,
+    lng: number,
+    zoom: number
+  ): { x: number; y: number } {
     const latRad = (lat * Math.PI) / 180;
     const n = Math.pow(2, zoom);
     const x = Math.floor(((lng + 180) / 360) * n);
-    const y = Math.floor(((1 - Math.asinh(Math.tan(latRad)) / Math.PI) / 2) * n);
+    const y = Math.floor(
+      ((1 - Math.asinh(Math.tan(latRad)) / Math.PI) / 2) * n
+    );
     return { x, y };
   }
 
@@ -106,7 +112,7 @@ export class OfflineTileManager {
     onProgress?: (progress: number, current: number, total: number) => void
   ): Promise<void> {
     if (this.isDownloading) {
-      throw new Error('Download already in progress');
+      throw new Error("Download already in progress");
     }
 
     const tiles = this.generateTileCoordinates(bounds, minZoom, maxZoom);
@@ -120,13 +126,21 @@ export class OfflineTileManager {
     try {
       for (let i = 0; i < tiles.length; i++) {
         const tile = tiles[i];
-        
+
         // Check if tile already exists and is not expired
-        const existingTile = await this.getTileFromCache(tile.x, tile.y, tile.z);
+        const existingTile = await this.getTileFromCache(
+          tile.x,
+          tile.y,
+          tile.z
+        );
         if (existingTile && !this.isTileExpired(existingTile)) {
           this.downloadProgress++;
           if (onProgress) {
-            onProgress((this.downloadProgress / this.totalTiles) * 100, this.downloadProgress, this.totalTiles);
+            onProgress(
+              (this.downloadProgress / this.totalTiles) * 100,
+              this.downloadProgress,
+              this.totalTiles
+            );
           }
           continue;
         }
@@ -137,23 +151,30 @@ export class OfflineTileManager {
             const blob = await response.blob();
             tile.blob = blob;
             await this.saveTileToCache(tile);
-            
+
             this.downloadProgress++;
             if (onProgress) {
-              onProgress((this.downloadProgress / this.totalTiles) * 100, this.downloadProgress, this.totalTiles);
+              onProgress(
+                (this.downloadProgress / this.totalTiles) * 100,
+                this.downloadProgress,
+                this.totalTiles
+              );
             }
           }
         } catch (error) {
-          console.error(`Failed to download tile ${tile.x}/${tile.y}/${tile.z}:`, error);
+          console.error(
+            `Failed to download tile ${tile.x}/${tile.y}/${tile.z}:`,
+            error
+          );
         }
 
         // Small delay to prevent overwhelming the server
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise((resolve) => setTimeout(resolve, 50));
       }
 
       // Update metadata
       await this.updateCacheMetadata();
-      console.log('Tile download completed');
+      console.log("Tile download completed");
     } finally {
       this.isDownloading = false;
       this.downloadQueue = [];
@@ -168,7 +189,7 @@ export class OfflineTileManager {
     const tileData = {
       blob: tile.blob,
       timestamp: tile.timestamp,
-      url: tile.url
+      url: tile.url,
     };
     await this.tileStore.setItem(key, tileData);
   }
@@ -176,10 +197,14 @@ export class OfflineTileManager {
   /**
    * Get tile from cache
    */
-  async getTileFromCache(x: number, y: number, z: number): Promise<TileInfo | null> {
+  async getTileFromCache(
+    x: number,
+    y: number,
+    z: number
+  ): Promise<TileInfo | null> {
     const key = `${z}/${x}/${y}`;
     try {
-      const tileData = await this.tileStore.getItem(key) as any;
+      const tileData = (await this.tileStore.getItem(key)) as any;
       if (tileData) {
         return {
           x,
@@ -187,11 +212,11 @@ export class OfflineTileManager {
           z,
           url: tileData.url,
           blob: tileData.blob,
-          timestamp: tileData.timestamp
+          timestamp: tileData.timestamp,
         };
       }
     } catch (error) {
-      console.error('Error retrieving tile from cache:', error);
+      console.error("Error retrieving tile from cache:", error);
     }
     return null;
   }
@@ -206,7 +231,11 @@ export class OfflineTileManager {
   /**
    * Get offline tile URL for Leaflet
    */
-  async getOfflineTileUrl(x: number, y: number, z: number): Promise<string | null> {
+  async getOfflineTileUrl(
+    x: number,
+    y: number,
+    z: number
+  ): Promise<string | null> {
     const tile = await this.getTileFromCache(x, y, z);
     if (tile && tile.blob) {
       return URL.createObjectURL(tile.blob);
@@ -222,14 +251,14 @@ export class OfflineTileManager {
     zoom: number
   ): Promise<boolean> {
     const tiles = this.generateTileCoordinates(bounds, zoom, zoom);
-    
+
     for (const tile of tiles) {
       const cachedTile = await this.getTileFromCache(tile.x, tile.y, tile.z);
       if (!cachedTile || this.isTileExpired(cachedTile)) {
         return false;
       }
     }
-    
+
     return true;
   }
 
@@ -249,7 +278,7 @@ export class OfflineTileManager {
 
     for (const key of keys) {
       try {
-        const tileData = await this.tileStore.getItem(key) as any;
+        const tileData = (await this.tileStore.getItem(key)) as any;
         if (tileData && tileData.blob) {
           totalSize += tileData.blob.size;
           if (tileData.timestamp < oldestTimestamp) {
@@ -260,7 +289,7 @@ export class OfflineTileManager {
           }
         }
       } catch (error) {
-        console.error('Error reading tile data:', error);
+        console.error("Error reading tile data:", error);
       }
     }
 
@@ -268,7 +297,7 @@ export class OfflineTileManager {
       totalTiles: keys.length,
       cacheSize: Math.round(totalSize / (1024 * 1024)), // MB
       oldestTile: oldestTimestamp,
-      newestTile: newestTimestamp
+      newestTile: newestTimestamp,
     };
   }
 
@@ -281,13 +310,16 @@ export class OfflineTileManager {
 
     for (const key of keys) {
       try {
-        const tileData = await this.tileStore.getItem(key) as any;
-        if (tileData && this.isTileExpired({ timestamp: tileData.timestamp } as TileInfo)) {
+        const tileData = (await this.tileStore.getItem(key)) as any;
+        if (
+          tileData &&
+          this.isTileExpired({ timestamp: tileData.timestamp } as TileInfo)
+        ) {
           await this.tileStore.removeItem(key);
           clearedCount++;
         }
       } catch (error) {
-        console.error('Error clearing expired tile:', error);
+        console.error("Error clearing expired tile:", error);
       }
     }
 
@@ -308,21 +340,29 @@ export class OfflineTileManager {
    */
   private async updateCacheMetadata(): Promise<void> {
     const stats = await this.getCacheStats();
-    await this.metadataStore.setItem('stats', {
+    await this.metadataStore.setItem("stats", {
       ...stats,
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     });
   }
 
   /**
    * Get download progress
    */
-  getDownloadProgress(): { progress: number; current: number; total: number; isDownloading: boolean } {
+  getDownloadProgress(): {
+    progress: number;
+    current: number;
+    total: number;
+    isDownloading: boolean;
+  } {
     return {
-      progress: this.totalTiles > 0 ? (this.downloadProgress / this.totalTiles) * 100 : 0,
+      progress:
+        this.totalTiles > 0
+          ? (this.downloadProgress / this.totalTiles) * 100
+          : 0,
       current: this.downloadProgress,
       total: this.totalTiles,
-      isDownloading: this.isDownloading
+      isDownloading: this.isDownloading,
     };
   }
 
