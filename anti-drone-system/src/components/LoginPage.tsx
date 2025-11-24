@@ -1,5 +1,5 @@
-// src/components/LoginPage.tsx
 import React, { useState } from "react";
+import {BASE_URL} from "../api/config";
 import {
   Box,
   TextField,
@@ -8,34 +8,37 @@ import {
   Paper,
   CircularProgress,
 } from "@mui/material";
-
+ 
 interface LoginPageProps {
   onLoginSuccess: (token: string) => void; // passed from parent
 }
-
+ 
 const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+ 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
+ 
     try {
-      const response = await fetch('http://192.168.21.54:8080/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-
+      const response = await fetch(
+        `${BASE_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        }
+      );
+ 
       const data = await response.json();
-
+ 
       if (response.ok) {
         console.log("Login response data:", data);
-        localStorage.setItem("authToken", data.data.token);
+        sessionStorage.setItem("token", data.data.token);
         onLoginSuccess(data.data.token);
       } else {
         setError(data.message || "Invalid credentials");
@@ -47,7 +50,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       setLoading(false);
     }
   };
-
+ 
   return (
     <Box
       sx={{
@@ -79,9 +82,29 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             variant="outlined"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            sx={{ mb: 2 }}
-            InputLabelProps={{ style: { color: "#888" } }}
-            InputProps={{ style: { color: "white" } }}
+            sx={{
+              mb: 2,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#888", // default border
+                },
+                "&:hover fieldset": {
+                  borderColor: "#00ff41", // hover border
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#00ff41", // focused border
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: "#888", // label color
+                "&.Mui-focused": {
+                  color: "#00ff41", // focused label color
+                },
+              },
+              "& .MuiInputBase-input": {
+                color: "white", // input text color
+              },
+            }}
           />
           <TextField
             fullWidth
@@ -90,9 +113,29 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            sx={{ mb: 2 }}
-            InputLabelProps={{ style: { color: "#888" } }}
-            InputProps={{ style: { color: "white" } }}
+            sx={{
+              mb: 2,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#888", // default border
+                },
+                "&:hover fieldset": {
+                  borderColor: "#00ff41", // hover border
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#00ff41", // focused border
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: "#888", // label color
+                "&.Mui-focused": {
+                  color: "#00ff41", // focused label color
+                },
+              },
+              "& .MuiInputBase-input": {
+                color: "white", // input text color
+              },
+            }}
           />
           {error && (
             <Typography color="error" variant="body2" sx={{ mb: 2 }}>
@@ -112,7 +155,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             }}
           >
             {loading ? (
-              <CircularProgress size={24} sx={{ color: "black" }} />
+              <CircularProgress size={24} sx={{ color: "#00cc33" }} />
             ) : (
               "Login"
             )}
@@ -122,5 +165,5 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     </Box>
   );
 };
-
+ 
 export default LoginPage;

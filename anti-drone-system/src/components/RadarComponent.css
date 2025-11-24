@@ -1,0 +1,102 @@
+/* RadarComponent.css */
+ 
+/* Radar Sweep Line Styling */
+.radar-sweep-line {
+  filter: drop-shadow(0 0 6px rgba(0, 255, 65, 0.8));
+  stroke-linecap: round;
+}
+ 
+.radar-sweep-glow {
+  mix-blend-mode: screen;
+}
+ 
+/* Radar Circles Styling */
+.radar-circle {
+  animation: fadePulse 3s ease-in-out infinite;
+}
+ 
+.radar-circle-0,
+.radar-circle-1,
+.radar-circle-2,
+.radar-circle-3,
+.radar-circle-4,
+.radar-circle-5,
+.radar-circle-6,
+.radar-circle-7,
+.radar-circle-8
+.radar-circle-9 {
+  animation-delay: 1.5s;
+}
+ 
+@keyframes fadePulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+ 
+/* Radar Axis Lines */
+.radar-axis-line {
+  filter: drop-shadow(0 0 3px rgba(0, 255, 170, 0.6));
+}
+ 
+/* Label Base Styling */
+.radius-label,
+.degree-marking,
+.cardinal-direction {
+  pointer-events: none !important;
+}
+ 
+/* Command Center Icon Animation */
+.command-center-icon {
+  animation: commandPulse 2s ease-in-out infinite;
+}
+ 
+@keyframes commandPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+ 
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .radar-circle {
+    stroke-width: 1px;
+  }
+ 
+  .radar-sweep-line {
+    stroke-width: 3px;
+  }
+}
+ 
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .radar-sweep-line {
+    filter: drop-shadow(0 0 4px rgba(0, 255, 65, 1));
+  }
+ 
+  .radius-label div,
+  .degree-marking div,
+  .cardinal-direction div {
+    /* background: rgba(0, 0, 0, 0.95) !important; */
+    background: "transparent" !important;
+    border-width: 2px !important;
+  }
+}
+ 
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .radar-circle,
+  .command-center-icon,
+  .radar-sweep-line {
+    animation: none;
+  }
+}
+ 

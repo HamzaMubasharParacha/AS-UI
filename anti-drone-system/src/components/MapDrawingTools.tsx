@@ -189,7 +189,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
         onShapeDrawn(shape);
       }
 
-      console.log(`Created ${layerType}:`, shape);
+     // console.log(`Created ${layerType}:`, shape);
     };
 
     const onDrawEdited = (e: any) => {
