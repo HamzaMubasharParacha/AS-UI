@@ -20,7 +20,7 @@ import {
 } from "@mui/icons-material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-
+ 
 import CesiumMap from "./CesiumMap";
 import DroneDetectionPanel from "./DroneDetectionPanel";
 import ThreatAssessment from "./ThreatAssessment";
@@ -32,7 +32,7 @@ import { BASE_URL } from "../api/config";
 interface DashboardProps {
   setToken: (token: string | null) => void;
 }
-
+ 
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -68,7 +68,7 @@ const darkTheme = createTheme({
     },
   },
 });
-
+ 
 interface DroneData {
   id: string;
   position: [number, number, number];
@@ -78,7 +78,7 @@ interface DroneData {
   heading: number;
   detected_at: string;
 }
-
+ 
 interface FloatingCard {
   id: string;
   title: string;
@@ -89,7 +89,7 @@ interface FloatingCard {
   lastActivity: string;
   status: "active" | "inactive" | "warning" | "error";
 }
-
+ 
 interface CardLog {
   id: string;
   title: string;
@@ -98,11 +98,69 @@ interface CardLog {
   description: string;
   icon: React.ReactNode;
 }
-
+ 
 const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+const jammerStart = async () => {
+  const token = sessionStorage.getItem("token");
+ 
+  try {
+    const response = await fetch(
+      "http://192.168.100.110:8080/api/jammer3000/1/jam/start",
+      {
+        method: "POST", // POST request
+        headers: {
+          "Content-Type": "application/json", // JSON body
+          Authorization: `Bearer ${token}`,   // Bearer token
+        },
+        body: JSON.stringify({
+          frequencyBand: "2.4GHz",
+          powerAttenuation: 18
+        }),
+      }
+    );
+ 
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+ 
+    const data = await response.json(); // parse JSON response
+    console.log("API Response:", data);
+ 
+ 
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+const jammerStop = async () => {
+  const token = sessionStorage.getItem("token");
+ 
+  try {
+    const response = await fetch(
+      "http://192.168.100.110:8080/api/jammer3000/1/jam/stop",
+      {
+        method: "POST", // POST request
+        headers: {
+          "Content-Type": "application/json", // JSON body
+          Authorization: `Bearer ${token}`,   // Bearer token
+        },
+       
+      }
+    );
+ 
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+ 
+    const data = await response.json(); // parse JSON response
+    console.log("API Response:", data);
+   
+ 
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
  const handleLogout = async () => {
     setLoading(true);
     setError("");
@@ -157,9 +215,9 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
             }`,
       },
     });
-
+ 
 const data = await response.json(); // First await the JSON parsing
-
+ 
 // Then map over the data array (assuming data.data contains the drones array based on your API response)
 const drones: DroneData[] = data.data.map((drone: any) => ({
   id: drone.name,
@@ -171,32 +229,32 @@ const drones: DroneData[] = data.data.map((drone: any) => ({
   threat_level: "HIGH", // Use a function to determine threat level
   distance: drone.distance || 0,
   speed: drone.speed || 0,
-  heading: Number(drone.direction) || 0, 
+  heading: Number(drone.direction) || 0,
   detected_at: drone.created_time || new Date().toISOString(),
 }));
-
+ 
 setDetectedDrones(drones);
-        
+       
       }
       catch (error){
         console.error("error")
       }
     }
-
+ 
 useEffect(() => {
   // Fetch immediately
   Drones();
-  
+ 
   // Set up interval
   const intervalId = setInterval(Drones, 1000);
-  
+ 
   // Cleanup
   return () => clearInterval(intervalId);
 }, []);
-
-
-
-
+ 
+ 
+ 
+ 
   const [dragState, setDragState] = useState<{
     isDragging: boolean;
     draggedCardId: string | null;
@@ -208,7 +266,7 @@ useEffect(() => {
     dragOffset: { x: 0, y: 0 },
     startPosition: { x: 0, y: 0 },
   });
-
+ 
   const [floatingCards, setFloatingCards] = useState<FloatingCard[]>([
     {
       id: "system-status",
@@ -260,141 +318,23 @@ useEffect(() => {
       lastActivity: new Date().toLocaleTimeString(),
       status: "inactive",
     },
-    {
-      id: "data-visualization",
-      title: "Data Analytics",
-      component: "DataVisualization",
-      position: { x: 800, y: 100 },
-      visible: false,
-      minimized: false,
-      lastActivity: new Date().toLocaleTimeString(),
-      status: "active",
-    },
+ 
   ]);
-
+ 
   const [systemStatus] = useState({
     radar: "ONLINE",
     countermeasures: "READY",
     communications: "ONLINE",
     power: 98,
   });
-
-  // // Initialize with sample drone data
-  // useEffect(() => {
-  //   const initialDrones: DroneData[] = [
-  //     {
-  //       id: "DRONE_001",
-  //       position: [72.9977674, 33.6475773, 150],
-  //       threat_level: "HIGH",
-  //       distance: 1100,
-  //       speed: 25,
-  //       heading: 45,
-  //       detected_at: new Date().toISOString(),
-  //     },
-  //     {
-  //       id: "DRONE_002",
-  //       position: [72.9777674, 33.6275773, 200],
-  //       threat_level: "MEDIUM",
-  //       distance: 2200,
-  //       speed: 18,
-  //       heading: 180,
-  //       detected_at: new Date().toISOString(),
-  //     },
-  //     {
-  //       id: "DRONE_003",
-  //       position: [72.9827674, 33.6425773, 100],
-  //       threat_level: "CRITICAL",
-  //       distance: 600,
-  //       speed: 35,
-  //       heading: 270,
-  //       detected_at: new Date().toISOString(),
-  //     },
-  //     {
-  //       id: "DRONE_004",
-  //       position: [73.0077674, 33.6375773, 300],
-  //       threat_level: "LOW",
-  //       distance: 2000,
-  //       speed: 15,
-  //       heading: 90,
-  //       detected_at: new Date().toISOString(),
-  //     },
-  //     {
-  //       id: "DRONE_005",
-  //       position: [72.9877674, 33.6575773, 250],
-  //       threat_level: "MEDIUM",
-  //       distance: 2200,
-  //       speed: 22,
-  //       heading: 315,
-  //       detected_at: new Date().toISOString(),
-  //     },
-  //   ];
-
-  //   setDetectedDrones(initialDrones);
-  // }, []);
-
-  // // Simulate drone detection updates
-  // useEffect(() => {
-  //   if (!systemActive) return;
-
-  //   const interval = setInterval(() => {
-  //     setDetectedDrones((prev) => {
-  //       const updated = prev.map((drone) => ({
-  //         ...drone,
-  //         position: [
-  //           drone.position[0] + (Math.random() - 0.5) * 0.001,
-  //           drone.position[1] + (Math.random() - 0.5) * 0.001,
-  //           drone.position[2] + (Math.random() - 0.5) * 10,
-  //         ] as [number, number, number],
-
-  //         distance: Math.max(50, drone.distance + (Math.random() - 0.5) * 100),
-  //         speed: Math.max(5, drone.speed + (Math.random() - 0.5) * 5),
-  //         heading: (drone.heading + (Math.random() - 0.5) * 20) % 360,
-  //       }));
-
-  //       if (Math.random() < 0.2 && updated.length < 10) {
-  //         const newDrone: DroneData = {
-  //           id: `DRONE_${Date.now()}_${Math.random()
-  //             .toString(36)
-  //             .substr(2, 5)}`,
-
-  //           position: [
-  //             72.9877674 + (Math.random() - 0.5) * 0.08,
-  //             33.6375773 + (Math.random() - 0.5) * 0.08,
-  //             Math.random() * 400 + 50,
-  //           ],
-
-  //           threat_level: ["LOW", "MEDIUM", "HIGH", "CRITICAL"][
-  //             Math.floor(Math.random() * 4)
-  //           ] as any,
-  //           distance: Math.random() * 4500 + 200,
-  //           speed: Math.random() * 40 + 10,
-  //           heading: Math.random() * 360,
-  //           detected_at: new Date().toISOString(),
-  //         };
-
-  //         updated.push(newDrone);
-  //       }
-  //       return updated;
-  //     });
-
-  //     // Update card activity timestamps
-  //     setFloatingCards((prev) =>
-  //       prev.map((card) => ({
-  //         ...card,
-  //         lastActivity: new Date().toLocaleTimeString(),
-  //         status: card.visible ? "active" : card.status,
-  //       }))
-  //     );
-  //   }, 3000);
-
-  //   return () => clearInterval(interval);
-  // }, [systemActive]);
-
+ 
+ 
+ 
   const activeThreat = detectedDrones.find(
     (drone) =>
       drone.threat_level === "HIGH" || drone.threat_level === "CRITICAL"
   );
-
+ 
   const toggleCard = (cardId: string) => {
     setFloatingCards((prev) =>
       prev.map((card) =>
@@ -409,7 +349,7 @@ useEffect(() => {
       )
     );
   };
-
+ 
   const minimizeCard = (cardId: string) => {
     setFloatingCards((prev) =>
       prev.map((card) =>
@@ -417,7 +357,7 @@ useEffect(() => {
       )
     );
   };
-
+ 
   const updateCardPosition = (
     cardId: string,
     newPosition: { x: number; y: number }
@@ -428,7 +368,7 @@ useEffect(() => {
       )
     );
   };
-
+ 
   const handleMouseDown = (e: React.MouseEvent, cardId: string) => {
     e.preventDefault();
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -441,7 +381,7 @@ useEffect(() => {
       startPosition: { x: e.clientX, y: e.clientY },
     });
   };
-
+ 
   const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
     e.preventDefault();
     const touch = e.touches[0];
@@ -455,7 +395,7 @@ useEffect(() => {
       startPosition: { x: touch.clientX, y: touch.clientY },
     });
   };
-
+ 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       if (!dragState.isDragging || !dragState.draggedCardId) return;
@@ -476,7 +416,7 @@ useEffect(() => {
       dragState.dragOffset.y,
     ]
   );
-
+ 
   const handleTouchMove = useCallback(
     (e: TouchEvent) => {
       if (!dragState.isDragging || !dragState.draggedCardId) return;
@@ -504,7 +444,7 @@ useEffect(() => {
       dragState.dragOffset.y,
     ]
   );
-
+ 
   const handleMouseUp = () => {
     setDragState({
       isDragging: false,
@@ -513,7 +453,7 @@ useEffect(() => {
       startPosition: { x: 0, y: 0 },
     });
   };
-
+ 
   const handleTouchEnd = () => {
     setDragState({
       isDragging: false,
@@ -522,7 +462,7 @@ useEffect(() => {
       startPosition: { x: 0, y: 0 },
     });
   };
-
+ 
   useEffect(() => {
     if (dragState.isDragging) {
       document.addEventListener("mousemove", handleMouseMove);
@@ -539,7 +479,7 @@ useEffect(() => {
       };
     }
   }, [dragState.isDragging, handleMouseMove, handleTouchMove]);
-
+ 
   const renderCardContent = (card: FloatingCard) => {
     switch (card.component) {
       case "SystemStatus":
@@ -606,7 +546,7 @@ useEffect(() => {
         return <Box>Unknown component</Box>;
     }
   };
-
+ 
   const leftCardLogs: CardLog[] = [
     {
       id: "system-status",
@@ -665,46 +605,7 @@ useEffect(() => {
       icon: <Edit />,
     },
   ];
-
-  const rightCardLogs: CardLog[] = [
-    {
-      id: "data-visualization",
-      title: "Data Analytics",
-      status:
-        floatingCards.find((c) => c.id === "data-visualization")?.status ||
-        "inactive",
-      lastActivity:
-        floatingCards.find((c) => c.id === "data-visualization")
-          ?.lastActivity || "",
-      description: "Real-time data analysis and charts",
-      icon: <BarChart />,
-    },
-    {
-      id: "timeline-view",
-      title: "Timeline View",
-      status: "inactive",
-      lastActivity: new Date().toLocaleTimeString(),
-      description: "Historical event timeline",
-      icon: <Timeline />,
-    },
-    {
-      id: "distribution-chart",
-      title: "Distribution Analysis",
-      status: "inactive",
-      lastActivity: new Date().toLocaleTimeString(),
-      description: "Threat distribution patterns",
-      icon: <PieChart />,
-    },
-    {
-      id: "trend-analysis",
-      title: "Trend Analysis",
-      status: "inactive",
-      lastActivity: new Date().toLocaleTimeString(),
-      description: "Long-term trend monitoring",
-      icon: <ShowChart />,
-    },
-  ];
-
+ 
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -720,6 +621,10 @@ useEffect(() => {
               <div className="status-dot active"></div>
               <span className="status-text">OPERATIONAL</span>
             </div>
+            <div>
+              <button style={{backgroundColor:"red", color:'white',padding:"6px",height:'25px',borderRadius:'6px',border:'none',marginRight:"5px"}} type="button" onClick={jammerStart} className="btn btn-primary">START</button>
+              <button style={{backgroundColor:"green", color:'white',padding:"6px",height:'25px',borderRadius:'6px',border:'none'}} type="button" onClick={jammerStop} className="btn btn-secondary">STOP</button>
+            </div>
             {/* <button onClick={Drones}>click</button> */}
             <Button
               onClick={handleLogout}
@@ -734,7 +639,7 @@ useEffect(() => {
               Logout
             </Button>
           </div>
-
+ 
           {/* Full Screen Map */}
           <div className="map-container">
             <CesiumMap
@@ -743,7 +648,7 @@ useEffect(() => {
               drawingToolsEnabled={drawingToolsEnabled}
             />
           </div>
-
+ 
           {/* Floating Cards */}
           {floatingCards
             .filter((card) => card.visible)
@@ -795,8 +700,8 @@ useEffect(() => {
                 )}
               </Box>
             ))}
-
-          {/* Left Fixed Column */}
+ 
+          {/* Left Fixed Column Only - Right Column Removed */}
           <div className="fixed-column left">
             <div className="column-header">
               <Dashboard className="column-icon" />
@@ -824,59 +729,7 @@ useEffect(() => {
                       </span>
                     </div>
                   </div>
-                  <div className="column-item-action">
-                    {floatingCards.find((c) => c.id === log.id)?.visible ? (
-                      <ChevronLeft className="action-icon active" />
-                    ) : (
-                      <ChevronRight className="action-icon" />
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right Fixed Column */}
-          <div className="fixed-column right">
-            <div className="column-header">
-              <BarChart className="column-icon" />
-              <h3 className="column-title">DATA</h3>
-            </div>
-            <div className="column-content">
-              {rightCardLogs.map((log) => (
-                <div
-                  key={log.id}
-                  className={`column-item ${
-                    floatingCards.find((c) => c.id === log.id)?.visible
-                      ? "active"
-                      : ""
-                  } ${log.id !== "data-visualization" ? "disabled" : ""}`}
-                  onClick={() =>
-                    log.id === "data-visualization" ? toggleCard(log.id) : null
-                  }
-                  title={log.description}
-                >
-                  <div className="column-item-icon">{log.icon}</div>
-                  <div className="column-item-info">
-                    <div className="column-item-title">{log.title}</div>
-                    <div className="column-item-status">
-                      <span className={`status-dot ${log.status}`}></span>
-                      <span className="status-text">
-                        {log.status.toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="column-item-action">
-                    {log.id === "data-visualization" ? (
-                      floatingCards.find((c) => c.id === log.id)?.visible ? (
-                        <ChevronLeft className="action-icon active" />
-                      ) : (
-                        <ChevronRight className="action-icon" />
-                      )
-                    ) : (
-                      <span className="action-icon disabled">•••</span>
-                    )}
-                  </div>
+                 
                 </div>
               ))}
             </div>
@@ -886,5 +739,5 @@ useEffect(() => {
     </ThemeProvider>
   );
 };
-
+ 
 export default ADSDashboard;
