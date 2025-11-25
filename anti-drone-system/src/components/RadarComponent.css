@@ -1,18 +1,48 @@
 /* RadarComponent.css */
  
-/* Radar Sweep Line Styling */
+/* RadarComponent.css */
+
+/* Radar sweep line with high z-index */
 .radar-sweep-line {
-  filter: drop-shadow(0 0 6px rgba(0, 255, 65, 0.8));
-  stroke-linecap: round;
+  z-index: 1000 !important;
 }
- 
+
+/* Radar sweep glow with high z-index */
 .radar-sweep-glow {
-  mix-blend-mode: screen;
+  z-index: 999 !important;
 }
- 
-/* Radar Circles Styling */
+
+/* Radar circles with high z-index */
 .radar-circle {
-  animation: fadePulse 3s ease-in-out infinite;
+  z-index: 800 !important;
+}
+
+/* Radar axis lines with high z-index */
+.radar-axis-line {
+  z-index: 801 !important;
+}
+
+/* Cardinal directions with high z-index */
+.cardinal-direction {
+  z-index: 900 !important;
+}
+
+/* Distance markings with high z-index */
+.distance-marking {
+  z-index: 901 !important;
+}
+
+/* Ensure the container has proper positioning */
+.leaflet-overlay-pane {
+  z-index: 400;
+}
+
+.leaflet-marker-pane {
+  z-index: 600;
+}
+
+.leaflet-popup-pane {
+  z-index: 700;
 }
  
 .radar-circle-0,
@@ -37,21 +67,32 @@
   }
 }
  
-/* Radar Axis Lines */
+/* Radar axis lines with high z-index */
 .radar-axis-line {
-  filter: drop-shadow(0 0 3px rgba(0, 255, 170, 0.6));
+  z-index: 801 !important;
 }
- 
-/* Label Base Styling */
-.radius-label,
-.degree-marking,
+
+/* Cardinal directions with high z-index */
 .cardinal-direction {
-  pointer-events: none !important;
+  z-index: 900 !important;
 }
- 
-/* Command Center Icon Animation */
-.command-center-icon {
-  animation: commandPulse 2s ease-in-out infinite;
+
+/* Distance markings with high z-index */
+.distance-marking {
+  z-index: 901 !important;
+}
+
+/* Ensure the container has proper positioning */
+.leaflet-overlay-pane {
+  z-index: 400;
+}
+
+.leaflet-marker-pane {
+  z-index: 600;
+}
+
+.leaflet-popup-pane {
+  z-index: 700;
 }
  
 @keyframes commandPulse {

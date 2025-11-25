@@ -10,7 +10,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "./RadarComponent.css";
- 
+
 // ==========================
 // Radar Sweep Line Component
 // ==========================
@@ -148,10 +148,6 @@ const CardinalDirections: React.FC<{
  
   const [centerLat, centerLng] = center;
  
-  // Calculate font size based on zoom
-  let fontSize = 12 * Math.pow(1.15, zoom);
-  fontSize = Math.min(Math.max(fontSize, 10), 16);
- 
   const cardinalPoints = [
     { degree: 0, label: "N" },
     { degree: 90, label: "E" },
@@ -175,11 +171,11 @@ const CardinalDirections: React.FC<{
                 <div style="
                   color: black;
                   font-weight: 800;
-                  font-size: ${fontSize}px;
+                  font-size: 14px;
                   font-family: 'Arial Black', sans-serif;
                 ">${label}</div>
               `,
-              iconSize: [fontSize, fontSize],
+              iconSize: [40, 40],
             })}
           />
         );
@@ -196,10 +192,6 @@ const DistanceMarkings: React.FC<{
   if (zoom < 12) return null; // hide when zoomed out
  
   const [centerLat, centerLng] = center;
- 
-  // scale font size
-  let fontSize = 10 * Math.pow(1.15, zoom);
-  fontSize = Math.min(Math.max(fontSize, 8), 14);
  
   // show markers less frequently depending on zoom
   // const spacing =
@@ -237,10 +229,10 @@ const DistanceMarkings: React.FC<{
         background: transparent;
         color: black;
         font-weight: 700;
-        font-size: ${fontSize * 0.7}px;
+        font-size: 14px;
         font-family: 'Courier New', monospace;
         white-space: nowrap;
-      ">${radiusKm} km</div>
+      ">${radiusKm}km</div>
     `,
           iconSize: [50, 24],
           iconAnchor: [25, 12],
@@ -306,8 +298,6 @@ const RadarComponent: React.FC<RadarComponentProps> = ({
       {Array.from({ length: 10 }).map((_, i) => {
         const radiusKm = i + 1;
         const radiusMeters = radiusKm * 1000;
-        let fontSize = 11 * Math.pow(1.15, zoom);
-        fontSize = Math.min(Math.max(fontSize, 9), 14);
  
         return (
           <React.Fragment key={i}>
@@ -351,6 +341,8 @@ const RadarComponent: React.FC<RadarComponentProps> = ({
             }}
           />
         ))}
+
+        
     </>
   );
 };

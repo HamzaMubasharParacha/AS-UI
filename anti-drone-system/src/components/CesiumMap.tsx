@@ -1,57 +1,14 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { MapContainer, Circle, Marker, Popup, useMap, Polyline, Polygon } from "react-leaflet";
+
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import MapDrawingTools from "./MapDrawingTools";
 import { createESRISatelliteOfflineLayer } from "../utils/OfflineTileLayer";
 import OfflineMapControl from "./OfflineMapControl";
 import { BASE_URL } from "../api/config";
- 
-// Custom Radar Component for animated scanning
-const RadarSweep: React.FC<{ center: [number, number] }> = ({ center }) => {
-  const [rotation, setRotation] = useState(0);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRotation((prev) => (prev + 2) % 360);
-    }, 50); // Update every 50ms for smooth animation
- 
-    return () => clearInterval(interval);
-  }, []);
- 
-  // Create radar sweep using SVG
-  const radarSweepIcon = new L.DivIcon({
-    html: `
-      <div style="
-        position: relative;
-        width: 300px;
-        height: 300px;
-        pointer-events: none;
-        transform: rotate(${rotation}deg);
-        transition: none;
-      ">
-        <svg width="300" height="300" style="position: absolute; top: 0; left: 0;">
-          <defs>
-            <radialGradient id="radarGradient" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" style="stop-color:#00ff41;stop-opacity:0.8" />
-              <stop offset="30%" style="stop-color:#00ff41;stop-opacity:0.4" />
-              <stop offset="70%" style="stop-color:#00ff41;stop-opacity:0.1" />
-              <stop offset="100%" style="stop-color:#00ff41;stop-opacity:0" />
-            </radialGradient>
-          </defs>
-          <path d="M 150 150 L 150 0 A 150 150 0 0 1 255.9 75 Z"
-                fill="url(#radarGradient)"
-                opacity="0.7"/>
-        </svg>
-      </div>
-    `,
-    className: "radar-sweep",
-    iconSize: [300, 300],
-    iconAnchor: [150, 150],
-  });
- 
-  return <Marker position={center} icon={radarSweepIcon} />;
-};
+import RadarComponent from "./RadarComponent";
 
 // Triangle Cone Component
 const TriangleCone: React.FC<{
@@ -59,7 +16,7 @@ const TriangleCone: React.FC<{
   angle: number;
   radius: number;
   direction?: number;
-}> = ({ center, angle = 45, radius = 5000, direction = 0 }) => {
+}> = ({ center, angle = 45, radius = 10000, direction = 0 }) => {
   // Convert degrees to radians
   const toRadians = (degrees: number) => degrees * (Math.PI / 180);
  
@@ -356,9 +313,9 @@ const calculateDistance = (
 // Get trajectory color based on threat level
 const getTrajectoryColor = (threatLevel: string): string => {
   const colors = {
-    LOW: "#4CAF50",      // Green
-    MEDIUM: "#FF9800",   // Orange
-    HIGH: "#F44336",     // Red
+    LOW: "#4CAF50", // Green
+    MEDIUM: "#FF9800", // Orange
+    HIGH: "#F44336", // Red
     CRITICAL: "#D32F2F", // Dark Red
   };
   return colors[threatLevel as keyof typeof colors];
@@ -380,17 +337,20 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   const [showTriangleCone, setShowTriangleCone] = useState(true);
    // Default 45 degrees
   const mapRef = useRef<L.Map>(null);
-  const [coordinat, setcoordinate] = useState("");
+
   // Updated coordinates as requested by user (Islamabad/Rawalpindi area)
-  const [latLon, setLatLon] = useState<{ lat: number | null; lon: number | null }>({ lat: null, lon: null });
-  const centerLat = latLon.lat ?? 0;
-  const centerLng = latLon.lon ?? 0;
+  const [latLon, setLatLon] = useState<{
+    lat: number | null;
+    lon: number | null;
+  }>({ lat: null, lon: null });
+  const centerLat = latLon.lat ?? 33.6375;
+  const centerLng = latLon.lon ?? 72.98;
   const centerPosition: [number, number] = [centerLat, centerLng];
  
   // Calculate 10km and 3KM radius in meters
-  const radius10km = 5000; // 5 kilometers in meters
+  const radius10km = 10000; // 5 kilometers in meters
   const radius3km = 3000; // 3 kilometers in meters
-  const coneRadius = 5000; // 5km cone radius
+  const coneRadius = 10000; // 10km cone radius
 
   //jammer cone set
   const [coneDirection, setConeDirection] = useState(0);
@@ -414,17 +374,14 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   const getCoordinate = async () => {
     try {
       const token = sessionStorage.getItem("token");
-      const response = await fetch(
-        `${BASE_URL}/drone-detection/sensors`,
-        {
-          method: "GET",
-          headers: {
+      const response = await fetch(`${BASE_URL}/drone-detection/sensors`, {
+        method: "GET",
+        headers: {
           Authorization: `Bearer ${
-              token || "219498f3-03f9-41a0-9140-eec5bfe0e311"
-            }`,
-          },
-        }
-      );
+            token || "219498f3-03f9-41a0-9140-eec5bfe0e311"
+          }`,
+        },
+      });
       const data = await response.json();
       if (data.data.length > 0) {
         const firstSensor = data.data[0];
@@ -469,19 +426,22 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
  
         if (existingTrajectoryIndex !== -1) {
           // Update existing trajectory
-          const existingPoints = updatedTrajectories[existingTrajectoryIndex].points;
+          const existingPoints =
+            updatedTrajectories[existingTrajectoryIndex].points;
           const lastPoint = existingPoints[existingPoints.length - 1];
          
           // Only add new point if position changed significantly (more than 10 meters)
           const distanceChange = calculateDistance(
-            lastPoint.position[1], lastPoint.position[0],
-            drone.position[1], drone.position[0]
+            lastPoint.position[1],
+            lastPoint.position[0],
+            drone.position[1],
+            drone.position[0]
           );
  
           if (distanceChange > 10) { // 10 meters threshold to avoid too many points
             updatedTrajectories[existingTrajectoryIndex].points = [
               ...existingPoints.slice(-99), // Keep last 100 points max
-              newPoint
+              newPoint,
             ];
           }
         } else {
@@ -490,16 +450,21 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             id: drone.id,
             points: [newPoint],
             color: getTrajectoryColor(drone.threat_level),
-            threat_level: drone.threat_level
+            threat_level: drone.threat_level,
           });
         }
       });
  
       // Remove trajectories for drones that are no longer present (after 5 minutes of inactivity)
       const now = new Date().getTime();
-      return updatedTrajectories.filter(trajectory => {
-        const lastPointTime = new Date(trajectory.points[trajectory.points.length - 1].timestamp).getTime();
-        return drones.find(d => d.id === trajectory.id) || (now - lastPointTime) < 5 * 60 * 1000; // 5 minutes
+      return updatedTrajectories.filter((trajectory) => {
+        const lastPointTime = new Date(
+          trajectory.points[trajectory.points.length - 1].timestamp
+        ).getTime();
+        return (
+          drones.find((d) => d.id === trajectory.id) ||
+          now - lastPointTime < 5 * 60 * 1000
+        ); // 5 minutes
       });
     });
   }, [drones]);
@@ -556,8 +521,13 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   };
  
   // Get trajectory points for polyline (convert to [lat, lng] format)
-  const getTrajectoryPoints = (trajectory: DroneTrajectory): [number, number][] => {
-    return trajectory.points.map(point => [point.position[1], point.position[0]]);
+  const getTrajectoryPoints = (
+    trajectory: DroneTrajectory
+  ): [number, number][] => {
+    return trajectory.points.map((point) => [
+      point.position[1],
+      point.position[0],
+    ]);
   };
  
   return (
@@ -622,9 +592,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             }}
           />
         ))}
- 
-        {/* Animated Radar Sweep - GEOGRAPHICALLY FIXED */}
-        {radarActive && systemActive && <RadarSweep center={centerPosition} />}
+
  
         {/* GEOGRAPHICALLY FIXED 10km Coverage Circle */}
         <Circle
@@ -651,9 +619,11 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             dashArray: "5, 5",
           }}
         />
+        
+        <RadarComponent center={centerPosition} radius={radius10km} radarActive={radarActive} systemActive={systemActive}></RadarComponent>
  
         {/* GEOGRAPHICALLY FIXED Command Center Marker */}
-        <Marker position={centerPosition} icon={commandCenterIcon}>
+        <Marker position={centerPosition} icon={commandCenterIcon} >
           <Popup>
             <div style={{ fontFamily: "monospace", fontSize: "12px" }}>
               <strong>🏢 COMMAND CENTER</strong>
@@ -676,6 +646,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             </div>
           </Popup>
         </Marker>
+
  
         {/* Drone Markers - Each positioned at their geographic coordinates with detection highlighting */}
         {drones.map((drone) => {
@@ -736,11 +707,12 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
                   <strong>DETECTED:</strong> {drone.detected_at}
                   <br />
                   {trajectory && (
-  <>
-    <strong>TRAJECTORY POINTS:</strong> {trajectory.points.length}
-    <br />
-  </>
-)}
+                    <>
+                      <strong>TRAJECTORY POINTS:</strong>{" "}
+                      {trajectory.points.length}
+                      <br />
+                    </>
+                  )}
                   <br />
                   {isDetected && (
                     <>
@@ -838,8 +810,10 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             cursor: "pointer",
             padding: "4px 8px",
             borderRadius: 1,
-            backgroundColor: showTrajectories ? "rgba(0, 255, 65, 0.2)" : "transparent",
-            "&:hover": { backgroundColor: "rgba(0, 255, 65, 0.1)" }
+            backgroundColor: showTrajectories
+              ? "rgba(0, 255, 65, 0.2)"
+              : "transparent",
+            "&:hover": { backgroundColor: "rgba(0, 255, 65, 0.1)" },
           }}
           onClick={toggleTrajectories}
         >
@@ -858,11 +832,15 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             cursor: "pointer",
             padding: "4px 8px",
             borderRadius: 1,
-            "&:hover": { backgroundColor: "rgba(255, 0, 0, 0.1)" }
+            "&:hover": { backgroundColor: "rgba(255, 0, 0, 0.1)" },
           }}
           onClick={clearTrajectories}
         >
-          <Typography variant="caption" display="block" sx={{ color: "#ff4444" }}>
+          <Typography
+            variant="caption"
+            display="block"
+            sx={{ color: "#ff4444" }}
+          >
             🗑️ CLEAR ALL
           </Typography>
         </Box>
@@ -870,8 +848,13 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         <Typography variant="caption" display="block" sx={{ mt: 1, fontSize: "10px", opacity: 0.8 }}>
           ACTIVE TRACKS: {trajectories.length}
         </Typography>
-        <Typography variant="caption" display="block" sx={{ fontSize: "10px", opacity: 0.8 }}>
-          TOTAL POINTS: {trajectories.reduce((sum, t) => sum + t.points.length, 0)}
+        <Typography
+          variant="caption"
+          display="block"
+          sx={{ fontSize: "10px", opacity: 0.8 }}
+        >
+          TOTAL POINTS:{" "}
+          {trajectories.reduce((sum, t) => sum + t.points.length, 0)}
         </Typography>
       </Box>
  
@@ -879,7 +862,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
       <Box
         sx={{
           position: "absolute",
-          top: 10,
+          bottom: 10,
           right: 10,
           backgroundColor: "rgba(0, 0, 0, 0.85)",
           color: "#fff",
@@ -892,26 +875,48 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           zIndex: 1000,
         }}
       >
-        <Typography variant="caption" display="block" sx={{ fontWeight: "bold", color: "#00ff41", mb: 1 }}>
+        <Typography
+          variant="caption"
+          display="block"
+          sx={{ fontWeight: "bold", color: "#00ff41", mb: 1 }}
+        >
           🛤️ TRAJECTORY LEGEND
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-          <Box sx={{ width: 20, height: 3, backgroundColor: "#4CAF50", mr: 1 }} />
+          <Box
+            sx={{ width: 20, height: 3, backgroundColor: "#4CAF50", mr: 1 }}
+          />
           <Typography variant="caption">LOW THREAT</Typography>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-          <Box sx={{ width: 20, height: 3, backgroundColor: "#FF9800", mr: 1 }} />
+          <Box
+            sx={{ width: 20, height: 3, backgroundColor: "#FF9800", mr: 1 }}
+          />
           <Typography variant="caption">MEDIUM THREAT</Typography>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-          <Box sx={{ width: 20, height: 3, backgroundColor: "#F44336", mr: 1 }} />
+          <Box
+            sx={{ width: 20, height: 3, backgroundColor: "#F44336", mr: 1 }}
+          />
           <Typography variant="caption">HIGH THREAT</Typography>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-          <Box sx={{ width: 20, height: 3, backgroundColor: "#D32F2F", mr: 1, border: "1px dashed #fff" }} />
+          <Box
+            sx={{
+              width: 20,
+              height: 3,
+              backgroundColor: "#D32F2F",
+              mr: 1,
+              border: "1px dashed #fff",
+            }}
+          />
           <Typography variant="caption">CRITICAL THREAT</Typography>
         </Box>
-        <Typography variant="caption" display="block" sx={{ mt: 1, fontSize: "9px", opacity: 0.7 }}>
+        <Typography
+          variant="caption"
+          display="block"
+          sx={{ mt: 1, fontSize: "9px", opacity: 0.7 }}
+        >
           Click lines to select drone
         </Typography>
       </Box>
@@ -1059,21 +1064,26 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
               </Typography>
               <Typography variant="caption" display="block">
                 <strong>TRACK POINTS:</strong>{" "}
-                {trajectories.find(t => t.id === selectedThreat.id)?.points.length || 0}
+                {trajectories.find((t) => t.id === selectedThreat.id)?.points
+                  .length || 0}
               </Typography>
               <Typography variant="caption" display="block" sx={{ mb: 1 }}>
                 <strong>TRACK LENGTH:</strong>{" "}
                 {(() => {
-                  const trajectory = trajectories.find(t => t.id === selectedThreat.id);
+                  const trajectory = trajectories.find(
+                    (t) => t.id === selectedThreat.id
+                  );
                   if (!trajectory || trajectory.points.length < 2) return "0m";
                  
                   let totalDistance = 0;
                   for (let i = 1; i < trajectory.points.length; i++) {
-                    const prev = trajectory.points[i-1];
+                    const prev = trajectory.points[i - 1];
                     const curr = trajectory.points[i];
                     totalDistance += calculateDistance(
-                      prev.position[1], prev.position[0],
-                      curr.position[1], curr.position[0]
+                      prev.position[1],
+                      prev.position[0],
+                      curr.position[1],
+                      curr.position[0]
                     );
                   }
                   return `${totalDistance.toFixed(0)}m`;

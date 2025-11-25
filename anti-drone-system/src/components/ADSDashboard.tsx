@@ -5,10 +5,6 @@ import {
   Radar,
   Assessment,
   Security,
-  BarChart,
-  Timeline,
-  PieChart,
-  ShowChart,
   ChevronLeft,
   ChevronRight,
   Close as CloseIcon,
@@ -102,92 +98,84 @@ interface CardLog {
 const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-const jammerStart = async () => {
-  const token = sessionStorage.getItem("token");
- 
-  try {
-    const response = await fetch(
-      "http://192.168.100.110:8080/api/jammer3000/1/jam/start",
-      {
-        method: "POST", // POST request
-        headers: {
-          "Content-Type": "application/json", // JSON body
-          Authorization: `Bearer ${token}`,   // Bearer token
-        },
-        body: JSON.stringify({
-          frequencyBand: "2.4GHz",
-          powerAttenuation: 18
-        }),
-      }
-    );
- 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
- 
-    const data = await response.json(); // parse JSON response
-    console.log("API Response:", data);
- 
- 
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
-const jammerStop = async () => {
-  const token = sessionStorage.getItem("token");
- 
-  try {
-    const response = await fetch(
-      "http://192.168.100.110:8080/api/jammer3000/1/jam/stop",
-      {
-        method: "POST", // POST request
-        headers: {
-          "Content-Type": "application/json", // JSON body
-          Authorization: `Bearer ${token}`,   // Bearer token
-        },
-       
-      }
-    );
- 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
- 
-    const data = await response.json(); // parse JSON response
-    console.log("API Response:", data);
-   
- 
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
- const handleLogout = async () => {
-    setLoading(true);
-    setError("");
- 
+
+  const getAllJammers = async () => {
     try {
       const token = sessionStorage.getItem("token");
-      console.log("Logging out with token :", token);
- 
+
+      const res = await fetch(`${BASE_URL}/jammer3000`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log("getAllJammers:", await res.json());
+    } catch (err) {
+      console.error("Error in getAllJammers:", err);
+    }
+  };
+
+  const StartJamming = async () => {
+    try {
+      const token = sessionStorage.getItem("token");
+
+      const res = await fetch(`${BASE_URL}/jammer3000/1/jam/start`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          frequency_band: "2.4GHz",
+          powerAttenuation: 18,
+        }),
+      });
+
+      console.log("Jamming Started:", await res.json());
+    } catch (err) {
+      console.error("Error Starting jamming:", err);
+    }
+  };
+
+  const StopJamming = async () => {
+    try {
+      const token = sessionStorage.getItem("token");
+
+      const res = await fetch(`${BASE_URL}/jammer3000/1/jam/stop`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log("Stopping Jmming:", await res.json());
+    } catch (err) {
+      console.error("Error in Stopping Jamming:", err);
+    }
+  };
+
+  const handleLogout = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const token = sessionStorage.getItem("token");
+      console.log("Attempting Logging out with token :", token);
+
       if (!token) {
         setError("No authentication token found");
         setLoading(false);
         return;
       }
- 
-      const response = await fetch(
-        "http://192.168.100.110:8080/api/auth/logout",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
- 
+
+      const response = await fetch(`${BASE_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       if (response.ok) {
         console.log("Logout successful");
+        // sessionStorage.removeItem("token");
         sessionStorage.removeItem("token");
         setToken(null); // triggers re-render → redirects to LoginPage
       } else {
@@ -201,16 +189,19 @@ const jammerStop = async () => {
       setLoading(false);
     }
   };
-    const [systemActive] = useState(true);
-    const [detectedDrones, setDetectedDrones] = useState<DroneData[]>([]);
-    const [drawingToolsEnabled, setDrawingToolsEnabled] = useState(false);
-    const Drones = async () =>{
-      try{
-        const token = sessionStorage.getItem("token");
-        const response = await fetch(`${BASE_URL}/drone-detection/drones/1?extended=true`, {
-        method: 'GET',
-        headers: {
-        Authorization: `Bearer ${
+  const [systemActive] = useState(true);
+  const [detectedDrones, setDetectedDrones] = useState<DroneData[]>([]);
+  const [drawingToolsEnabled, setDrawingToolsEnabled] = useState(false);
+
+  const Drones = async () => {
+    try {
+      const token = sessionStorage.getItem("token");
+      const response = await fetch(
+        `${BASE_URL}/drone-detection/drones`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${
               token || "219498f3-03f9-41a0-9140-eec5bfe0e311"
             }`,
       },
@@ -297,6 +288,16 @@ useEffect(() => {
       minimized: false,
       lastActivity: new Date().toLocaleTimeString(),
       status: "warning",
+    },
+    {
+      id: "jammer-options",
+      title: "Jammer Options",
+      component: "JammerOptions",
+      position: { x: 800, y: 350 },
+      visible: false,
+      minimized: false,
+      lastActivity: new Date().toLocaleTimeString(),
+      status: "inactive",
     },
     {
       id: "countermeasures",
@@ -488,6 +489,42 @@ useEffect(() => {
         return <DroneDetectionPanel drones={detectedDrones} />;
       case "ThreatAssessment":
         return <ThreatAssessment drones={detectedDrones} />;
+
+      case "JammerOptions":
+        return (
+          <Box sx={{ p: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, color: "#00ff41" }}>
+              Jammer Options
+            </Typography>
+
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <Button
+                variant="outlined"
+                sx={{ borderColor: "#00ff41", color: "#00ff41" }}
+                onClick={getAllJammers}
+              >
+                Get all Jammers
+              </Button>
+
+              <Button
+                variant="outlined"
+                sx={{ borderColor: "#ffaa00", color: "#ffaa00" }}
+                onClick={StartJamming}
+              >
+                Start Jamming
+              </Button>
+
+              <Button
+                variant="outlined"
+                sx={{ borderColor: "#ff4444", color: "#ff4444" }}
+                onClick={StopJamming}
+              >
+                Stop Jamming
+              </Button>
+            </Box>
+          </Box>
+        );
+
       case "CountermeasureControls":
         return (
           <CountermeasureControls
@@ -594,6 +631,18 @@ useEffect(() => {
       icon: <Security />,
     },
     {
+      id: "jammer-options",
+      title: "Jammer Options",
+      status:
+        floatingCards.find((c) => c.id === "jammer-options")?.status ||
+        "inactive",
+      lastActivity:
+        floatingCards.find((c) => c.id === "jammer-options")?.lastActivity ||
+        "",
+      description: "Activate or deactivate jammer systems",
+      icon: <Security />,
+    },
+    {
       id: "drawing-tools",
       title: "Drawing Tools",
       status: drawingToolsEnabled ? "active" : "inactive",
@@ -622,8 +671,8 @@ useEffect(() => {
               <span className="status-text">OPERATIONAL</span>
             </div>
             <div>
-              <button style={{backgroundColor:"red", color:'white',padding:"6px",height:'25px',borderRadius:'6px',border:'none',marginRight:"5px"}} type="button" onClick={jammerStart} className="btn btn-primary">START</button>
-              <button style={{backgroundColor:"green", color:'white',padding:"6px",height:'25px',borderRadius:'6px',border:'none'}} type="button" onClick={jammerStop} className="btn btn-secondary">STOP</button>
+              <button style={{backgroundColor:"red", color:'white',padding:"6px",height:'25px',borderRadius:'6px',border:'none',marginRight:"5px"}} type="button" onClick={StartJamming} className="btn btn-primary">START</button>
+              <button style={{backgroundColor:"green", color:'white',padding:"6px",height:'25px',borderRadius:'6px',border:'none'}} type="button" onClick={StopJamming} className="btn btn-secondary">STOP</button>
             </div>
             {/* <button onClick={Drones}>click</button> */}
             <Button

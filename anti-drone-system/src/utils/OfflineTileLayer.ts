@@ -190,9 +190,9 @@ export function createESRISatelliteOfflineLayer(
   options: Partial<OfflineTileLayerOptions> = {}
 ): OfflineTileLayer {
   return new OfflineTileLayer({
-    // onlineUrl: "/NUST_TILES_2/{z}/{x}/{y}.png",
     onlineUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution: '&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+    // onlineUrl: "/NUST_TILES_2/{z}/{x}/{y}.png",
+    // attribution: '&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
     maxZoom: 19,
     offlineFirst: true,
     showOfflineIndicator: true,
