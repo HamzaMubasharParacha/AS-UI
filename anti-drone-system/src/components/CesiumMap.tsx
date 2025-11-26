@@ -54,53 +54,64 @@ const RadarSweep: React.FC<{ center: [number, number] }> = ({ center }) => {
 };
 
 // Triangle Cone Component
-const TriangleCone: React.FC<{
-  center: [number, number];
-  angle: number;
+// Triangle Cone Component with Circular Edges
+const TriangleCone: React.FC<{ 
+  center: [number, number]; 
+  angle: number; 
   radius: number;
   direction?: number;
 }> = ({ center, angle = 45, radius = 5000, direction = 0 }) => {
   // Convert degrees to radians
   const toRadians = (degrees: number) => degrees * (Math.PI / 180);
- 
-  // Calculate triangle points
-  const getTrianglePoints = (): [number, number][] => {
+  
+  // Calculate cone points with circular arc
+  const getConePoints = (): [number, number][] => {
     const [centerLat, centerLng] = center;
-   
+    
     // Convert radius from meters to degrees (approximate)
     const radiusInDegrees = radius / 111320; // 111,320 meters per degree
-   
-    // Calculate the two edge points of the triangle
+    
+    // Calculate the two edge angles
     const leftAngle = direction - angle / 2;
     const rightAngle = direction + angle / 2;
-   
-    const leftPoint: [number, number] = [
-      centerLat + radiusInDegrees * Math.cos(toRadians(leftAngle)),
-      centerLng + radiusInDegrees * Math.sin(toRadians(leftAngle)) / Math.cos(toRadians(centerLat))
-    ];
-   
-    const rightPoint: [number, number] = [
-      centerLat + radiusInDegrees * Math.cos(toRadians(rightAngle)),
-      centerLng + radiusInDegrees * Math.sin(toRadians(rightAngle)) / Math.cos(toRadians(centerLat))
-    ];
-   
-    return [center, leftPoint, rightPoint, center];
+    
+    // Create arc points for smooth circular edges
+    const points: [number, number][] = [];
+    
+    // Start from center
+    points.push(center);
+    
+    // Create arc points from left to right
+    const arcSteps = 20; // Number of points for smooth arc
+    for (let i = 0; i <= arcSteps; i++) {
+      const currentAngle = leftAngle + (i / arcSteps) * angle;
+      
+      const point: [number, number] = [
+        centerLat + radiusInDegrees * Math.cos(toRadians(currentAngle)),
+        centerLng + radiusInDegrees * Math.sin(toRadians(currentAngle)) / Math.cos(toRadians(centerLat))
+      ];
+      
+      points.push(point);
+    }
+    
+    // Close the polygon by returning to center
+    points.push(center);
+    
+    return points;
   };
- 
+
   return (
     <Polygon
-      positions={getTrianglePoints()}
+      positions={getConePoints()}
       pathOptions={{
-        color: "#ec5b5bff",
-        fillColor: "#dd1822ff",
-        fillOpacity: 0.25,
-        weight: 2,
-        dashArray: "5, 5",
+        color: "#f70d18ff",
+        fillColor: "#f70d18ff",
+        fillOpacity: 0.4,
       }}
     >
       <Popup>
         <div style={{ fontFamily: "monospace", fontSize: "12px" }}>
-          <strong>▲ STATIC TRIANGLE CONE</strong>
+          <strong>▲ RADAR CONE</strong>
           <br />
           <strong>ANGLE:</strong> {angle}°
           <br />
@@ -383,8 +394,8 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   const [coordinat, setcoordinate] = useState("");
   // Updated coordinates as requested by user (Islamabad/Rawalpindi area)
   const [latLon, setLatLon] = useState<{ lat: number | null; lon: number | null }>({ lat: null, lon: null });
-  const centerLat = latLon.lat ?? 0;
-  const centerLng = latLon.lon ?? 0;
+  const centerLat = latLon.lat ?? 33.6464;
+  const centerLng = latLon.lon ?? 72.999;
   const centerPosition: [number, number] = [centerLat, centerLng];
  
   // Calculate 10km and 3KM radius in meters
@@ -403,7 +414,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
     } catch (error) {
       console.error("Error fetching azimuth:", error);
     }
-  }, 1000); // 1000 ms = 10 sec
+  }, 1000); // 1000 ms = 1 sec
 
   return () => clearInterval(interval); // cleanup on unmount
 }, []);
@@ -634,8 +645,8 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             color: "#00E676",
             fillColor: "#00E676",
             fillOpacity: 0.1,
-            weight: 3,
-            dashArray: "10, 10",
+            weight: 2,
+            dashArray: "5, 8",
           }}
         />
  

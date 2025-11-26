@@ -17,6 +17,8 @@ import {
   CropFree,
   Room,
   Straighten,
+  Analytics,
+  SettingsInputAntenna, // Add this for jammer icon
 } from "@mui/icons-material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -27,8 +29,11 @@ import ThreatAssessment from "./ThreatAssessment";
 import CountermeasureControls from "./CountermeasureControls";
 import SystemStatus from "./SystemStatus";
 import DataVisualization from "./DataVisualization";
+import SpectrumAnalyzer from "./SpectrumAnalyzer";
+import JammerControls from "./JammerControls"; // We'll create this component
 import "../ADSDashboard.css";
 import { BASE_URL } from "../api/config";
+
 interface DashboardProps {
   setToken: (token: string | null) => void;
 }
@@ -102,79 +107,82 @@ interface CardLog {
 const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-const jammerStart = async () => {
-  const token = sessionStorage.getItem("token");
- 
-  try {
-    const response = await fetch(
-      "http://192.168.100.110:8080/api/jammer3000/1/jam/start",
-      {
-        method: "POST", // POST request
-        headers: {
-          "Content-Type": "application/json", // JSON body
-          Authorization: `Bearer ${token}`,   // Bearer token
-        },
-        body: JSON.stringify({
-          frequencyBand: "2.4GHz",
-          powerAttenuation: 18
-        }),
-      }
-    );
- 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
- 
-    const data = await response.json(); // parse JSON response
-    console.log("API Response:", data);
- 
- 
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
-const jammerStop = async () => {
-  const token = sessionStorage.getItem("token");
- 
-  try {
-    const response = await fetch(
-      "http://192.168.100.110:8080/api/jammer3000/1/jam/stop",
-      {
-        method: "POST", // POST request
-        headers: {
-          "Content-Type": "application/json", // JSON body
-          Authorization: `Bearer ${token}`,   // Bearer token
-        },
-       
-      }
-    );
- 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
- 
-    const data = await response.json(); // parse JSON response
-    console.log("API Response:", data);
+  const [showSpectrum, setShowSpectrum] = useState(false);
+  const [jammerStatus, setJammerStatus] = useState<'stopped' | 'starting' | 'running' | 'stopping'>('stopped');
+
+  const jammerStart = async () => {
    
- 
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
- const handleLogout = async () => {
+    setJammerStatus('starting');
+  
+    try {
+      const response = await fetch(
+        "http://192.168.100.110:8080/api/jammer3000/1/jam/start",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            frequencyBand: "2.4GHz",
+            powerAttenuation: 18
+          }),
+        }
+      );
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log("API Response:", data);
+      setJammerStatus('running');
+    } catch (error) {
+      console.error("Error:", error);
+      setJammerStatus('stopped');
+    }
+  };
+
+  const jammerStop = async () => {
+    setJammerStatus('stopping');
+  
+    try {
+      const response = await fetch(
+        "http://192.168.100.110:8080/api/jammer3000/1/jam/stop",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log("API Response:", data);
+      setJammerStatus('stopped');
+    } catch (error) {
+      console.error("Error:", error);
+      setJammerStatus('stopped');
+    }
+  };
+
+  const handleLogout = async () => {
     setLoading(true);
     setError("");
- 
+  
     try {
       const token = sessionStorage.getItem("token");
       console.log("Logging out with token :", token);
- 
+  
       if (!token) {
         setError("No authentication token found");
         setLoading(false);
         return;
       }
- 
+  
       const response = await fetch(
         "http://192.168.100.110:8080/api/auth/logout",
         {
@@ -185,11 +193,11 @@ const jammerStop = async () => {
           },
         }
       );
- 
+  
       if (response.ok) {
         console.log("Logout successful");
         sessionStorage.removeItem("token");
-        setToken(null); // triggers re-render → redirects to LoginPage
+        setToken(null);
       } else {
         const data = await response.json();
         setError(data.message || "Logout failed");
@@ -201,59 +209,47 @@ const jammerStop = async () => {
       setLoading(false);
     }
   };
-    const [systemActive] = useState(true);
-    const [detectedDrones, setDetectedDrones] = useState<DroneData[]>([]);
-    const [drawingToolsEnabled, setDrawingToolsEnabled] = useState(false);
-    const Drones = async () =>{
-      try{
-        const token = sessionStorage.getItem("token");
-        const response = await fetch(`${BASE_URL}/drone-detection/drones/1?extended=true`, {
+
+  const [systemActive] = useState(true);
+  const [detectedDrones, setDetectedDrones] = useState<DroneData[]>([]);
+  const [drawingToolsEnabled, setDrawingToolsEnabled] = useState(false);
+
+  const Drones = async () => {
+    try {
+      const token = sessionStorage.getItem("token");
+      const response = await fetch(`${BASE_URL}/drone-detection/drones`, {
         method: 'GET',
         headers: {
-        Authorization: `Bearer ${
-              token || "219498f3-03f9-41a0-9140-eec5bfe0e311"
-            }`,
-      },
-    });
- 
-const data = await response.json(); // First await the JSON parsing
- 
-// Then map over the data array (assuming data.data contains the drones array based on your API response)
-const drones: DroneData[] = data.data.map((drone: any) => ({
-  id: drone.name,
-  position: [
-    drone.longitude || 0,
-    drone.latitude || 0,
-    drone.height || 0,
-  ],
-  threat_level: "HIGH", // Use a function to determine threat level
-  distance: drone.distance || 0,
-  speed: drone.speed || 0,
-  heading: Number(drone.direction) || 0,
-  detected_at: drone.created_time || new Date().toISOString(),
-}));
- 
-setDetectedDrones(drones);
-       
-      }
-      catch (error){
-        console.error("error")
-      }
+          Authorization: `Bearer ${token || "219498f3-03f9-41a0-9140-eec5bfe0e311"}`,
+        },
+      });
+  
+      const data = await response.json();
+      const drones: DroneData[] = data.data.map((drone: any) => ({
+        id: drone.name,
+        position: [
+          drone.longitude || 0,
+          drone.latitude || 0,
+          drone.height || 0,
+        ],
+        threat_level: "HIGH",
+        distance: drone.distance || 0,
+        speed: drone.speed || 0,
+        heading: Number(drone.direction) || 0,
+        detected_at: drone.created_time || new Date().toISOString(),
+      }));
+  
+      setDetectedDrones(drones);
+    } catch (error) {
+      console.error("error");
     }
+  };
  
-useEffect(() => {
-  // Fetch immediately
-  Drones();
- 
-  // Set up interval
-  const intervalId = setInterval(Drones, 1000);
- 
-  // Cleanup
-  return () => clearInterval(intervalId);
-}, []);
- 
- 
- 
+  useEffect(() => {
+    Drones();
+    const intervalId = setInterval(Drones, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
  
   const [dragState, setDragState] = useState<{
     isDragging: boolean;
@@ -318,7 +314,26 @@ useEffect(() => {
       lastActivity: new Date().toLocaleTimeString(),
       status: "inactive",
     },
- 
+    {
+      id: "spectrum-analyzer",
+      title: "Spectrum Analyzer",
+      component: "SpectrumAnalyzer",
+      position: { x: 800, y: 100 },
+      visible: false,
+      minimized: false,
+      lastActivity: new Date().toLocaleTimeString(),
+      status: "inactive",
+    },
+    {
+      id: "jammer-controls",
+      title: "Jammer Controls",
+      component: "JammerControls",
+      position: { x: 800, y: 400 },
+      visible: false,
+      minimized: false,
+      lastActivity: new Date().toLocaleTimeString(),
+      status: "inactive",
+    },
   ]);
  
   const [systemStatus] = useState({
@@ -327,8 +342,6 @@ useEffect(() => {
     communications: "ONLINE",
     power: 98,
   });
- 
- 
  
   const activeThreat = detectedDrones.find(
     (drone) =>
@@ -540,11 +553,32 @@ useEffect(() => {
             </Box>
           </Box>
         );
+      case "SpectrumAnalyzer":
+        return <SpectrumAnalyzer />;
+      case "JammerControls":
+        return (
+          <JammerControls
+            jammerStatus={jammerStatus}
+            onStart={jammerStart}
+            onStop={jammerStop}
+          />
+        );
       case "DataVisualization":
         return <DataVisualization drones={detectedDrones} />;
       default:
         return <Box>Unknown component</Box>;
     }
+  };
+
+  // Add spectrum button handler
+  const handleSpectrumClick = () => {
+    setShowSpectrum(true);
+    toggleCard("spectrum-analyzer");
+  };
+
+  // Add jammer controls handler
+  const handleJammerControlsClick = () => {
+    toggleCard("jammer-controls");
   };
  
   const leftCardLogs: CardLog[] = [
@@ -604,6 +638,27 @@ useEffect(() => {
         : "Drawing tools disabled",
       icon: <Edit />,
     },
+    {
+      id: "spectrum-analyzer",
+      title: "Spectrum Analyzer",
+      status: showSpectrum ? "active" : "inactive",
+      lastActivity:
+        floatingCards.find((c) => c.id === "spectrum-analyzer")?.lastActivity || "",
+      description: "Real-time frequency spectrum analysis",
+      icon: <Analytics />,
+    },
+    {
+      id: "jammer-controls",
+      title: "Jammer Controls",
+      status: jammerStatus === 'running' ? 'active' : 
+             jammerStatus === 'starting' || jammerStatus === 'stopping' ? 'warning' : 'inactive',
+      lastActivity:
+        floatingCards.find((c) => c.id === "jammer-controls")?.lastActivity || "",
+      description: jammerStatus === 'running' ? "Jammer active" : 
+                  jammerStatus === 'starting' ? "Jammer starting..." :
+                  jammerStatus === 'stopping' ? "Jammer stopping..." : "Jammer ready",
+      icon: <SettingsInputAntenna />,
+    },
   ];
  
   return (
@@ -612,7 +667,7 @@ useEffect(() => {
       <div className="App">
         {/* Main Container */}
         <div className="main-container">
-          {/* Application Header */}
+          {/* Application Header - Cleaned up */}
           <div className="app-header">
             <Typography variant="h5" className="app-title">
               ANTI-DRONE-SYSTEM
@@ -622,10 +677,7 @@ useEffect(() => {
               <span className="status-text">OPERATIONAL</span>
             </div>
             <div>
-              <button style={{backgroundColor:"red", color:'white',padding:"6px",height:'25px',borderRadius:'6px',border:'none',marginRight:"5px"}} type="button" onClick={jammerStart} className="btn btn-primary">START</button>
-              <button style={{backgroundColor:"green", color:'white',padding:"6px",height:'25px',borderRadius:'6px',border:'none'}} type="button" onClick={jammerStop} className="btn btn-secondary">STOP</button>
             </div>
-            {/* <button onClick={Drones}>click</button> */}
             <Button
               onClick={handleLogout}
               variant="outlined"
@@ -701,7 +753,7 @@ useEffect(() => {
               </Box>
             ))}
  
-          {/* Left Fixed Column Only - Right Column Removed */}
+          {/* Left Fixed Column */}
           <div className="fixed-column left">
             <div className="column-header">
               <Dashboard className="column-icon" />
@@ -729,7 +781,6 @@ useEffect(() => {
                       </span>
                     </div>
                   </div>
-                 
                 </div>
               ))}
             </div>
