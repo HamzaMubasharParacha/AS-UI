@@ -18,11 +18,9 @@ import {
 } from "@mui/icons-material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
- 
 import CesiumMap from "./CesiumMap";
 import DroneDetectionPanel from "./DroneDetectionPanel";
 import ThreatAssessment from "./ThreatAssessment";
-import CountermeasureControls from "./CountermeasureControls";
 import SystemStatus from "./SystemStatus";
 import DataVisualization from "./DataVisualization";
 import SpectrumAnalyzer from "./SpectrumAnalyzer";
@@ -205,7 +203,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   };
   const [systemActive] = useState(true);
   const [detectedDrones, setDetectedDrones] = useState<DroneData[]>([]);
-  const [drawingToolsEnabled, setDrawingToolsEnabled] = useState(false);
+  const [drawingToolsEnabled, setDrawingToolsEnabled] = useState(true);
 
   const Drones = async () => {
     try {
@@ -289,26 +287,6 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     },
    
     {
-      id: "countermeasures",
-      title: "Countermeasures",
-      component: "CountermeasureControls",
-      position: { x: 450, y: 350 },
-      visible: false,
-      minimized: false,
-      lastActivity: new Date().toLocaleTimeString(),
-      status: "inactive",
-    },
-    {
-      id: "drawing-tools",
-      title: "Map Drawing Tools",
-      component: "DrawingTools",
-      position: { x: 200, y: 200 },
-      visible: false,
-      minimized: false,
-      lastActivity: new Date().toLocaleTimeString(),
-      status: "inactive",
-    },
-    {
       id: "spectrum-analyzer",
       title: "Spectrum Analyzer",
       component: "SpectrumAnalyzer",
@@ -376,33 +354,42 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     );
   };
  
-  const handleMouseDown = (e: React.MouseEvent, cardId: string) => {
-    e.preventDefault();
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const startX = e.clientX - rect.left;
-    const startY = e.clientY - rect.top;
-    setDragState({
-      isDragging: true,
-      draggedCardId: cardId,
-      dragOffset: { x: startX, y: startY },
-      startPosition: { x: e.clientX, y: e.clientY },
-    });
-  };
- 
-  const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const startX = touch.clientX - rect.left;
-    const startY = touch.clientY - rect.top;
-    setDragState({
-      isDragging: true,
-      draggedCardId: cardId,
-      dragOffset: { x: startX, y: startY },
-      startPosition: { x: touch.clientX, y: touch.clientY },
-    });
-  };
- 
+const handleMouseDown = (e: React.MouseEvent, cardId: string) => {
+  // Only allow dragging from the header (prevent content dragging)
+  if (!(e.target as HTMLElement).closest('.floating-card-header')) {
+    return;
+  }
+  
+  e.preventDefault();
+  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+  const startX = e.clientX - rect.left;
+  const startY = e.clientY - rect.top;
+  setDragState({
+    isDragging: true,
+    draggedCardId: cardId,
+    dragOffset: { x: startX, y: startY },
+    startPosition: { x: e.clientX, y: e.clientY },
+  });
+};
+
+const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
+  // Only allow dragging from the header (prevent content dragging)
+  if (!(e.target as HTMLElement).closest('.floating-card-header')) {
+    return;
+  }
+  
+  e.preventDefault();
+  const touch = e.touches[0];
+  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+  const startX = touch.clientX - rect.left;
+  const startY = touch.clientY - rect.top;
+  setDragState({
+    isDragging: true,
+    draggedCardId: cardId,
+    dragOffset: { x: startX, y: startY },
+    startPosition: { x: touch.clientX, y: touch.clientY },
+  });
+};
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       if (!dragState.isDragging || !dragState.draggedCardId) return;
@@ -495,61 +482,6 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
         return <DroneDetectionPanel drones={detectedDrones} />;
       case "ThreatAssessment":
         return <ThreatAssessment drones={detectedDrones} />;
-
-     
-
-      case "CountermeasureControls":
-        return (
-          <CountermeasureControls
-            activeThreat={activeThreat}
-            systemActive={systemActive}
-          />
-        );
-      case "DrawingTools":
-        return (
-          <Box sx={{ p: 2 }}>
-            <Typography variant="h6" sx={{ mb: 2, color: "#00ff41" }}>
-              Map Drawing Tools
-            </Typography>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Box
-                sx={{
-                  p: 1,
-                  border: "1px solid #00ff41",
-                  borderRadius: 1,
-                  cursor: "pointer",
-                  "&:hover": { backgroundColor: "rgba(0, 255, 65, 0.1)" },
-                }}
-                onClick={() => setDrawingToolsEnabled(!drawingToolsEnabled)}
-              >
-                <Typography variant="body2">
-                  Drawing Tools: {drawingToolsEnabled ? "ENABLED" : "DISABLED"}
-                </Typography>
-              </Box>
-              <Typography variant="caption" sx={{ color: "#888", mt: 1 }}>
-                Available Tools:
-              </Typography>
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <Polyline sx={{ fontSize: 16 }} />
-                  <Typography variant="caption">Polygon</Typography>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <CropFree sx={{ fontSize: 16 }} />
-                  <Typography variant="caption">Rectangle</Typography>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <Room sx={{ fontSize: 16 }} />
-                  <Typography variant="caption">Circle</Typography>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <Straighten sx={{ fontSize: 16 }} />
-                  <Typography variant="caption">Line</Typography>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-        );
       case "SpectrumAnalyzer":
         return <SpectrumAnalyzer />;
       case "JammerControls":
@@ -614,28 +546,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
         : "No active threats",
       icon: <Assessment />,
     },
-    {
-      id: "countermeasures",
-      title: "Countermeasures",
-      status: systemActive ? "active" : "inactive",
-      lastActivity:
-        floatingCards.find((c) => c.id === "countermeasures")?.lastActivity ||
-        "",
-      description: systemActive ? "Systems armed and ready" : "Systems offline",
-      icon: <Security />,
-    },
     
-    {
-      id: "drawing-tools",
-      title: "Drawing Tools",
-      status: drawingToolsEnabled ? "active" : "inactive",
-      lastActivity:
-        floatingCards.find((c) => c.id === "drawing-tools")?.lastActivity || "",
-      description: drawingToolsEnabled
-        ? "Drawing tools enabled"
-        : "Drawing tools disabled",
-      icon: <Edit />,
-    },
     {
       id: "spectrum-analyzer",
       title: "Spectrum Analyzer",
@@ -700,57 +611,68 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
           </div>
  
           {/* Floating Cards */}
-          {floatingCards
-            .filter((card) => card.visible)
-            .map((card) => (
-              <Box
-                key={card.id}
-                className={`floating-card ${
-                  card.minimized ? "floating-card-minimized" : ""
-                } ${
-                  dragState.draggedCardId === card.id
-                    ? "floating-card-dragging"
-                    : ""
-                }`}
-                sx={{
-                  left: card.position.x,
-                  top: card.position.y,
-                }}
-                onMouseDown={(e) => handleMouseDown(e, card.id)}
-                onTouchStart={(e) => handleTouchStart(e, card.id)}
-              >
-                <Box className="floating-card-header">
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ fontWeight: "bold", color: "#00ff41" }}
-                  >
-                    {card.title}
-                  </Typography>
-                  <Box>
-                    <IconButton
-                      size="small"
-                      onClick={() => minimizeCard(card.id)}
-                      sx={{ color: "#00ff41", p: 0.5 }}
-                    >
-                      {card.minimized ? <ChevronRight /> : <ChevronLeft />}
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => toggleCard(card.id)}
-                      sx={{ color: "#ff4444", p: 0.5, ml: 0.5 }}
-                    >
-                      <CloseIcon />
-                    </IconButton>
-                  </Box>
-                </Box>
-                {!card.minimized && (
-                  <Box className="floating-card-content">
-                    {renderCardContent(card)}
-                  </Box>
-                )}
-              </Box>
-            ))}
- 
+// Floating Cards Section - Update the JSX
+{floatingCards
+  .filter((card) => card.visible)
+  .map((card) => (
+    <Box
+      key={card.id}
+      className={`floating-card ${
+        card.minimized ? "floating-card-minimized" : ""
+      } ${
+        dragState.draggedCardId === card.id
+          ? "floating-card-dragging"
+          : ""
+      }`}
+      sx={{
+        left: card.position.x,
+        top: card.position.y,
+      }}
+    >
+      {/* Header with drag handlers - ONLY HEADER IS DRAGGABLE */}
+      <Box 
+        className="floating-card-header"
+        onMouseDown={(e) => handleMouseDown(e, card.id)}
+        onTouchStart={(e) => handleTouchStart(e, card.id)}
+      >
+        <Typography
+          variant="subtitle1"
+          sx={{ fontWeight: "bold", color: "#00ff41" }}
+        >
+          {card.title}
+        </Typography>
+        <Box>
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent drag when clicking buttons
+              minimizeCard(card.id);
+            }}
+            sx={{ color: "#00ff41", p: 0.5 }}
+          >
+            {card.minimized ? <ChevronRight /> : <ChevronLeft />}
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent drag when clicking buttons
+              toggleCard(card.id);
+            }}
+            sx={{ color: "#ff4444", p: 0.5, ml: 0.5 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+      </Box>
+      
+      {/* Content area - NO DRAG HANDLERS */}
+      {!card.minimized && (
+        <Box className="floating-card-content">
+          {renderCardContent(card)}
+        </Box>
+      )}
+    </Box>
+  ))}
           {/* Left Fixed Column */}
           <div className="fixed-column left">
             <div className="column-header">

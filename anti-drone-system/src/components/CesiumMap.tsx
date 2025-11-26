@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography,FormControlLabel,Checkbox,Button } from "@mui/material";
 import { MapContainer, Circle, Marker, Popup, useMap, Polyline, Polygon } from "react-leaflet";
 
 import L from "leaflet";
@@ -61,9 +61,11 @@ const TriangleCone: React.FC<{
     <Polygon
       positions={getConePoints()}
       pathOptions={{
-        color: "#f70d18ff",
-        fillColor: "#f70d18ff",
-        fillOpacity: 0.4,
+        color: "#FFD700",
+        fillColor: "#FFD700",
+        fillOpacity: 0.15,
+        weight: 2,
+        dashArray: "5, 5",
       }}
     >
       <Popup>
@@ -729,55 +731,12 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         {drawingToolsEnabled && <MapDrawingTools />}
       </MapContainer>
  
-      {/* Radar Control Panel */}
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: 10,
-          left: 10,
-          backgroundColor: "rgba(73, 228, 68, 0.85)",
-          color: "#191f1aff",
-          padding: 1.5,
-          borderRadius: 2,
-          fontFamily: "monospace",
-          fontSize: "12px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-          zIndex: 1000,
-          cursor: "pointer",
-          border: "1px solid #00ff41",
-        }}
-        onClick={toggleRadar}
-      >
-        <Typography
-          variant="caption"
-          display="block"
-          sx={{ fontWeight: "bold" }}
-        >
-          📡 RADAR CONTROL
-        </Typography>
-        <Typography variant="caption" display="block">
-          STATUS: {radarActive ? "ACTIVE" : "INACTIVE"}
-        </Typography>
-        <Typography
-          variant="caption"
-          display="block"
-          sx={{ fontSize: "10px", opacity: 0.8 }}
-        >
-          CLICK TO TOGGLE
-        </Typography>
-        <Typography
-          variant="caption"
-          display="block"
-          sx={{ fontWeight: "bold", color: "#00ff41" }}
-        >
-          📱 CLICK MAP CONTROLS FOR OFFLINE OPTIONS
-        </Typography>
-      </Box>
+
       {/* Trajectory Control Panel */}
       <Box
         sx={{
           position: "absolute",
-          bottom: 120,
+          bottom: 10,
           left: 10,
           backgroundColor: "rgba(0, 0, 0, 0.85)",
           color: "#00ff41",
@@ -854,68 +813,118 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         </Typography>
       </Box>
  
-      {/* Trajectory Legend */}
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: 10,
-          right: 10,
-          backgroundColor: "rgba(0, 0, 0, 0.85)",
-          color: "#fff",
-          padding: 1.5,
-          borderRadius: 2,
-          fontFamily: "monospace",
-          fontSize: "11px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-          border: "1px solid #00ff41",
-          zIndex: 1000,
-        }}
-      >
-        <Typography
-          variant="caption"
-          display="block"
-          sx={{ fontWeight: "bold", color: "#00ff41", mb: 1 }}
-        >
-          🛤️ TRAJECTORY LEGEND
-        </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-          <Box
-            sx={{ width: 20, height: 3, backgroundColor: "#4CAF50", mr: 1 }}
-          />
-          <Typography variant="caption">LOW THREAT</Typography>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-          <Box
-            sx={{ width: 20, height: 3, backgroundColor: "#FF9800", mr: 1 }}
-          />
-          <Typography variant="caption">MEDIUM THREAT</Typography>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-          <Box
-            sx={{ width: 20, height: 3, backgroundColor: "#F44336", mr: 1 }}
-          />
-          <Typography variant="caption">HIGH THREAT</Typography>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-          <Box
-            sx={{
-              width: 20,
-              height: 3,
-              backgroundColor: "#D32F2F",
-              mr: 1,
-              border: "1px dashed #fff",
-            }}
-          />
-          <Typography variant="caption">CRITICAL THREAT</Typography>
-        </Box>
-        <Typography
-          variant="caption"
-          display="block"
-          sx={{ mt: 1, fontSize: "9px", opacity: 0.7 }}
-        >
-          Click lines to select drone
-        </Typography>
-      </Box>
+<Box
+  sx={{
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.85)",
+    color: "#fff",
+    padding: 2,
+    borderRadius: 2,
+    fontFamily: "monospace",
+    fontSize: "11px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+    border: "1px solid #00ff41",
+    zIndex: 1000,
+    minWidth: 200,
+    backdropFilter: "blur(10px)",
+  }}
+>
+  {/* Checkboxes Section */}
+  <Box sx={{ mb: 2 }}>
+    <Typography 
+      variant="subtitle2" 
+      sx={{ 
+        color: "#00ff41", 
+        mb: 1, 
+        fontWeight: "bold",
+        fontSize: "12px"
+      }}
+    >
+      OPTIONS
+    </Typography>
+    
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+      {["5.8GHz", "2.4GHz", "1.5GHz", "<1GHz"].map((label) => (
+        <FormControlLabel
+          key={label}
+          control={
+            <Checkbox
+              size="small"
+              sx={{
+                color: "#00ff41",
+                '&.Mui-checked': {
+                  color: "#00ff41",
+                },
+                '& .MuiSvgIcon-root': {
+                  fontSize: 16,
+                },
+                padding: "4px",
+              }}
+            />
+          }
+          label={
+            <Typography sx={{ fontSize: "11px", fontFamily: "monospace" }}>
+              {label}
+            </Typography>
+          }
+          sx={{
+            margin: 0,
+            '&:hover': {
+              backgroundColor: "rgba(0, 255, 65, 0.1)",
+              borderRadius: 1,
+            },
+          }}
+        />
+      ))}
+    </Box>
+  </Box>
+
+  {/* Buttons Section */}
+  <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between" }}>
+    <Button
+      variant="outlined"
+      size="small"
+      sx={{
+        color: "#00ff41",
+        borderColor: "#00ff41",
+        fontSize: "10px",
+        padding: "4px 12px",
+        fontFamily: "monospace",
+        textTransform: "none",
+        '&:hover': {
+          borderColor: "#00ff41",
+          backgroundColor: "rgba(0, 255, 65, 0.1)",
+        },
+        flex: 1,
+      }}
+    >
+      START
+    </Button>
+    
+    <Button
+      variant="contained"
+      size="small"
+      sx={{
+        backgroundColor: "#00ff41",
+        color: "#000",
+        fontSize: "10px",
+        padding: "4px 12px",
+        fontFamily: "monospace",
+        textTransform: "none",
+        fontWeight: "bold",
+        '&:hover': {
+          backgroundColor: "#00cc33",
+          boxShadow: "0 0 8px rgba(0, 255, 65, 0.6)",
+        },
+        flex: 1,
+      }}
+    >
+      STOP
+    </Button>
+  </Box>
+</Box>
  
       {/* Detailed Threat Information Panel */}
       {selectedThreat && (
@@ -1161,20 +1170,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             >
               🎯 THREAT ASSESSMENT
             </Typography>
-            <Typography
-              variant="caption"
-              display="block"
-              sx={{ fontSize: "12px" }}
-            >
-              {selectedThreat.threat_level === "CRITICAL" &&
-                "⚠️ CRITICAL THREAT: Immediate countermeasures required. High-speed approach detected. Potential hostile intent."}
-              {selectedThreat.threat_level === "HIGH" &&
-                "⚠️ HIGH THREAT: Close monitoring required. Unusual flight pattern detected. Prepare countermeasures."}
-              {selectedThreat.threat_level === "MEDIUM" &&
-                "⚠️ MEDIUM THREAT: Standard monitoring protocol. Maintain surveillance. Ready defensive systems."}
-              {selectedThreat.threat_level === "LOW" &&
-                "ℹ️ LOW THREAT: Routine surveillance. Standard civilian or commercial drone. Continue monitoring."}
-            </Typography>
+            
           </Box>
  
           {/* Action Buttons */}
@@ -1196,23 +1192,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             >
               📡 TRACK DRONE
             </Box>
-            <Box
-              sx={{
-                backgroundColor: "#f44336",
-                color: "#fff",
-                padding: "8px 16px",
-                borderRadius: 2,
-                cursor: "pointer",
-                fontWeight: "bold",
-                fontSize: "12px",
-                "&:hover": { backgroundColor: "#ef5350" },
-              }}
-              onClick={() =>
-                console.log("Deploy countermeasures:", selectedThreat.id)
-              }
-            >
-              🚀 COUNTERMEASURES
-            </Box>
+            
             <Box
               sx={{
                 backgroundColor: "#4caf50",
