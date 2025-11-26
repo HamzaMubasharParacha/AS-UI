@@ -14,7 +14,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // Retrieve token from memory (if available)
-    const storedToken = sessionStorage.getItem("authToken");
+    const storedToken = sessionStorage.getItem("token");
     if (storedToken) setToken(storedToken);
   }, []);
 
@@ -31,7 +31,7 @@ const App: React.FC = () => {
             ) : (
               <LoginPage
                 onLoginSuccess={(token) => {
-                  sessionStorage.setItem("authToken", token);
+                  sessionStorage.setItem("token", token);
                   setToken(token);
                 }}
               />

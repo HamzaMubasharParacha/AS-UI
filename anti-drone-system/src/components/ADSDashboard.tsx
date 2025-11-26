@@ -5,10 +5,6 @@ import {
   Radar,
   Assessment,
   Security,
-  BarChart,
-  Timeline,
-  PieChart,
-  ShowChart,
   ChevronLeft,
   ChevronRight,
   Close as CloseIcon,
@@ -30,7 +26,7 @@ import CountermeasureControls from "./CountermeasureControls";
 import SystemStatus from "./SystemStatus";
 import DataVisualization from "./DataVisualization";
 import SpectrumAnalyzer from "./SpectrumAnalyzer";
-import JammerControls from "./JammerControls"; // We'll create this component
+import JammerControls from "./JammerControls";
 import "../ADSDashboard.css";
 import { BASE_URL } from "../api/config";
 
@@ -182,20 +178,18 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
         setLoading(false);
         return;
       }
-  
-      const response = await fetch(
-        "http://192.168.100.110:8080/api/auth/logout",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-  
+
+      const response = await fetch(`${BASE_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       if (response.ok) {
         console.log("Logout successful");
+        // sessionStorage.removeItem("token");
         sessionStorage.removeItem("token");
         setToken(null);
       } else {
@@ -209,7 +203,6 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       setLoading(false);
     }
   };
-
   const [systemActive] = useState(true);
   const [detectedDrones, setDetectedDrones] = useState<DroneData[]>([]);
   const [drawingToolsEnabled, setDrawingToolsEnabled] = useState(false);
@@ -294,6 +287,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       lastActivity: new Date().toLocaleTimeString(),
       status: "warning",
     },
+   
     {
       id: "countermeasures",
       title: "Countermeasures",
@@ -501,6 +495,9 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
         return <DroneDetectionPanel drones={detectedDrones} />;
       case "ThreatAssessment":
         return <ThreatAssessment drones={detectedDrones} />;
+
+     
+
       case "CountermeasureControls":
         return (
           <CountermeasureControls
@@ -627,6 +624,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       description: systemActive ? "Systems armed and ready" : "Systems offline",
       icon: <Security />,
     },
+    
     {
       id: "drawing-tools",
       title: "Drawing Tools",
