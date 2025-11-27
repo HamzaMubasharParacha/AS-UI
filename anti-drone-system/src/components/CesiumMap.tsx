@@ -1,16 +1,14 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Box, Typography,FormControlLabel,Checkbox,Button } from "@mui/material";
+import { Box, Typography, FormControlLabel, Checkbox, Button, Snackbar, Alert } from "@mui/material";
 import { MapContainer, Circle, Marker, Popup, useMap, Polyline, Polygon } from "react-leaflet";
-
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import MapDrawingTools from "./MapDrawingTools";
 import { createESRISatelliteOfflineLayer } from "../utils/OfflineTileLayer";
 import OfflineMapControl from "./OfflineMapControl";
-import { BASE_URL } from "../api/config";
+import { command_center, cone_angle } from "../api/config";
 import RadarComponent from "./RadarComponent";
 
-// Triangle Cone Component
 // Triangle Cone Component with Circular Edges
 const TriangleCone: React.FC<{ 
   center: [number, number]; 
@@ -18,42 +16,28 @@ const TriangleCone: React.FC<{
   radius: number;
   direction?: number;
 }> = ({ center, angle = 45, radius = 10000, direction = 0 }) => {
-  // Convert degrees to radians
   const toRadians = (degrees: number) => degrees * (Math.PI / 180);
   
-  // Calculate cone points with circular arc
   const getConePoints = (): [number, number][] => {
     const [centerLat, centerLng] = center;
-    
-    // Convert radius from meters to degrees (approximate)
-    const radiusInDegrees = radius / 111320; // 111,320 meters per degree
-    
-    // Calculate the two edge angles
+    const radiusInDegrees = radius / 111320;
     const leftAngle = direction - angle / 2;
     const rightAngle = direction + angle / 2;
-    
-    // Create arc points for smooth circular edges
     const points: [number, number][] = [];
     
-    // Start from center
     points.push(center);
     
-    // Create arc points from left to right
-    const arcSteps = 20; // Number of points for smooth arc
+    const arcSteps = 20;
     for (let i = 0; i <= arcSteps; i++) {
       const currentAngle = leftAngle + (i / arcSteps) * angle;
-      
       const point: [number, number] = [
         centerLat + radiusInDegrees * Math.cos(toRadians(currentAngle)),
         centerLng + radiusInDegrees * Math.sin(toRadians(currentAngle)) / Math.cos(toRadians(centerLat))
       ];
-      
       points.push(point);
     }
     
-    // Close the polygon by returning to center
     points.push(center);
-    
     return points;
   };
 
@@ -84,7 +68,7 @@ const TriangleCone: React.FC<{
     </Polygon>
   );
 };
- 
+
 interface DroneData {
   id: string;
   position: [number, number, number];
@@ -94,60 +78,58 @@ interface DroneData {
   heading: number;
   detected_at: string;
 }
- 
+
 interface TrajectoryPoint {
   position: [number, number, number];
   timestamp: string;
   speed: number;
   heading: number;
 }
- 
+
 interface DroneTrajectory {
   id: string;
   points: TrajectoryPoint[];
   color: string;
   threat_level: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 }
- 
+
 interface CesiumMapProps {
   drones: DroneData[];
   systemActive: boolean;
   drawingToolsEnabled?: boolean;
 }
- 
+
 // Custom component to add offline tile layer
 const OfflineTileLayerComponent: React.FC<{ offlineFirst: boolean }> = ({
   offlineFirst,
 }) => {
   const map = useMap();
- 
+
   useEffect(() => {
     if (!map) return;
- 
-    // Remove existing tile layers
+
     map.eachLayer((layer) => {
       if (layer instanceof L.TileLayer) {
         map.removeLayer(layer);
       }
     });
- 
-    // Add offline tile layer
+
     const offlineLayer = createESRISatelliteOfflineLayer({
       offlineFirst: offlineFirst,
     });
- 
+
     offlineLayer.addTo(map);
- 
+
     return () => {
       if (map.hasLayer(offlineLayer)) {
         map.removeLayer(offlineLayer);
       }
     };
   }, [map, offlineFirst]);
- 
+
   return null;
 };
- 
+
 // Fix Leaflet default markers
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -158,7 +140,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl:
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
- 
+
 // Create custom command center icon
 const commandCenterIcon = new L.DivIcon({
   html: `
@@ -181,7 +163,7 @@ const commandCenterIcon = new L.DivIcon({
   iconSize: [50, 50],
   iconAnchor: [25, 25],
 });
- 
+
 // Create drone icons based on threat level with enhanced detection highlighting
 const createDroneIcon = (
   threatLevel: string,
@@ -194,14 +176,14 @@ const createDroneIcon = (
     HIGH: "#F44336",
     CRITICAL: "#D32F2F",
   };
- 
+
   const droneEmojis = {
     LOW: "🛩️",
     MEDIUM: "🚁",
     HIGH: "✈️",
     CRITICAL: "🚀",
   };
- 
+
   const pulseAnimation = isDetected
     ? `
     animation: pulse 1.5s infinite;
@@ -218,7 +200,7 @@ const createDroneIcon = (
     }
   `
     : "";
- 
+
   const detectionRing = isDetected
     ? `
     <div style="
@@ -241,7 +223,7 @@ const createDroneIcon = (
     </style>
   `
     : "";
- 
+
   return new L.DivIcon({
     html: `
       <div style="position: relative;">
@@ -301,7 +283,7 @@ const createDroneIcon = (
     iconAnchor: [15, 15],
   });
 };
- 
+
 // Calculate distance between two coordinates in meters
 const calculateDistance = (
   lat1: number,
@@ -309,31 +291,31 @@ const calculateDistance = (
   lat2: number,
   lng2: number
 ): number => {
-  const R = 6371e3; // Earth's radius in meters
+  const R = 6371e3;
   const φ1 = (lat1 * Math.PI) / 180;
   const φ2 = (lat2 * Math.PI) / 180;
   const Δφ = ((lat2 - lat1) * Math.PI) / 180;
   const Δλ = ((lng2 - lng1) * Math.PI) / 180;
- 
+
   const a =
     Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
     Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
- 
+
   return R * c;
 };
- 
+
 // Get trajectory color based on threat level
 const getTrajectoryColor = (threatLevel: string): string => {
   const colors = {
-    LOW: "#4CAF50", // Green
-    MEDIUM: "#FF9800", // Orange
-    HIGH: "#F44336", // Red
-    CRITICAL: "#D32F2F", // Dark Red
+    LOW: "#4CAF50",
+    MEDIUM: "#FF9800",
+    HIGH: "#F44336",
+    CRITICAL: "#D32F2F",
   };
   return colors[threatLevel as keyof typeof colors];
 };
- 
+
 const CesiumMap: React.FC<CesiumMapProps> = ({
   drones,
   systemActive,
@@ -348,7 +330,25 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   const [trajectories, setTrajectories] = useState<DroneTrajectory[]>([]);
   const [showTrajectories, setShowTrajectories] = useState(true);
   const [showTriangleCone, setShowTriangleCone] = useState(true);
-   // Default 45 degrees
+  
+  // Jammer state management
+  const [jammerStatus, setJammerStatus] = useState<'idle' | 'starting' | 'active' | 'stopping'>('idle');
+  const [selectedFrequencies, setSelectedFrequencies] = useState<Record<string, boolean>>({
+    "5.8GHz": true,
+    "2.4GHz": true,
+    "1.5GHz": false,
+    "<1GHz": false,
+  });
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error' | 'info' | 'warning';
+  }>({
+    open: false,
+    message: '',
+    severity: 'info'
+  });
+
   const mapRef = useRef<L.Map>(null);
 
   // Updated coordinates as requested by user (Islamabad/Rawalpindi area)
@@ -357,41 +357,79 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   const centerLng = latLon.lon ?? 72.999;
   const centerPosition: [number, number] = [centerLat, centerLng];
  
-  // Calculate 10km and 3KM radius in meters
-  const radius10km = 10000; // 5 kilometers in meters
-  // const radius3km = 3000; // 3 kilometers in meters
-  const coneRadius = 10000; // 10km cone radius
+  const radius10km = 10000;
+  const coneRadius = 10000;
 
-  //jammer cone set
-  const [coneDirection, setConeDirection] = useState(0);
-   useEffect(() => {
-  const interval = setInterval(async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/jammer3000/1/status`);
-      const jam_data = await response.json();
-      setConeDirection(jam_data.data.ptz_azimuth);
-    } catch (error) {
-      console.error("Error fetching azimuth:", error);
+  // Enhanced getToken function with fallback
+  const getToken = () => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      setSnackbar({
+        open: true,
+        message: 'Authentication token not found. Please login again.',
+        severity: 'error'
+      });
+      throw new Error('No authentication token');
     }
-  }, 1000); // 1000 ms = 1 sec
+    return token;
+  };
 
-  return () => clearInterval(interval); // cleanup on unmount
-}, []);
+  // Jammer cone direction with token authentication
+  const [coneDirection, setConeDirection] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const token = sessionStorage.getItem("token");
+        
+        if (!token) {
+          console.warn("No token available for cone angle fetch");
+          return;
+        }
 
+        const response = await fetch(cone_angle, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
+        if (!response.ok) {
+          if (response.status === 401) {
+            console.error("Authentication failed for cone angle fetch");
+            return;
+          }
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-  //get coordinate of command center
+        const jam_data = await response.json();
+        setConeDirection(jam_data.data.ptz_azimuth);
+      } catch (error) {
+        console.error("Error fetching azimuth:", error);
+      }
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Get coordinate of command center
   const getCoordinate = async () => {
     try {
-      const token = sessionStorage.getItem("token");
-      const response = await fetch(`${BASE_URL}/drone-detection/sensors`, {
+      const token = getToken();
+      const response = await fetch(`${command_center}`, {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${
-            token || "219498f3-03f9-41a0-9140-eec5bfe0e311"
-          }`,
+          Authorization: `Bearer ${token}`,
         },
       });
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Authentication failed for command center data');
+        }
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
       const data = await response.json();
       if (data.data.length > 0) {
         const firstSensor = data.data[0];
@@ -400,27 +438,33 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           lat: config.geo_location.lat,
           lon: config.geo_location.lng,
         });
-        console.log("this is sensor data", data);
       }
     } catch (error) {
-      console.log("Error fetching drone data:", error);
+      console.log("Error fetching command center data:", error);
+      if (error instanceof Error && error.message.includes('Authentication')) {
+        setSnackbar({
+          open: true,
+          message: error.message,
+          severity: 'error'
+        });
+      }
     }
   };
- 
+
   useEffect(() => {
-    getCoordinate(); // Fetch immediately
-    const intervalId = setInterval(getCoordinate, 2000);
+    getCoordinate();
+    const intervalId = setInterval(getCoordinate, 100000);
     return () => clearInterval(intervalId);
   }, []);
- 
+
   useEffect(() => {
     setMapLoaded(true);
   }, []);
- 
+
   // Update trajectories when drones data changes
   useEffect(() => {
     if (drones.length === 0) return;
- 
+
     setTrajectories(prevTrajectories => {
       const updatedTrajectories = [...prevTrajectories];
      
@@ -433,29 +477,25 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           speed: drone.speed,
           heading: drone.heading,
         };
- 
+
         if (existingTrajectoryIndex !== -1) {
-          // Update existing trajectory
-          const existingPoints =
-            updatedTrajectories[existingTrajectoryIndex].points;
+          const existingPoints = updatedTrajectories[existingTrajectoryIndex].points;
           const lastPoint = existingPoints[existingPoints.length - 1];
          
-          // Only add new point if position changed significantly (more than 10 meters)
           const distanceChange = calculateDistance(
             lastPoint.position[1],
             lastPoint.position[0],
             drone.position[1],
             drone.position[0]
           );
- 
-          if (distanceChange > 10) { // 10 meters threshold to avoid too many points
+
+          if (distanceChange > 10) {
             updatedTrajectories[existingTrajectoryIndex].points = [
-              ...existingPoints.slice(-99), // Keep last 100 points max
+              ...existingPoints.slice(-99),
               newPoint,
             ];
           }
         } else {
-          // Create new trajectory
           updatedTrajectories.push({
             id: drone.id,
             points: [newPoint],
@@ -464,8 +504,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           });
         }
       });
- 
-      // Remove trajectories for drones that are no longer present (after 5 minutes of inactivity)
+
       const now = new Date().getTime();
       return updatedTrajectories.filter((trajectory) => {
         const lastPointTime = new Date(
@@ -474,12 +513,12 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         return (
           drones.find((d) => d.id === trajectory.id) ||
           now - lastPointTime < 5 * 60 * 1000
-        ); // 5 minutes
+        );
       });
     });
   }, [drones]);
- 
-  // Threat detection logic - check which drones are within radar range
+
+  // Threat detection logic
   useEffect(() => {
     if (radarActive && systemActive) {
       const detected: string[] = [];
@@ -499,38 +538,156 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
       setDetectedThreats([]);
     }
   }, [drones, radarActive, systemActive, centerLat, centerLng, radius10km]);
- 
-  // Toggle radar scanning
+
+  // Jammer API functions with enhanced token authentication
+  const startJammer = async () => {
+    if (jammerStatus === 'active' || jammerStatus === 'starting') return;
+    
+    setJammerStatus('starting');
+    
+    try {
+      const token = getToken();
+      
+      // Get selected frequencies
+      const activeFrequencies = Object.keys(selectedFrequencies).filter(
+        freq => selectedFrequencies[freq]
+      );
+      
+      if (activeFrequencies.length === 0) {
+        setSnackbar({
+          open: true,
+          message: 'Please select at least one frequency band',
+          severity: 'warning'
+        });
+        setJammerStatus('idle');
+        return;
+      }
+
+      const response = await fetch(
+        "http://192.168.100.102:8080/api/jammer/1/jam/start",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            frequencyBand: "2.4GHz",
+            powerAttenuation: 18
+          }),
+        }
+      );
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Authentication failed. Please login again.');
+        }
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setJammerStatus('active');
+        setSnackbar({
+          open: true,
+          message: data.message || 'Jamming started successfully',
+          severity: 'success'
+        });
+      } else {
+        throw new Error(data.message || 'Failed to start jamming');
+      }
+    } catch (error) {
+      console.error("Error starting jammer:", error);
+      setJammerStatus('idle');
+      setSnackbar({
+        open: true,
+        message: error instanceof Error ? error.message : 'Failed to start jamming',
+        severity: 'error'
+      });
+    }
+  };
+
+  const stopJammer = async () => {
+    if (jammerStatus !== 'active' && jammerStatus !== 'stopping') return;
+    
+    setJammerStatus('stopping');
+    
+    try {
+      const token = getToken();
+      
+      const response = await fetch(
+        "http://192.168.100.102:8080/api/jammer/1/jam/stop",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Authentication failed. Please login again.');
+        }
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setJammerStatus('idle');
+        setSnackbar({
+          open: true,
+          message: data.message || 'Jamming stopped successfully',
+          severity: 'success'
+        });
+      } else {
+        throw new Error(data.message || 'Failed to stop jamming');
+      }
+    } catch (error) {
+      console.error("Error stopping jammer:", error);
+      setJammerStatus('active');
+      setSnackbar({
+        open: true,
+        message: error instanceof Error ? error.message : 'Failed to stop jamming',
+        severity: 'error'
+      });
+    }
+  };
+
+  const handleFrequencyChange = (frequency: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedFrequencies(prev => ({
+      ...prev,
+      [frequency]: event.target.checked
+    }));
+  };
+
   const toggleRadar = () => {
     setRadarActive(!radarActive);
   };
- 
-  // Toggle trajectory visibility
+
   const toggleTrajectories = () => {
     setShowTrajectories(!showTrajectories);
   };
- 
-  // Toggle triangle cone visibility
+
   const toggleTriangleCone = () => {
     setShowTriangleCone(!showTriangleCone);
   };
- 
-  // Handle threat selection
+
   const handleThreatClick = (drone: DroneData) => {
     setSelectedThreat(drone);
   };
- 
-  // Close threat details
+
   const closeThreatDetails = () => {
     setSelectedThreat(null);
   };
- 
-  // Clear all trajectories
+
   const clearTrajectories = () => {
     setTrajectories([]);
   };
- 
-  // Get trajectory points for polyline (convert to [lat, lng] format)
+
   const getTrajectoryPoints = (
     trajectory: DroneTrajectory
   ): [number, number][] => {
@@ -539,20 +696,39 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
       point.position[0],
     ]);
   };
- 
+
+  // Fixed TypeScript error by simplifying the condition
+  const isStopButtonDisabled = jammerStatus !== 'active';
+
   return (
     <Box
       sx={{
         position: "relative",
         width: "100%",
         height: {
-          xs: "calc(100vh - 45px)", // Small mobile
-          sm: "calc(100vh - 50px)", // Mobile
-          md: "calc(100vh - 60px)", // Desktop
+          xs: "calc(100vh - 45px)",
+          sm: "calc(100vh - 50px)",
+          md: "calc(100vh - 60px)",
         },
         overflow: "hidden",
       }}
     >
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        sx={{ mt: "5vh" }}
+      >
+        <Alert 
+          severity={snackbar.severity} 
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+
       {/* Leaflet Map with Satellite Imagery */}
       <MapContainer
         center={centerPosition}
@@ -567,7 +743,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
       >
         {/* Offline Tile Layer */}
         <OfflineTileLayerComponent offlineFirst={offlineMode} />
- 
+
         {/* Triangle Cone */}
         {showTriangleCone && (
           <TriangleCone
@@ -577,7 +753,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             direction={coneDirection}
           />
         )}
- 
+
         {/* Drone Trajectories */}
         {showTrajectories && trajectories.map(trajectory => (
           <Polyline
@@ -603,7 +779,6 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           />
         ))}
 
- 
         {/* GEOGRAPHICALLY FIXED 10km Coverage Circle */}
         <Circle
           center={centerPosition}
@@ -616,23 +791,24 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             dashArray: "5, 8",
           }}
         />
- 
         
-        <RadarComponent center={centerPosition} radius={radius10km} radarActive={radarActive} systemActive={systemActive}></RadarComponent>
- 
+        <RadarComponent center={centerPosition} radius={radius10km} radarActive={radarActive} systemActive={systemActive} />
+
         {/* GEOGRAPHICALLY FIXED Command Center Marker */}
-        <Marker position={centerPosition} icon={commandCenterIcon} >
+        <Marker position={centerPosition} icon={commandCenterIcon}>
           <Popup>
             <div style={{ fontFamily: "monospace", fontSize: "12px" }}>
               <strong>🏢 COMMAND CENTER</strong>
               <br />
-              <strong>LAT:</strong> {latLon.lat}
+              <strong>LAT:</strong> {latLon.lat?.toFixed(6) || 'Loading...'}
               <br />
-              <strong>LNG:</strong> {latLon.lon}
+              <strong>LNG:</strong> {latLon.lon?.toFixed(6) || 'Loading...'}
               <br />
               <strong>STATUS:</strong> {systemActive ? "ONLINE" : "OFFLINE"}
               <br />
               <strong>RADAR:</strong> {radarActive ? "SCANNING" : "OFFLINE"}
+              <br />
+              <strong>JAMMER:</strong> {jammerStatus.toUpperCase()}
               <br />
               <strong>COVERAGE:</strong> 10km RADIUS
               <br />
@@ -641,12 +817,13 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
               <strong>TRIANGLE CONE:</strong> {showTriangleCone ? "ON" : "OFF"}
               <br />
               <strong>ACTIVE TRACKS:</strong> {trajectories.length}
+              <br />
+              <strong>CONE DIRECTION:</strong> {coneDirection}°
             </div>
           </Popup>
         </Marker>
 
- 
-        {/* Drone Markers - Each positioned at their geographic coordinates with detection highlighting */}
+        {/* Drone Markers */}
         {drones.map((drone) => {
           const isDetected = detectedThreats.includes(drone.id);
           const actualDistance = calculateDistance(
@@ -656,11 +833,11 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             drone.position[0]
           );
           const trajectory = trajectories.find(t => t.id === drone.id);
- 
+
           return (
             <Marker
               key={drone.id}
-              position={[drone.position[1], drone.position[0]]} // [lat, lng]
+              position={[drone.position[1], drone.position[0]]}
               icon={createDroneIcon(
                 drone.threat_level,
                 isDetected,
@@ -726,11 +903,10 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             </Marker>
           );
         })}
- 
+
         {/* Map Drawing Tools */}
         {drawingToolsEnabled && <MapDrawingTools />}
       </MapContainer>
- 
 
       {/* Trajectory Control Panel */}
       <Box
@@ -779,7 +955,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             TRAJECTORIES
           </Typography>
         </Box>
- 
+
         <Box
           sx={{
             display: "flex",
@@ -799,7 +975,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             🗑️ CLEAR ALL
           </Typography>
         </Box>
- 
+
         <Typography variant="caption" display="block" sx={{ mt: 1, fontSize: "10px", opacity: 0.8 }}>
           ACTIVE TRACKS: {trajectories.length}
         </Typography>
@@ -812,120 +988,170 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           {trajectories.reduce((sum, t) => sum + t.points.length, 0)}
         </Typography>
       </Box>
- 
-<Box
-  sx={{
-    position: "absolute",
-    bottom: 10,
-    right: 10,
-    backgroundColor: "rgba(0, 0, 0, 0.85)",
-    color: "#fff",
-    padding: 2,
-    borderRadius: 2,
-    fontFamily: "monospace",
-    fontSize: "11px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-    border: "1px solid #00ff41",
-    zIndex: 1000,
-    minWidth: 200,
-    backdropFilter: "blur(10px)",
-  }}
->
-  {/* Checkboxes Section */}
-  <Box sx={{ mb: 2 }}>
-    <Typography 
-      variant="subtitle2" 
-      sx={{ 
-        color: "#00ff41", 
-        mb: 1, 
-        fontWeight: "bold",
-        fontSize: "12px"
-      }}
-    >
-      OPTIONS
-    </Typography>
-    
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-      {["5.8GHz", "2.4GHz", "1.5GHz", "<1GHz"].map((label) => (
-        <FormControlLabel
-          key={label}
-          control={
-            <Checkbox
-              size="small"
-              sx={{
-                color: "#00ff41",
-                '&.Mui-checked': {
-                  color: "#00ff41",
-                },
-                '& .MuiSvgIcon-root': {
-                  fontSize: 16,
-                },
-                padding: "4px",
-              }}
-            />
-          }
-          label={
-            <Typography sx={{ fontSize: "11px", fontFamily: "monospace" }}>
-              {label}
-            </Typography>
-          }
-          sx={{
-            margin: 0,
-            '&:hover': {
-              backgroundColor: "rgba(0, 255, 65, 0.1)",
-              borderRadius: 1,
-            },
-          }}
-        />
-      ))}
-    </Box>
-  </Box>
 
-  {/* Buttons Section */}
-  <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between" }}>
-    <Button
-      variant="outlined"
-      size="small"
-      sx={{
-        color: "#00ff41",
-        borderColor: "#00ff41",
-        fontSize: "10px",
-        padding: "4px 12px",
-        fontFamily: "monospace",
-        textTransform: "none",
-        '&:hover': {
-          borderColor: "#00ff41",
-          backgroundColor: "rgba(0, 255, 65, 0.1)",
-        },
-        flex: 1,
-      }}
-    >
-      START
-    </Button>
-    
-    <Button
-      variant="contained"
-      size="small"
-      sx={{
-        backgroundColor: "#00ff41",
-        color: "#000",
-        fontSize: "10px",
-        padding: "4px 12px",
-        fontFamily: "monospace",
-        textTransform: "none",
-        fontWeight: "bold",
-        '&:hover': {
-          backgroundColor: "#00cc33",
-          boxShadow: "0 0 8px rgba(0, 255, 65, 0.6)",
-        },
-        flex: 1,
-      }}
-    >
-      STOP
-    </Button>
-  </Box>
-</Box>
- 
+      {/* Jammer Control Panel */}
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: 10,
+          right: 10,
+          backgroundColor: "rgba(0, 0, 0, 0.85)",
+          color: "#fff",
+          padding: 2,
+          borderRadius: 2,
+          fontFamily: "monospace",
+          fontSize: "11px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+          border: `1px solid ${
+            jammerStatus === 'active' ? '#00ff41' : 
+            jammerStatus === 'starting' ? '#ffaa00' : 
+            jammerStatus === 'stopping' ? '#ffaa00' : '#ff4444'
+          }`,
+          zIndex: 1000,
+          minWidth: 200,
+          backdropFilter: "blur(10px)",
+        }}
+      >
+        {/* Jammer Status */}
+        <Box sx={{ mb: 2, textAlign: 'center' }}>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              color: 
+                jammerStatus === 'active' ? '#00ff41' : 
+                jammerStatus === 'starting' ? '#ffaa00' : 
+                jammerStatus === 'stopping' ? '#ffaa00' : '#ff4444',
+              fontWeight: "bold",
+              fontSize: "12px",
+            }}
+          >
+            {jammerStatus === 'active' ? '🟢 JAMMER ACTIVE' :
+             jammerStatus === 'starting' ? '🟡 STARTING...' :
+             jammerStatus === 'stopping' ? '🟡 STOPPING...' : '🔴 JAMMER IDLE'}
+          </Typography>
+        </Box>
+
+        {/* Checkboxes Section */}
+        <Box sx={{ mb: 2 }}>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              color: "#00ff41", 
+              mb: 1, 
+              fontWeight: "bold",
+              fontSize: "12px",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            JAMMING BANDS
+          </Typography>
+          
+          <Box sx={{ display: "flex", flexDirection: "row", gap: 1, flexWrap: 'wrap' }}>
+            {Object.keys(selectedFrequencies).map((frequency) => (
+              <FormControlLabel
+                key={frequency}
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={selectedFrequencies[frequency]}
+                    onChange={handleFrequencyChange(frequency)}
+                    disabled={jammerStatus === 'active' || jammerStatus === 'starting' || jammerStatus === 'stopping'}
+                    sx={{
+                      color: "#00ff41",
+                      '&.Mui-checked': {
+                        color: "#00ff41",
+                      },
+                      '&.Mui-disabled': {
+                        color: 'rgba(0, 255, 65, 0.5)',
+                      },
+                      '& .MuiSvgIcon-root': {
+                        fontSize: 16,
+                      },
+                      padding: "4px",
+                    }}
+                  />
+                }
+                label={
+                  <Typography sx={{ 
+                    fontSize: "11px", 
+                    fontFamily: "monospace",
+                    color: (jammerStatus === 'active' || jammerStatus === 'starting' || jammerStatus === 'stopping') ? 'rgba(255, 255, 255, 0.7)' : '#fff'
+                  }}>
+                    {frequency}
+                  </Typography>
+                }
+                sx={{
+                  margin: 0,
+                  '&:hover': {
+                    backgroundColor: "rgba(0, 255, 65, 0.1)",
+                    borderRadius: 1,
+                  },
+                }}
+              />
+            ))}
+          </Box>
+        </Box>
+
+        {/* Buttons Section */}
+        <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between" }}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={startJammer}
+            disabled={jammerStatus === 'active' || jammerStatus === 'starting' || jammerStatus === 'stopping'}
+            sx={{
+              color: "#00ff41",
+              borderColor: "#00ff41",
+              fontSize: "10px",
+              padding: "4px 12px",
+              fontFamily: "monospace",
+              textTransform: "none",
+              '&:hover': {
+                borderColor: "#00ff41",
+                backgroundColor: "rgba(0, 255, 65, 0.1)",
+              },
+              '&.Mui-disabled': {
+                color: 'rgba(0, 255, 65, 0.5)',
+                borderColor: 'rgba(0, 255, 65, 0.3)',
+              },
+              flex: 1,
+            }}
+          >
+            {jammerStatus === 'starting' ? 'STARTING...' : 'START'}
+          </Button>
+          
+          <Button
+            variant="contained"
+            size="small"
+            onClick={stopJammer}
+            disabled={isStopButtonDisabled}
+            sx={{
+              backgroundColor: 
+                jammerStatus === 'active' ? "#00ff41" : 
+                'rgba(0, 255, 65, 0.3)',
+              color: "#000",
+              fontSize: "10px",
+              padding: "4px 12px",
+              fontFamily: "monospace",
+              textTransform: "none",
+              fontWeight: "bold",
+              '&:hover': {
+                backgroundColor: "#00cc33",
+                boxShadow: "0 0 8px rgba(0, 255, 65, 0.6)",
+              },
+              '&.Mui-disabled': {
+                backgroundColor: 'rgba(0, 255, 65, 0.3)',
+                color: 'rgba(0, 0, 0, 0.5)',
+              },
+              flex: 1,
+            }}
+          >
+            {jammerStatus === 'stopping' ? 'STOPPING...' : 'STOP'}
+          </Button>
+        </Box>
+      </Box>
+
       {/* Detailed Threat Information Panel */}
       {selectedThreat && (
         <Box
@@ -978,7 +1204,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
               ✕
             </Box>
           </Box>
- 
+
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
             {/* Left Column - Basic Info */}
             <Box>
@@ -1010,7 +1236,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
                   {selectedThreat.threat_level}
                 </span>
               </Typography>
- 
+
               <Typography
                 variant="caption"
                 display="block"
@@ -1040,7 +1266,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
                 m from Command Center
               </Typography>
             </Box>
- 
+
             {/* Right Column - Movement & Status */}
             <Box>
               <Typography
@@ -1059,7 +1285,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
               <Typography variant="caption" display="block" sx={{ mb: 1 }}>
                 <strong>FIRST DETECTED:</strong> {selectedThreat.detected_at}
               </Typography>
- 
+
               <Typography
                 variant="caption"
                 display="block"
@@ -1094,7 +1320,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
                   return `${totalDistance.toFixed(0)}m`;
                 })()}
               </Typography>
- 
+
               <Typography
                 variant="caption"
                 display="block"
@@ -1152,7 +1378,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
               </Typography>
             </Box>
           </Box>
- 
+
           {/* Threat Assessment */}
           <Box
             sx={{
@@ -1170,9 +1396,17 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             >
               🎯 THREAT ASSESSMENT
             </Typography>
-            
+            <Typography variant="caption" display="block">
+              {selectedThreat.threat_level === "CRITICAL" 
+                ? "CRITICAL THREAT - IMMEDIATE COUNTERMEASURES REQUIRED"
+                : selectedThreat.threat_level === "HIGH"
+                ? "HIGH PRIORITY THREAT - ENGAGE COUNTERMEASURES"
+                : selectedThreat.threat_level === "MEDIUM"
+                ? "MEDIUM THREAT - MONITOR AND PREPARE COUNTERMEASURES"
+                : "LOW THREAT - CONTINUE SURVEILLANCE"}
+            </Typography>
           </Box>
- 
+
           {/* Action Buttons */}
           <Box
             sx={{ display: "flex", gap: 2, mt: 2, justifyContent: "center" }}
@@ -1211,7 +1445,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           </Box>
         </Box>
       )}
- 
+
       {/* Overlay backdrop for threat details */}
       {selectedThreat && (
         <Box
@@ -1227,7 +1461,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           onClick={closeThreatDetails}
         />
       )}
- 
+
       {/* Offline Map Control Panel */}
       {showOfflineControl && (
         <Box
@@ -1263,6 +1497,5 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
     </Box>
   );
 };
- 
+
 export default CesiumMap;
- 

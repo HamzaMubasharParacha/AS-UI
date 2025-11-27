@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {BASE_URL} from "../api/config";
+import {login} from "../api/config";
 import {
   Box,
   TextField,
@@ -26,7 +26,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
  
     try {
       const response = await fetch(
-        `${BASE_URL}/auth/login`,
+        `${login}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

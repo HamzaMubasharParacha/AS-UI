@@ -57,24 +57,24 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ status }) => {
 
   const systemComponents = [
     {
-      name: "RADAR ARRAY",
+      name: "JAMMER",
       status: status.radar,
       icon: <Radar />,
     },
     {
-      name: "COUNTERMEASURES",
+      name: "DF-10",
       status: status.countermeasures,
       icon: <Computer />,
     },
     {
-      name: "COMMUNICATIONS",
+      name: "SPOOFER",
       status: status.communications,
       icon: <Wifi />,
     },
   ];
 
   return (
-    <Paper sx={{ p: 2, height: "200px" }}>
+    <Paper sx={{ p: 1, height: "200px" }}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <Computer sx={{ mr: 1, color: "#00ff41" }} />
         <Typography variant="h6" sx={{ color: "#00ff41" }}>
@@ -117,62 +117,6 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ status }) => {
             </Box>
           </Box>
         ))}
-      </Box>
-
-      <Box sx={{ mt: 2 }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mb: 1,
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Battery90 sx={{ color: getPowerColor(status.power) }} />
-            <Typography variant="body2" sx={{ ml: 1, fontSize: "0.8rem" }}>
-              POWER LEVEL
-            </Typography>
-          </Box>
-          <Typography
-            variant="body2"
-            sx={{
-              color: getPowerColor(status.power),
-              fontWeight: "bold",
-              fontFamily: "monospace",
-            }}
-          >
-            {status.power}%
-          </Typography>
-        </Box>
-        <LinearProgress
-          variant="determinate"
-          value={status.power}
-          sx={{
-            height: 6,
-            borderRadius: 3,
-            backgroundColor: "#333",
-            "& .MuiLinearProgress-bar": {
-              backgroundColor: getPowerColor(status.power),
-              borderRadius: 3,
-            },
-          }}
-        />
-      </Box>
-
-      <Box sx={{ mt: 2, textAlign: "center" }}>
-        <Chip
-          label={`SYSTEM ${
-            status.radar === "ONLINE" ? "OPERATIONAL" : "DEGRADED"
-          }`}
-          size="small"
-          sx={{
-            backgroundColor: status.radar === "ONLINE" ? "#00ff41" : "#ffaa00",
-            color: "#000",
-            fontWeight: "bold",
-            fontSize: "0.7rem",
-          }}
-        />
       </Box>
     </Paper>
   );

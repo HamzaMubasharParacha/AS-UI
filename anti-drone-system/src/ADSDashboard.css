@@ -165,8 +165,6 @@ body {
   border-right: 2px solid rgba(0, 255, 65, 0.4);
 }
 
-/* REMOVED: .fixed-column.right styles */
-
 .column-header {
   padding: 12px;
   border-bottom: 2px solid rgba(0, 255, 65, 0.3);
@@ -337,26 +335,37 @@ body {
   transform: translateX(4px);
 }
 
-/* ===== FLOATING CARDS - ENHANCED RESPONSIVE ===== */
-
+/* ===== FLOATING CARDS - OPTIMIZED DRAGGING ===== */
+/* ===== INSTANT DRAG RESPONSE ===== */
 .floating-card {
-  position: absolute;
+  position: fixed;
+  width: 380px;
   background: rgba(10, 10, 10, 0.98);
   backdrop-filter: blur(15px);
   border: 2px solid rgba(0, 255, 65, 0.3);
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
   z-index: 1500;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.15s ease-out;
   overflow: hidden;
-  cursor: grab;
+  cursor: default;
   user-select: none;
+  transform-origin: center;
 }
 
 .floating-card:hover {
   border-color: rgba(0, 255, 65, 0.6);
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
+}
+
+.floating-card-dragging {
+  box-shadow: 0 25px 80px rgba(0, 255, 65, 0.6) !important;
+  border-color: rgba(0, 255, 65, 0.9) !important;
+  transform: scale(1.02) !important;
+  z-index: 2500 !important;
+  cursor: grabbing !important;
+  transition: none !important; /* No transition during drag */
 }
 
 .floating-card-header {
@@ -374,6 +383,25 @@ body {
   color: #00ff41;
   cursor: grab;
   user-select: none;
+  transition: all 0.1s ease;
+}
+
+.floating-card-header:active {
+  cursor: grabbing;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 65, 0.25) 0%,
+    rgba(0, 255, 65, 0.1) 100%
+  );
+}
+
+.floating-card-dragging .floating-card-header {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 65, 0.3) 0%,
+    rgba(0, 255, 65, 0.15) 100%
+  ) !important;
+  cursor: grabbing !important;
 }
 
 .floating-card-content {
@@ -381,33 +409,14 @@ body {
   color: #ffffff;
   max-height: 60vh;
   overflow-y: auto;
+  cursor: default;
 }
-
-/* ===== DRAG AND DROP ENHANCEMENTS ===== */
-
-.floating-card-dragging {
-  box-shadow: 0 25px 80px rgba(0, 255, 65, 0.4) !important;
-  border-color: rgba(0, 255, 65, 0.9) !important;
-  transform: scale(1.03) rotate(1deg) !important;
-  z-index: 2500 !important;
-  cursor: grabbing !important;
-}
-
-.floating-card-dragging .floating-card-header {
-  background: linear-gradient(
-    135deg,
-    rgba(0, 255, 65, 0.3) 0%,
-    rgba(0, 255, 65, 0.1) 100%
-  ) !important;
-  cursor: grabbing !important;
-}
-
 /* ===== RESPONSIVE BREAKPOINTS ===== */
 
 /* Desktop (1200px+) */
 @media (min-width: 1200px) {
   .floating-card {
-    width: 950px;
+    width: 400px;
     min-height: 300px;
   }
 
@@ -429,7 +438,7 @@ body {
 /* Large Desktop (1400px+) */
 @media (min-width: 1400px) {
   .floating-card {
-    width: 950px;
+    width: auto;
     min-height: 350px;
   }
 
@@ -451,7 +460,7 @@ body {
 /* Tablet (768px - 1199px) */
 @media (min-width: 768px) and (max-width: 1199px) {
   .floating-card {
-    width: 910px;
+    width: auto;
     min-height: 280px;
     max-height: 55vh;
   }

@@ -3,7 +3,7 @@ import { useMap } from "react-leaflet";
 import * as L from "leaflet";
 import "leaflet-draw";
 import "leaflet-draw/dist/leaflet.draw.css";
-
+ 
 interface DrawnShape {
   id: string;
   type: string;
@@ -18,62 +18,46 @@ interface DrawnShape {
     opacity: number;
   };
   measurements?: {
-    area?: number;
-    perimeter?: number;
-    distance?: number;
+    area?: number;       // km²
+    perimeter?: number;  // km
+    distance?: number;   // km
   };
 }
-
+ 
 interface MapDrawingToolsProps {
   onShapeDrawn?: (shape: DrawnShape) => void;
   onShapeEdited?: (shapes: DrawnShape[]) => void;
   onShapeDeleted?: (deletedIds: string[]) => void;
 }
-
+ 
 const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
   onShapeDrawn,
   onShapeEdited,
   onShapeDeleted,
 }) => {
   const map = useMap();
-  const [drawControl, setDrawControl] = useState<any>(null);
-  const [drawnItems, setDrawnItems] = useState<L.FeatureGroup>(
-    new L.FeatureGroup()
-  );
   const [shapes, setShapes] = useState<DrawnShape[]>([]);
-  const [activeDrawingTool, setActiveDrawingTool] = useState<string | null>(
-    null
-  );
-  const drawControlRef = useRef<any>(null);
-
-  // Initialize drawing tools
+  const drawnItems = useRef<L.FeatureGroup>(new L.FeatureGroup()).current;
+ 
+  // -------------------------------------------------------------------
+  // Initialize draw controls
+  // -------------------------------------------------------------------
   useEffect(() => {
     if (!map) return;
-
-    // Add drawn items layer to map
+ 
     map.addLayer(drawnItems);
-
-    // Configure drawing options
-    const drawOptions = {
-      position: "topright" as L.ControlPosition,
+ 
+    const drawControl = new (L as any).Control.Draw({
+      position: "topright",
       draw: {
         polygon: {
           allowIntersection: false,
-          drawError: {
-            color: "#e1e100",
-            message: "<strong>Error:</strong> Shape edges cannot cross!",
-          },
-          shapeOptions: {
-            color: "#00ff41",
-            fillColor: "#00ff41",
-            fillOpacity: 0.2,
-            weight: 2,
-            opacity: 0.8,
-          },
+          shapeOptions: commonPolygonStyle(),
           showArea: true,
-          metric: true,
-          feet: false,
-          nautic: false,
+        },
+        rectangle: {
+          shapeOptions: commonPolygonStyle(),
+          showArea: true,
         },
         polyline: {
           shapeOptions: {
@@ -81,42 +65,18 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
             weight: 3,
             opacity: 0.8,
           },
-          metric: true,
-          feet: false,
-          nautic: false,
           showLength: true,
         },
-        rectangle: {
-          shapeOptions: {
-            color: "#00ff41",
-            fillColor: "#00ff41",
-            fillOpacity: 0.2,
-            weight: 2,
-            opacity: 0.8,
-          },
-          showArea: true,
-          metric: true,
-        },
         circle: {
-          shapeOptions: {
-            color: "#00ff41",
-            fillColor: "#00ff41",
-            fillOpacity: 0.2,
-            weight: 2,
-            opacity: 0.8,
-          },
+          shapeOptions: commonPolygonStyle(),
           showRadius: true,
-          metric: true,
-          feet: false,
-          nautic: false,
         },
         marker: {
           icon: new L.Icon({
             iconUrl:
-              "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJDOC4xMyAyIDUgNS4xMyA1IDlDNSAxNC4yNSAxMiAyMiAxMiAyMkMxMiAyMiAxOSAxNC4yNSAxOSA5QzE5IDUuMTMgMTUuODcgMiAxMiAyWk0xMiAxMS41QzEwLjYyIDExLjUgOS41IDEwLjM4IDkuNSA5QzkuNSA3LjYyIDEwLjYyIDYuNSAxMiA2LjVDMTMuMzggNi41IDE0LjUgNy42MiAxNC41IDlDMTQuNSAxMC4zOCAxMy4zOCAxMS41IDEyIDExLjVaIiBmaWxsPSIjMDBmZjQxIi8+Cjwvc3ZnPgo=",
+              "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkM4LjEzIDIgNSA1LjEzIDUgOUM1IDE0LjI1IDEyIDIyIDEyIDIyQzEyIDIyIDE5IDE0LjI1IDE5IDlDMTkgNS4xMyAxNS44NyAyIDEyIDJaTTEyIDExLjVDMTAuNjIgMTEuNSA5LjUgMTAuMzggOS41IDlDOS41IDcuNjIgMTAuNjIgNi41IDEyIDYuNUMxMy4zOCA2LjUgMTQuNSA3LjYyIDE0LjUgOUMxNC41IDEwLjM4IDEzLjM4IDExLjUgMTIgMTEuNVoiIGZpbGw9IiMwMGZmNDEiLz48L3N2Zz4=",
             iconSize: [24, 24],
             iconAnchor: [12, 24],
-            popupAnchor: [0, -24],
           }),
         },
         circlemarker: false,
@@ -124,321 +84,142 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
       edit: {
         featureGroup: drawnItems,
         remove: true,
-        edit: {},
       },
-    };
-
-    // Create and add draw control
-    const control = new (L as any).Control.Draw(drawOptions);
-    map.addControl(control);
-    setDrawControl(control);
-    drawControlRef.current = control;
-
-    // Event handlers
-    const onDrawCreated = (e: any) => {
-      const { layerType, layer } = e;
-      const shapeId = `shape_${Date.now()}_${Math.random()
-        .toString(36)
-        .substr(2, 9)}`;
-
-      // Add layer to drawn items
-      drawnItems.addLayer(layer);
-
-      // Calculate measurements
-      let measurements: any = {};
-      if (layerType === "polygon" || layerType === "rectangle") {
-        const latlngs = layer.getLatLngs()[0];
-        measurements.area = calculatePolygonArea(latlngs);
-        measurements.perimeter = calculatePerimeter(latlngs);
-      } else if (layerType === "polyline") {
-        measurements.distance = calculateDistance(layer.getLatLngs());
-      } else if (layerType === "circle") {
-        const radius = layer.getRadius();
-        measurements.area = Math.PI * radius * radius;
-        measurements.perimeter = 2 * Math.PI * radius;
-      }
-
-      // Create shape object
-      const shape: DrawnShape = {
-        id: shapeId,
-        type: layerType,
-        name: `${layerType}_${shapeId}`, // <-- default name
-        layer: layer,
-        coordinates: getCoordinates(layer, layerType),
-        properties: {
-          color: "#00ff41",
-          fillColor: "#00ff41",
-          fillOpacity: 0.2,
-          weight: 2,
-          opacity: 0.8,
-        },
-        measurements,
-      };
-
-      // Store shape ID in layer
-      (layer as any)._shapeId = shapeId;
-
-      // Update shapes state
-      setShapes((prev) => [...prev, shape]);
-
-      // Add popup with information
-      addShapePopup(layer, shape);
-
-      // Callback
-      if (onShapeDrawn) {
-        onShapeDrawn(shape);
-      }
-
-     // console.log(`Created ${layerType}:`, shape);
-    };
-
-    const onDrawEdited = (e: any) => {
-      const editedShapes: DrawnShape[] = [];
-
-      e.layers.eachLayer((layer: any) => {
-        const shapeId = layer._shapeId;
-        if (shapeId) {
-          const existingShape = shapes.find((s) => s.id === shapeId);
-          if (existingShape) {
-            // Update coordinates and measurements
-            const updatedShape = {
-              ...existingShape,
-              coordinates: getCoordinates(layer, existingShape.type),
-              measurements: calculateMeasurements(layer, existingShape.type),
-            };
-            editedShapes.push(updatedShape);
-
-            // Update popup
-            addShapePopup(layer, updatedShape);
-          }
-        }
-      });
-
-      // Update shapes state
-      setShapes((prev) =>
-        prev.map((shape) => {
-          const edited = editedShapes.find((s) => s.id === shape.id);
-          return edited || shape;
-        })
-      );
-
-      if (onShapeEdited && editedShapes.length > 0) {
-        onShapeEdited(editedShapes);
-      }
-    };
-
-    const onDrawDeleted = (e: any) => {
-      const deletedIds: string[] = [];
-
-      e.layers.eachLayer((layer: any) => {
-        const shapeId = layer._shapeId;
-        if (shapeId) {
-          deletedIds.push(shapeId);
-        }
-      });
-
-      // Update shapes state
-      setShapes((prev) =>
-        prev.filter((shape) => !deletedIds.includes(shape.id))
-      );
-
-      if (onShapeDeleted && deletedIds.length > 0) {
-        onShapeDeleted(deletedIds);
-      }
-    };
-
-    // Add event listeners
-    map.on((L as any).Draw.Event.CREATED, onDrawCreated);
-    map.on((L as any).Draw.Event.EDITED, onDrawEdited);
-    map.on((L as any).Draw.Event.DELETED, onDrawDeleted);
-
-    // Cleanup
+    });
+ 
+    map.addControl(drawControl);
+ 
+    map.on((L as any).Draw.Event.CREATED, handleShapeCreated);
+    map.on((L as any).Draw.Event.EDITED, handleShapeEdited);
+    map.on((L as any).Draw.Event.DELETED, handleShapeDeleted);
+ 
     return () => {
-      if (drawControlRef.current) {
-        map.removeControl(drawControlRef.current);
-      }
-      map.removeLayer(drawnItems);
-      map.off((L as any).Draw.Event.CREATED, onDrawCreated);
-      map.off((L as any).Draw.Event.EDITED, onDrawEdited);
-      map.off((L as any).Draw.Event.DELETED, onDrawDeleted);
+      map.removeControl(drawControl);
+      map.off((L as any).Draw.Event.CREATED, handleShapeCreated);
+      map.off((L as any).Draw.Event.EDITED, handleShapeEdited);
+      map.off((L as any).Draw.Event.DELETED, handleShapeDeleted);
     };
-  }, [map, drawnItems, shapes, onShapeDrawn, onShapeEdited, onShapeDeleted]);
-
-  // Helper functions
-  const getCoordinates = (layer: any, type: string) => {
-    switch (type) {
-      case "polygon":
-      case "rectangle":
-        return layer
-          .getLatLngs()[0]
-          .map((latlng: L.LatLng) => [latlng.lat, latlng.lng]);
-      case "polyline":
-        return layer
-          .getLatLngs()
-          .map((latlng: L.LatLng) => [latlng.lat, latlng.lng]);
-      case "circle":
-        const center = layer.getLatLng();
-        return {
-          center: [center.lat, center.lng],
-          radius: layer.getRadius(),
-        };
-      case "marker":
-        const pos = layer.getLatLng();
-        return [pos.lat, pos.lng];
-      default:
-        return null;
-    }
+  }, [map]);
+ 
+  const commonPolygonStyle = () => ({
+    color: "#00ff41",
+    fillColor: "#00ff41",
+    fillOpacity: 0.2,
+    weight: 2,
+    opacity: 0.8,
+  });
+ 
+  // -------------------------------------------------------------------
+  // Shape Created
+  // -------------------------------------------------------------------
+  const handleShapeCreated = (e: any) => {
+    const { layerType, layer } = e;
+ 
+    const id = `shape_${Date.now()}_${Math.random()
+      .toString(36)
+      .substring(2, 9)}`;
+ 
+    drawnItems.addLayer(layer);
+    (layer as any)._shapeId = id;
+ 
+    const shape: DrawnShape = {
+      id,
+      type: layerType,
+      name: `${layerType}_${id}`,
+      layer,
+      coordinates: getCoordinates(layer, layerType),
+      properties: commonPolygonStyle(),
+      measurements: calculateMeasurements(layer, layerType),
+    };
+ 
+    setShapes((prev) => [...prev, shape]);
+ 
+    addShapePopup(layer, shape);
+    onShapeDrawn?.(shape);
   };
-
-  const calculateMeasurements = (layer: any, type: string) => {
-    const measurements: any = {};
-
-    if (type === "polygon" || type === "rectangle") {
-      const latlngs = layer.getLatLngs()[0];
-      measurements.area = calculatePolygonArea(latlngs);
-      measurements.perimeter = calculatePerimeter(latlngs);
-    } else if (type === "polyline") {
-      measurements.distance = calculateDistance(layer.getLatLngs());
-    } else if (type === "circle") {
-      const radius = layer.getRadius();
-      measurements.area = Math.PI * radius * radius;
-      measurements.perimeter = 2 * Math.PI * radius;
-    }
-
-    return measurements;
+ 
+  // -------------------------------------------------------------------
+  // Shape Edited
+  // -------------------------------------------------------------------
+  const handleShapeEdited = (e: any) => {
+    const updated: DrawnShape[] = [];
+ 
+    e.layers.eachLayer((layer: any) => {
+      const id = layer._shapeId;
+      const original = shapes.find((s) => s.id === id);
+      if (!original) return;
+ 
+      const newShape = {
+        ...original,
+        coordinates: getCoordinates(layer, original.type),
+        measurements: calculateMeasurements(layer, original.type),
+      };
+ 
+      updated.push(newShape);
+      addShapePopup(layer, newShape);
+    });
+ 
+    setShapes((prev) =>
+      prev.map((s) => updated.find((x) => x.id === s.id) || s)
+    );
+ 
+    onShapeEdited?.(updated);
   };
-
-  const calculatePolygonArea = (latlngs: L.LatLng[]) => {
-    // Simple polygon area calculation using shoelace formula
-    let area = 0;
-    const n = latlngs.length;
-
-    for (let i = 0; i < n; i++) {
-      const j = (i + 1) % n;
-      area += latlngs[i].lat * latlngs[j].lng;
-      area -= latlngs[j].lat * latlngs[i].lng;
-    }
-
-    return Math.abs(area / 2) * 111320 * 111320; // Rough conversion to square meters
+ 
+  // -------------------------------------------------------------------
+  // Shape Deleted
+  // -------------------------------------------------------------------
+  const handleShapeDeleted = (e: any) => {
+    const deletedIds: string[] = [];
+ 
+    e.layers.eachLayer((layer: any) => {
+      deletedIds.push(layer._shapeId);
+    });
+ 
+    setShapes((prev) => prev.filter((s) => !deletedIds.includes(s.id)));
+    onShapeDeleted?.(deletedIds);
   };
-
-  const calculatePerimeter = (latlngs: L.LatLng[]) => {
-    let perimeter = 0;
-    for (let i = 0; i < latlngs.length; i++) {
-      const current = latlngs[i];
-      const next = latlngs[(i + 1) % latlngs.length];
-      perimeter += current.distanceTo(next);
-    }
-    return perimeter;
-  };
-
-  const calculateDistance = (latlngs: L.LatLng[]) => {
-    let distance = 0;
-    for (let i = 0; i < latlngs.length - 1; i++) {
-      distance += latlngs[i].distanceTo(latlngs[i + 1]);
-    }
-    return distance;
-  };
-
-  const formatMeasurement = (value: number, unit: string) => {
-    if (unit === "area") {
-      if (value < 1000000) {
-        return `${Math.round(value)} m²`;
-      } else {
-        return `${(value / 1000000).toFixed(2)} km²`;
-      }
-    } else {
-      if (value < 1000) {
-        return `${Math.round(value)} m`;
-      } else {
-        return `${(value / 1000).toFixed(2)} km`;
-      }
-    }
-  };
-
-  // const addShapePopup = (layer: any, shape: DrawnShape) => {
-  //   let popupContent = `<div style="color: #00ff41; font-family: 'Courier New', monospace;">`;
-  //   popupContent += `<strong>${shape.type.toUpperCase()}</strong><br/>`;
-  //   popupContent += `<strong>ID:</strong> ${shape.id}<br/>`;
-
-  //   if (shape.measurements) {
-  //     if (shape.measurements.area !== undefined) {
-  //       popupContent += `<strong>Area:</strong> ${formatMeasurement(shape.measurements.area, 'area')}<br/>`;
-  //     }
-  //     if (shape.measurements.perimeter !== undefined) {
-  //       popupContent += `<strong>Perimeter:</strong> ${formatMeasurement(shape.measurements.perimeter, 'distance')}<br/>`;
-  //     }
-  //     if (shape.measurements.distance !== undefined) {
-  //       popupContent += `<strong>Distance:</strong> ${formatMeasurement(shape.measurements.distance, 'distance')}<br/>`;
-  //     }
-  //   }
-
-  //   popupContent += `</div>`;
-
-  //   layer.bindPopup(popupContent, {
-  //     className: 'drawing-popup',
-  //     maxWidth: 300
-  //   });
-  // };
-
+ 
+  // -------------------------------------------------------------------
+  // Popup with Editable Name
+  // -------------------------------------------------------------------
   const addShapePopup = (layer: any, shape: DrawnShape) => {
     const popupDiv = document.createElement("div");
     popupDiv.style.color = "#00ff41";
     popupDiv.style.fontFamily = "Courier New, monospace";
-
+ 
+    const { area, perimeter, distance } = shape.measurements || {};
+ 
     popupDiv.innerHTML = `
-    <strong>${shape.type.toUpperCase()}</strong><br/>
-    <strong>ID:</strong> ${shape.id}<br/>
-
-    <strong>Name:</strong>
-    <span id="shape-name-text">${shape.name}</span>
-
-    <input 
-      type="text" 
-      id="shape-name-input" 
-      value="${shape.name}"
-      style="width: 100%; margin-top: 6px; margin-bottom: 8px;
-             background: black; color: #00ff41; border: 1px solid #00ff41;
-             padding: 4px; display:none;"
-    />
-  `;
-
-    // Measurements
-    if (shape.measurements) {
-      if (shape.measurements.area !== undefined)
-        popupDiv.innerHTML += `<strong>Area:</strong> ${formatMeasurement(
-          shape.measurements.area,
-          "area"
-        )}<br/>`;
-
-      if (shape.measurements.perimeter !== undefined)
-        popupDiv.innerHTML += `<strong>Perimeter:</strong> ${formatMeasurement(
-          shape.measurements.perimeter,
-          "distance"
-        )}<br/>`;
-
-      if (shape.measurements.distance !== undefined)
-        popupDiv.innerHTML += `<strong>Distance:</strong> ${formatMeasurement(
-          shape.measurements.distance,
-          "distance"
-        )}<br/>`;
-    }
-
-    layer.bindPopup(popupDiv, {
-      className: "drawing-popup",
-      maxWidth: 300,
-    });
-
+      <strong>${shape.type.toUpperCase()}</strong><br/>
+      <strong>ID:</strong> ${shape.id}<br/><br/>
+ 
+      <strong>Name:</strong>
+      <span id="shape-name-text">${shape.name}</span>
+      <input id="shape-name-input"
+             type="text"
+             value="${shape.name}"
+             style="display:none;width:100%;margin-top:6px;
+             background:black;color:#00ff41;border:1px solid #00ff41;
+             padding:4px;" />
+ 
+      <br/><br/>
+ 
+      ${area !== undefined ? `<strong>Area:</strong> ${area.toFixed(3)} km²<br/>` : ""}
+      ${perimeter !== undefined ? `<strong>Perimeter:</strong> ${perimeter.toFixed(3)} km<br/>` : ""}
+      ${distance !== undefined ? `<strong>Distance:</strong> ${distance.toFixed(3)} km<br/>` : ""}
+    `;
+ 
+    layer.bindPopup(popupDiv, { className: "drawing-popup", maxWidth: 300 });
+ 
     layer.on("popupopen", () => {
       const popupEl = document.querySelector(".leaflet-popup");
-      const closeBtn = popupEl?.querySelector(".leaflet-popup-close-button");
-
-      if (!popupEl || !closeBtn) return;
-
-      // If button already exists, don’t add again
-      if (popupEl.querySelector("#edit-icon-btn")) return;
-
-      // Create edit icon button
+      if (!popupEl) return;
+ 
+      // remove previous button
+      popupEl.querySelector("#edit-icon-btn")?.remove();
+ 
+      // create edit button
       const editBtn = document.createElement("button");
       editBtn.id = "edit-icon-btn";
       editBtn.innerHTML = "✏️";
@@ -448,150 +229,117 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
       editBtn.style.padding = "2px 6px";
       editBtn.style.cursor = "pointer";
       editBtn.style.fontSize = "12px";
-
+ 
       popupEl.appendChild(editBtn);
-
-      const nameText = popupDiv.querySelector(
-        "#shape-name-text"
-      ) as HTMLElement;
-      const nameInput = popupDiv.querySelector(
-        "#shape-name-input"
-      ) as HTMLInputElement;
-
-      editBtn.addEventListener("click", () => {
+ 
+      // get name UI
+      const nameText = popupDiv.querySelector("#shape-name-text") as HTMLElement;
+      const nameInput = popupDiv.querySelector("#shape-name-input") as HTMLInputElement;
+ 
+      // EDIT MODE
+      const enableEdit = () => {
         nameText.style.display = "none";
         nameInput.style.display = "block";
         nameInput.focus();
-
-        // Replace edit icon with Save icon
-        editBtn.innerHTML = "💾"; // save icon
-
-        editBtn.onclick = () => {
-          const newName = nameInput.value;
-          shape.name = newName;
-
-          setShapes((prev) =>
-            prev.map((s) => (s.id === shape.id ? { ...s, name: newName } : s))
-          );
-
-          // Rebuild popup
-          addShapePopup(layer, shape);
-          layer.openPopup();
-        };
-      });
+        editBtn.innerHTML = "💾";
+ 
+        editBtn.removeEventListener("click", enableEdit);
+        editBtn.addEventListener("click", saveName);
+      };
+ 
+      // SAVE MODE
+      const saveName = () => {
+        const newName = nameInput.value;
+        shape.name = newName;
+ 
+        setShapes((prev) =>
+          prev.map((s) => (s.id === shape.id ? { ...s, name: newName } : s))
+        );
+ 
+        addShapePopup(layer, shape);
+        layer.openPopup();
+      };
+ 
+      editBtn.addEventListener("click", enableEdit);
     });
   };
-
-  // Public methods for external control
-  const enableDrawingTool = (toolType: string) => {
-    setActiveDrawingTool(toolType);
-    // Programmatically trigger drawing mode
-    const toolbar = (drawControl as any)?._toolbars?.draw;
-    if (toolbar) {
-      const tool = toolbar._modes[toolType];
-      if (tool && tool.handler) {
-        tool.handler.enable();
-      }
+ 
+  // -------------------------------------------------------------------
+  // Coordinate Extraction
+  // -------------------------------------------------------------------
+  const getCoordinates = (layer: any, type: string) => {
+    if (type === "polygon" || type === "rectangle")
+      return layer.getLatLngs()[0].map((p: L.LatLng) => [p.lat, p.lng]);
+ 
+    if (type === "polyline")
+      return layer.getLatLngs().map((p: L.LatLng) => [p.lat, p.lng]);
+ 
+    if (type === "circle") {
+      const c = layer.getLatLng();
+      return { center: [c.lat, c.lng], radius: layer.getRadius() };
     }
-  };
-
-  const disableDrawingTool = () => {
-    setActiveDrawingTool(null);
-    // Disable all drawing modes
-    const toolbar = (drawControl as any)?._toolbars?.draw;
-    if (toolbar) {
-      Object.values(toolbar._modes).forEach((mode: any) => {
-        if (mode.handler) {
-          mode.handler.disable();
-        }
-      });
+ 
+    if (type === "marker") {
+      const p = layer.getLatLng();
+      return [p.lat, p.lng];
     }
+ 
+    return null;
   };
-
-  const clearAllShapes = () => {
-    drawnItems.clearLayers();
-    setShapes([]);
-    if (onShapeDeleted) {
-      onShapeDeleted(shapes.map((s) => s.id));
+ 
+  // -------------------------------------------------------------------
+  // Measurements (converted to km and km²)
+  // -------------------------------------------------------------------
+  const calculateMeasurements = (layer: any, type: string) => {
+    const m: any = {};
+ 
+    if (type === "polygon" || type === "rectangle") {
+      const pts = layer.getLatLngs()[0];
+ 
+      // perimeter (m → km)
+      const perimeterMeters = pts.reduce(
+        (acc: number, p1: any, i: number) =>
+          acc + p1.distanceTo(pts[(i + 1) % pts.length]),
+        0
+      );
+      m.perimeter = perimeterMeters / 1000;
+ 
+      // area rough calculation → convert m² to km²
+      const areaMeters2 = Math.abs(
+        pts.reduce((sum: number, p: any, i: number) => {
+          const j = (i + 1) % pts.length;
+          return sum + p.lat * pts[j].lng - pts[j].lat * p.lng;
+        }, 0) /
+          2 *
+          111320 *
+          111320
+      );
+      m.area = areaMeters2 / 1_000_000;
     }
-  };
-
-  const exportShapes = () => {
-    const geoJsonData = {
-      type: "FeatureCollection",
-      features: shapes.map((shape) => ({
-        type: "Feature",
-        properties: {
-          id: shape.id,
-          name: shape.name,
-          type: shape.type,
-          ...shape.properties,
-          measurements: shape.measurements,
-        },
-        geometry: convertToGeoJSON(shape),
-      })),
-    };
-
-    return geoJsonData;
-  };
-
-  const convertToGeoJSON = (shape: DrawnShape) => {
-    switch (shape.type) {
-      case "polygon":
-      case "rectangle":
-        return {
-          type: "Polygon",
-          coordinates: [
-            shape.coordinates.map((coord: number[]) => [coord[1], coord[0]]),
-          ],
-        };
-      case "polyline":
-        return {
-          type: "LineString",
-          coordinates: shape.coordinates.map((coord: number[]) => [
-            coord[1],
-            coord[0],
-          ]),
-        };
-      case "circle":
-        return {
-          type: "Point",
-          coordinates: [
-            shape.coordinates.center[1],
-            shape.coordinates.center[0],
-          ],
-        };
-      case "marker":
-        return {
-          type: "Point",
-          coordinates: [shape.coordinates[1], shape.coordinates[0]],
-        };
-      default:
-        return null;
+ 
+    if (type === "polyline") {
+      const mDist = layer
+        .getLatLngs()
+        .reduce(
+          (sum: number, p: any, i: number, arr: any[]) =>
+            i === arr.length - 1 ? sum : sum + p.distanceTo(arr[i + 1]),
+          0
+        );
+ 
+      m.distance = mDist / 1000;
     }
+ 
+    if (type === "circle") {
+      const r = layer.getRadius(); // meters
+      m.area = (Math.PI * r * r) / 1_000_000;
+      m.perimeter = (2 * Math.PI * r) / 1000;
+    }
+ 
+    return m;
   };
-
-  // Expose methods for external access
-  React.useEffect(() => {
-    (MapDrawingTools as any).currentInstance = {
-      enableDrawingTool,
-      disableDrawingTool,
-      clearAllShapes,
-      exportShapes,
-      shapes,
-      activeDrawingTool,
-    };
-  }, [
-    enableDrawingTool,
-    disableDrawingTool,
-    clearAllShapes,
-    exportShapes,
-    shapes,
-    activeDrawingTool,
-  ]);
-
-  return null; // This component doesn't render anything directly
+ 
+  return null;
 };
-
+ 
 export default MapDrawingTools;
 export type { DrawnShape, MapDrawingToolsProps };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Typography, Box, IconButton, Button } from "@mui/material";
 import {
   Dashboard,
@@ -14,7 +14,7 @@ import {
   Room,
   Straighten,
   Analytics,
-  SettingsInputAntenna, // Add this for jammer icon
+  SettingsInputAntenna,
 } from "@mui/icons-material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -24,14 +24,13 @@ import ThreatAssessment from "./ThreatAssessment";
 import SystemStatus from "./SystemStatus";
 import DataVisualization from "./DataVisualization";
 import SpectrumAnalyzer from "./SpectrumAnalyzer";
-import JammerControls from "./JammerControls";
 import "../ADSDashboard.css";
-import { BASE_URL } from "../api/config";
+import { drone_data, logout } from "../api/config";
 
 interface DashboardProps {
   setToken: (token: string | null) => void;
 }
- 
+
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -67,7 +66,7 @@ const darkTheme = createTheme({
     },
   },
 });
- 
+
 interface DroneData {
   id: string;
   position: [number, number, number];
@@ -77,7 +76,7 @@ interface DroneData {
   heading: number;
   detected_at: string;
 }
- 
+
 interface FloatingCard {
   id: string;
   title: string;
@@ -86,108 +85,50 @@ interface FloatingCard {
   visible: boolean;
   minimized: boolean;
   lastActivity: string;
-  status: "active" | "inactive" | "warning" | "error";
 }
- 
+
 interface CardLog {
   id: string;
   title: string;
-  status: "active" | "inactive" | "warning" | "error";
   lastActivity: string;
   description: string;
   icon: React.ReactNode;
 }
- 
+
 const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showSpectrum, setShowSpectrum] = useState(false);
-  const [jammerStatus, setJammerStatus] = useState<'stopped' | 'starting' | 'running' | 'stopping'>('stopped');
 
-  const jammerStart = async () => {
-   
-    setJammerStatus('starting');
-  
-    try {
-      const response = await fetch(
-        "http://192.168.100.110:8080/api/jammer3000/1/jam/start",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            frequencyBand: "2.4GHz",
-            powerAttenuation: 18
-          }),
-        }
-      );
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-  
-      const data = await response.json();
-      console.log("API Response:", data);
-      setJammerStatus('running');
-    } catch (error) {
-      console.error("Error:", error);
-      setJammerStatus('stopped');
-    }
-  };
+  // Use refs for better performance
+  const dragStateRef = useRef({
+    isDragging: false,
+    draggedCardId: null as string | null,
+    dragOffset: { x: 0, y: 0 },
+    startPosition: { x: 0, y: 0 }
+  });
 
-  const jammerStop = async () => {
-    setJammerStatus('stopping');
-  
-    try {
-      const response = await fetch(
-        "http://192.168.100.110:8080/api/jammer3000/1/jam/stop",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-  
-      const data = await response.json();
-      console.log("API Response:", data);
-      setJammerStatus('stopped');
-    } catch (error) {
-      console.error("Error:", error);
-      setJammerStatus('stopped');
-    }
-  };
-
+  const cardsRef = useRef<FloatingCard[]>([]);
   const handleLogout = async () => {
     setLoading(true);
     setError("");
-  
     try {
       const token = sessionStorage.getItem("token");
       console.log("Logging out with token :", token);
-  
       if (!token) {
         setError("No authentication token found");
         setLoading(false);
         return;
       }
-
-      const response = await fetch(`${BASE_URL}/auth/logout`, {
+      const response = await fetch(`${logout}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
-
       if (response.ok) {
         console.log("Logout successful");
-        // sessionStorage.removeItem("token");
         sessionStorage.removeItem("token");
         setToken(null);
       } else {
@@ -201,6 +142,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       setLoading(false);
     }
   };
+
   const [systemActive] = useState(true);
   const [detectedDrones, setDetectedDrones] = useState<DroneData[]>([]);
   const [drawingToolsEnabled, setDrawingToolsEnabled] = useState(true);
@@ -208,13 +150,12 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   const Drones = async () => {
     try {
       const token = sessionStorage.getItem("token");
-      const response = await fetch(`${BASE_URL}/drone-detection/drones`, {
+      const response = await fetch(`${drone_data}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token || "219498f3-03f9-41a0-9140-eec5bfe0e311"}`,
         },
       });
-  
       const data = await response.json();
       const drones: DroneData[] = data.data.map((drone: any) => ({
         id: drone.name,
@@ -229,31 +170,18 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
         heading: Number(drone.direction) || 0,
         detected_at: drone.created_time || new Date().toISOString(),
       }));
-  
       setDetectedDrones(drones);
     } catch (error) {
       console.error("error");
     }
   };
- 
+
   useEffect(() => {
     Drones();
-    const intervalId = setInterval(Drones, 1000);
+    const intervalId = setInterval(Drones, 5000);
     return () => clearInterval(intervalId);
   }, []);
- 
-  const [dragState, setDragState] = useState<{
-    isDragging: boolean;
-    draggedCardId: string | null;
-    dragOffset: { x: number; y: number };
-    startPosition: { x: number; y: number };
-  }>({
-    isDragging: false,
-    draggedCardId: null,
-    dragOffset: { x: 0, y: 0 },
-    startPosition: { x: 0, y: 0 },
-  });
- 
+
   const [floatingCards, setFloatingCards] = useState<FloatingCard[]>([
     {
       id: "system-status",
@@ -263,7 +191,6 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       visible: false,
       minimized: false,
       lastActivity: new Date().toLocaleTimeString(),
-      status: "active",
     },
     {
       id: "drone-detection",
@@ -273,7 +200,6 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       visible: false,
       minimized: false,
       lastActivity: new Date().toLocaleTimeString(),
-      status: "active",
     },
     {
       id: "threat-assessment",
@@ -283,9 +209,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       visible: false,
       minimized: false,
       lastActivity: new Date().toLocaleTimeString(),
-      status: "warning",
     },
-   
     {
       id: "spectrum-analyzer",
       title: "Spectrum Analyzer",
@@ -294,32 +218,26 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       visible: false,
       minimized: false,
       lastActivity: new Date().toLocaleTimeString(),
-      status: "inactive",
-    },
-    {
-      id: "jammer-controls",
-      title: "Jammer Controls",
-      component: "JammerControls",
-      position: { x: 800, y: 400 },
-      visible: false,
-      minimized: false,
-      lastActivity: new Date().toLocaleTimeString(),
-      status: "inactive",
     },
   ]);
- 
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    cardsRef.current = floatingCards;
+  }, [floatingCards]);
+
   const [systemStatus] = useState({
     radar: "ONLINE",
     countermeasures: "READY",
     communications: "ONLINE",
     power: 98,
   });
- 
+
   const activeThreat = detectedDrones.find(
     (drone) =>
       drone.threat_level === "HIGH" || drone.threat_level === "CRITICAL"
   );
- 
+
   const toggleCard = (cardId: string) => {
     setFloatingCards((prev) =>
       prev.map((card) =>
@@ -328,13 +246,12 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
               ...card,
               visible: !card.visible,
               lastActivity: new Date().toLocaleTimeString(),
-              status: !card.visible ? "active" : "inactive",
             }
           : card
       )
     );
   };
- 
+
   const minimizeCard = (cardId: string) => {
     setFloatingCards((prev) =>
       prev.map((card) =>
@@ -342,7 +259,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       )
     );
   };
- 
+
   const updateCardPosition = (
     cardId: string,
     newPosition: { x: number; y: number }
@@ -353,127 +270,165 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       )
     );
   };
- 
-const handleMouseDown = (e: React.MouseEvent, cardId: string) => {
-  // Only allow dragging from the header (prevent content dragging)
-  if (!(e.target as HTMLElement).closest('.floating-card-header')) {
-    return;
-  }
-  
-  e.preventDefault();
-  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-  const startX = e.clientX - rect.left;
-  const startY = e.clientY - rect.top;
-  setDragState({
-    isDragging: true,
-    draggedCardId: cardId,
-    dragOffset: { x: startX, y: startY },
-    startPosition: { x: e.clientX, y: e.clientY },
-  });
-};
 
-const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
-  // Only allow dragging from the header (prevent content dragging)
-  if (!(e.target as HTMLElement).closest('.floating-card-header')) {
-    return;
-  }
-  
-  e.preventDefault();
-  const touch = e.touches[0];
-  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-  const startX = touch.clientX - rect.left;
-  const startY = touch.clientY - rect.top;
-  setDragState({
-    isDragging: true,
-    draggedCardId: cardId,
-    dragOffset: { x: startX, y: startY },
-    startPosition: { x: touch.clientX, y: touch.clientY },
-  });
-};
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (!dragState.isDragging || !dragState.draggedCardId) return;
-      const newX = Math.max(
-        20,
-        Math.min(window.innerWidth - 400, e.clientX - dragState.dragOffset.x)
-      );
-      const newY = Math.max(
-        20,
-        Math.min(window.innerHeight - 250, e.clientY - dragState.dragOffset.y)
-      );
-      updateCardPosition(dragState.draggedCardId, { x: newX, y: newY });
-    },
-    [
-      dragState.isDragging,
-      dragState.draggedCardId,
-      dragState.dragOffset.x,
-      dragState.dragOffset.y,
-    ]
-  );
- 
-  const handleTouchMove = useCallback(
-    (e: TouchEvent) => {
-      if (!dragState.isDragging || !dragState.draggedCardId) return;
-      const touch = e.touches[0];
-      const newX = Math.max(
-        20,
-        Math.min(
-          window.innerWidth - 400,
-          touch.clientX - dragState.dragOffset.x
-        )
-      );
-      const newY = Math.max(
-        20,
-        Math.min(
-          window.innerHeight - 250,
-          touch.clientY - dragState.dragOffset.y
-        )
-      );
-      updateCardPosition(dragState.draggedCardId, { x: newX, y: newY });
-    },
-    [
-      dragState.isDragging,
-      dragState.draggedCardId,
-      dragState.dragOffset.x,
-      dragState.dragOffset.y,
-    ]
-  );
- 
-  const handleMouseUp = () => {
-    setDragState({
-      isDragging: false,
-      draggedCardId: null,
-      dragOffset: { x: 0, y: 0 },
-      startPosition: { x: 0, y: 0 },
-    });
-  };
- 
-  const handleTouchEnd = () => {
-    setDragState({
-      isDragging: false,
-      draggedCardId: null,
-      dragOffset: { x: 0, y: 0 },
-      startPosition: { x: 0, y: 0 },
-    });
-  };
- 
-  useEffect(() => {
-    if (dragState.isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-      document.addEventListener("touchmove", handleTouchMove, {
-        passive: false,
-      });
-      document.addEventListener("touchend", handleTouchEnd);
-      return () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
-        document.removeEventListener("touchmove", handleTouchMove);
-        document.removeEventListener("touchend", handleTouchEnd);
-      };
+  // INSTANT DRAG START
+  const handleMouseDown = (e: React.MouseEvent, cardId: string) => {
+    if (!(e.target as HTMLElement).closest('.floating-card-header')) {
+      return;
     }
-  }, [dragState.isDragging, handleMouseMove, handleTouchMove]);
- 
+    
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const cardElement = e.currentTarget as HTMLElement;
+    const rect = cardElement.getBoundingClientRect();
+    
+    dragStateRef.current = {
+      isDragging: true,
+      draggedCardId: cardId,
+      dragOffset: {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      },
+      startPosition: {
+        x: rect.left,
+        y: rect.top
+      }
+    };
+
+    // Add dragging class immediately
+    cardElement.classList.add('floating-card-dragging');
+    
+    // Set cursor immediately
+    document.body.style.cursor = 'grabbing';
+    document.body.style.userSelect = 'none';
+  };
+
+  const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
+    if (!(e.target as HTMLElement).closest('.floating-card-header')) {
+      return;
+    }
+    
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const touch = e.touches[0];
+    const cardElement = e.currentTarget as HTMLElement;
+    const rect = cardElement.getBoundingClientRect();
+    
+    dragStateRef.current = {
+      isDragging: true,
+      draggedCardId: cardId,
+      dragOffset: {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+      },
+      startPosition: {
+        x: rect.left,
+        y: rect.top
+      }
+    };
+
+    cardElement.classList.add('floating-card-dragging');
+  };
+
+  // SMOOTH DRAGGING - Immediate response
+  const updateCardPositionOptimized = useCallback((clientX: number, clientY: number) => {
+    if (!dragStateRef.current.isDragging || !dragStateRef.current.draggedCardId) return;
+
+    const newX = Math.max(10, Math.min(window.innerWidth - 390, clientX - dragStateRef.current.dragOffset.x));
+    const newY = Math.max(10, Math.min(window.innerHeight - 200, clientY - dragStateRef.current.dragOffset.y));
+
+    // Update the DOM directly for immediate response
+    const cardElement = document.querySelector(`[data-card-id="${dragStateRef.current.draggedCardId}"]`) as HTMLElement;
+    if (cardElement) {
+      cardElement.style.left = `${newX}px`;
+      cardElement.style.top = `${newY}px`;
+    }
+  }, []);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!dragStateRef.current.isDragging) return;
+
+    // Immediate update without waiting for animation frame for better responsiveness
+    updateCardPositionOptimized(e.clientX, e.clientY);
+  }, [updateCardPositionOptimized]);
+
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    if (!dragStateRef.current.isDragging) return;
+    
+    e.preventDefault();
+    const touch = e.touches[0];
+    updateCardPositionOptimized(touch.clientX, touch.clientY);
+  }, [updateCardPositionOptimized]);
+
+  // Clean up drag state - FIXED: Properly sync DOM and React state
+  const handleMouseUp = useCallback(() => {
+    if (!dragStateRef.current.isDragging || !dragStateRef.current.draggedCardId) return;
+
+    // Get final position from DOM
+    const cardElement = document.querySelector(`[data-card-id="${dragStateRef.current.draggedCardId}"]`) as HTMLElement;
+    if (cardElement) {
+      const finalX = parseInt(cardElement.style.left);
+      const finalY = parseInt(cardElement.style.top);
+
+      // Only update React state if position actually changed
+      if (!isNaN(finalX) && !isNaN(finalY)) {
+        updateCardPosition(dragStateRef.current.draggedCardId, { x: finalX, y: finalY });
+      }
+
+      // Remove dragging class
+      cardElement.classList.remove('floating-card-dragging');
+      
+      // Reset inline styles to let React control the position
+      cardElement.style.left = '';
+      cardElement.style.top = '';
+    }
+
+    // Reset cursor and selection
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+
+    // Reset drag state
+    dragStateRef.current = {
+      isDragging: false,
+      draggedCardId: null,
+      dragOffset: { x: 0, y: 0 },
+      startPosition: { x: 0, y: 0 }
+    };
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    handleMouseUp();
+  }, [handleMouseUp]);
+
+  // Event listeners setup - ALWAYS ACTIVE for immediate response
+  useEffect(() => {
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      if (dragStateRef.current.isDragging) {
+        handleMouseMove(e);
+      }
+    };
+
+    const handleGlobalTouchMove = (e: TouchEvent) => {
+      if (dragStateRef.current.isDragging) {
+        handleTouchMove(e);
+      }
+    };
+
+    document.addEventListener('mousemove', handleGlobalMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchmove', handleGlobalTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleGlobalTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
+
   const renderCardContent = (card: FloatingCard) => {
     switch (card.component) {
       case "SystemStatus":
@@ -484,14 +439,6 @@ const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
         return <ThreatAssessment drones={detectedDrones} />;
       case "SpectrumAnalyzer":
         return <SpectrumAnalyzer />;
-      case "JammerControls":
-        return (
-          <JammerControls
-            jammerStatus={jammerStatus}
-            onStart={jammerStart}
-            onStop={jammerStop}
-          />
-        );
       case "DataVisualization":
         return <DataVisualization drones={detectedDrones} />;
       default:
@@ -499,24 +446,14 @@ const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
     }
   };
 
-  // Add spectrum button handler
   const handleSpectrumClick = () => {
     setShowSpectrum(true);
     toggleCard("spectrum-analyzer");
   };
-
-  // Add jammer controls handler
-  const handleJammerControlsClick = () => {
-    toggleCard("jammer-controls");
-  };
- 
   const leftCardLogs: CardLog[] = [
     {
       id: "system-status",
       title: "System Status",
-      status:
-        floatingCards.find((c) => c.id === "system-status")?.status ||
-        "inactive",
       lastActivity:
         floatingCards.find((c) => c.id === "system-status")?.lastActivity || "",
       description: "System health and operational status",
@@ -525,9 +462,6 @@ const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
     {
       id: "drone-detection",
       title: "Drone Detection",
-      status:
-        floatingCards.find((c) => c.id === "drone-detection")?.status ||
-        "inactive",
       lastActivity:
         floatingCards.find((c) => c.id === "drone-detection")?.lastActivity ||
         "",
@@ -537,7 +471,6 @@ const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
     {
       id: "threat-assessment",
       title: "Threat Assessment",
-      status: activeThreat ? "error" : "active",
       lastActivity:
         floatingCards.find((c) => c.id === "threat-assessment")?.lastActivity ||
         "",
@@ -546,37 +479,23 @@ const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
         : "No active threats",
       icon: <Assessment />,
     },
-    
     {
       id: "spectrum-analyzer",
       title: "Spectrum Analyzer",
-      status: showSpectrum ? "active" : "inactive",
       lastActivity:
         floatingCards.find((c) => c.id === "spectrum-analyzer")?.lastActivity || "",
       description: "Real-time frequency spectrum analysis",
       icon: <Analytics />,
     },
-    {
-      id: "jammer-controls",
-      title: "Jammer Controls",
-      status: jammerStatus === 'running' ? 'active' : 
-             jammerStatus === 'starting' || jammerStatus === 'stopping' ? 'warning' : 'inactive',
-      lastActivity:
-        floatingCards.find((c) => c.id === "jammer-controls")?.lastActivity || "",
-      description: jammerStatus === 'running' ? "Jammer active" : 
-                  jammerStatus === 'starting' ? "Jammer starting..." :
-                  jammerStatus === 'stopping' ? "Jammer stopping..." : "Jammer ready",
-      icon: <SettingsInputAntenna />,
-    },
   ];
- 
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <div className="App">
         {/* Main Container */}
         <div className="main-container">
-          {/* Application Header - Cleaned up */}
+          {/* Application Header */}
           <div className="app-header">
             <Typography variant="h5" className="app-title">
               ANTI-DRONE-SYSTEM
@@ -584,8 +503,6 @@ const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
             <div className="header-status">
               <div className="status-dot active"></div>
               <span className="status-text">OPERATIONAL</span>
-            </div>
-            <div>
             </div>
             <Button
               onClick={handleLogout}
@@ -600,7 +517,7 @@ const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
               Logout
             </Button>
           </div>
- 
+
           {/* Full Screen Map */}
           <div className="map-container">
             <CesiumMap
@@ -609,70 +526,60 @@ const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
               drawingToolsEnabled={drawingToolsEnabled}
             />
           </div>
- 
+
           {/* Floating Cards */}
-// Floating Cards Section - Update the JSX
-{floatingCards
-  .filter((card) => card.visible)
-  .map((card) => (
-    <Box
-      key={card.id}
-      className={`floating-card ${
-        card.minimized ? "floating-card-minimized" : ""
-      } ${
-        dragState.draggedCardId === card.id
-          ? "floating-card-dragging"
-          : ""
-      }`}
-      sx={{
-        left: card.position.x,
-        top: card.position.y,
-      }}
-    >
-      {/* Header with drag handlers - ONLY HEADER IS DRAGGABLE */}
-      <Box 
-        className="floating-card-header"
-        onMouseDown={(e) => handleMouseDown(e, card.id)}
-        onTouchStart={(e) => handleTouchStart(e, card.id)}
-      >
-        <Typography
-          variant="subtitle1"
-          sx={{ fontWeight: "bold", color: "#00ff41" }}
-        >
-          {card.title}
-        </Typography>
-        <Box>
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent drag when clicking buttons
-              minimizeCard(card.id);
-            }}
-            sx={{ color: "#00ff41", p: 0.5 }}
-          >
-            {card.minimized ? <ChevronRight /> : <ChevronLeft />}
-          </IconButton>
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent drag when clicking buttons
-              toggleCard(card.id);
-            }}
-            sx={{ color: "#ff4444", p: 0.5, ml: 0.5 }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-      </Box>
-      
-      {/* Content area - NO DRAG HANDLERS */}
-      {!card.minimized && (
-        <Box className="floating-card-content">
-          {renderCardContent(card)}
-        </Box>
-      )}
-    </Box>
-  ))}
+          {floatingCards
+            .filter((card) => card.visible)
+            .map((card) => (
+              <Box
+                key={card.id}
+                data-card-id={card.id}
+                className={`floating-card ${
+                  card.minimized ? "floating-card-minimized" : ""
+                }`}
+                sx={{
+                  left: card.position.x,
+                  top: card.position.y,
+                }}
+              >
+                {/* Header with drag handlers */}
+                <Box 
+                  className="floating-card-header"
+                  onMouseDown={(e) => handleMouseDown(e, card.id)}
+                  onTouchStart={(e) => handleTouchStart(e, card.id)}
+                >
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#00ff41" }}>
+                    {card.title}
+                  </Typography>
+                  <Box>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        minimizeCard(card.id);
+                      }}
+                      sx={{ color: "#00ff41", p: 0.5 }}
+                    >
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleCard(card.id);
+                      }}
+                      sx={{ color: "#ff4444", p: 0.5, ml: 0.5 }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+                {/* Content area */}
+                  <Box className="floating-card-content">
+                    {renderCardContent(card)}
+                  </Box>
+              </Box>
+            ))}
+
           {/* Left Fixed Column */}
           <div className="fixed-column left">
             <div className="column-header">
@@ -694,12 +601,7 @@ const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
                   <div className="column-item-icon">{log.icon}</div>
                   <div className="column-item-info">
                     <div className="column-item-title">{log.title}</div>
-                    <div className="column-item-status">
-                      <span className={`status-dot ${log.status}`}></span>
-                      <span className="status-text">
-                        {log.status.toUpperCase()}
-                      </span>
-                    </div>
+                   
                   </div>
                 </div>
               ))}
@@ -710,5 +612,5 @@ const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
     </ThemeProvider>
   );
 };
- 
+
 export default ADSDashboard;
