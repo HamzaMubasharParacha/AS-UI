@@ -8,3 +8,17 @@ export const drone_data = `${BASE_URL}/df/drones`;
 export const logout = `${BASE_URL}/auth/logout`;
 export const login = `${BASE_URL}/auth/login`;
 export const azimuth = `${BASE_URL}/jammer/1/command`;
+
+
+ 
+export const hardwareSystemId = 1;
+export const sensorId = 1;
+export const freqStart = 10000000;
+export const freqStop = 6000000000;
+export const spanPoints = 1024;
+ 
+ 
+export const subscribe = `${BASE_URL}/df/${hardwareSystemId}/subscribe?sensorId=${sensorId}&freqStart=${freqStart}&freqStop=${freqStop}&spanPoints=${spanPoints}`;
+export const simulate = `${BASE_URL}/df/${hardwareSystemId}/simulate`;
+export const spectrum_data = `${BASE_URL}/df/spectrum`;
+ 
