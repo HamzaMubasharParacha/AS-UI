@@ -228,9 +228,8 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
 
   const [systemStatus] = useState({
     radar: "ONLINE",
-    countermeasures: "READY",
+    countermeasures: "ONLINE",
     communications: "ONLINE",
-    power: 98,
   });
 
   const activeThreat = detectedDrones.find(
@@ -497,14 +496,15 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
         <div className="main-container">
           {/* Application Header */}
           <div className="app-header">
-            <Typography variant="h5" className="app-title">
+            
+            <div className="header_data "><h2>RAPIDEV</h2> </div>
+            <div className="header_data">
+              <Typography variant="h5" className="app-title">
               ANTI-DRONE-SYSTEM
             </Typography>
-            <div className="header-status">
-              <div className="status-dot active"></div>
-              <span className="status-text">OPERATIONAL</span>
             </div>
-            <Button
+            <div className="header_data">
+              <Button
               onClick={handleLogout}
               variant="outlined"
               sx={{
@@ -515,7 +515,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
               }}
             >
               Logout
-            </Button>
+            </Button></div>
           </div>
 
           {/* Full Screen Map */}

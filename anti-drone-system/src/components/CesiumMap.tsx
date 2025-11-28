@@ -1,13 +1,224 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Box, Typography, FormControlLabel, Checkbox, Button, Snackbar, Alert } from "@mui/material";
+import { Box, Typography, FormControlLabel, Checkbox, Button, Snackbar, Alert, TextField } from "@mui/material";
 import { MapContainer, Circle, Marker, Popup, useMap, Polyline, Polygon } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import MapDrawingTools from "./MapDrawingTools";
 import { createESRISatelliteOfflineLayer } from "../utils/OfflineTileLayer";
 import OfflineMapControl from "./OfflineMapControl";
-import { command_center, cone_angle } from "../api/config";
+import { command_center, cone_angle, azimuth} from "../api/config";
 import RadarComponent from "./RadarComponent";
+
+// Compass Component
+const Compass: React.FC<{ 
+  direction: number;
+  size?: number;
+  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+}> = ({ direction, size = 80, position = 'bottom-left' }) => {
+  const getPositionStyles = () => {
+    switch (position) {
+      case 'top-left':
+        return { top: 10, left: 10 };
+      case 'top-right':
+        return { top: 10, right: 10 };
+      case 'bottom-left':
+        return { bottom: 20, left: 10 };
+      case 'bottom-right':
+        return { bottom: 10, right: 10 };
+      default:
+        return { top: 10, right: 10 };
+    }
+  };
+
+  return (
+    <Box
+      sx={{
+        position: "absolute",
+        ...getPositionStyles(),
+        width: size,
+        height: size,
+        backgroundColor: "rgba(0, 0, 0, 0.85)",
+        borderRadius: "50%",
+        border: "2px solid #00ff41",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1000,
+        boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+        backdropFilter: "blur(10px)",
+      }}
+    >
+      {/* Compass Outer Circle */}
+      <Box
+        sx={{
+          position: "relative",
+          width: size - 20,
+          height: size - 20,
+          borderRadius: "50%",
+          border: "1px solid #00ff41",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {/* Direction Letters */}
+        <Typography
+          sx={{
+            position: "absolute",
+            top: 2,
+            left: "50%",
+            transform: "translateX(-50%)",
+            color: "#00ff41",
+            fontSize: "10px",
+            fontWeight: "bold",
+            fontFamily: "monospace",
+          }}
+        >
+          N
+        </Typography>
+        <Typography
+          sx={{
+            position: "absolute",
+            bottom: 2,
+            left: "50%",
+            transform: "translateX(-50%)",
+            color: "#00ff41",
+            fontSize: "10px",
+            fontWeight: "bold",
+            fontFamily: "monospace",
+          }}
+        >
+          S
+        </Typography>
+        <Typography
+          sx={{
+            position: "absolute",
+            left: 2,
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: "#00ff41",
+            fontSize: "10px",
+            fontWeight: "bold",
+            fontFamily: "monospace",
+          }}
+        >
+          W
+        </Typography>
+        <Typography
+          sx={{
+            position: "absolute",
+            right: 2,
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: "#00ff41",
+            fontSize: "10px",
+            fontWeight: "bold",
+            fontFamily: "monospace",
+          }}
+        >
+          E
+        </Typography>
+
+        {/* Compass Needle */}
+        <Box
+          sx={{
+            position: "relative",
+            width: "100%",
+            height: "100%",
+            transform: `rotate(${direction}deg)`,
+            transition: "transform 0.3s ease",
+          }}
+        >
+          {/* North Pointer */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: 2,
+              height: "40%",
+              backgroundColor: "#ff0000",
+              "&::after": {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: 0,
+                height: 0,
+                borderLeft: "6px solid transparent",
+                borderRight: "6px solid transparent",
+                borderBottom: "8px solid #ff0000",
+              },
+            }}
+          />
+          
+          {/* South Pointer */}
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: 2,
+              height: "40%",
+              backgroundColor: "#00ff41",
+              "&::after": {
+                content: '""',
+                position: "absolute",
+                bottom: 0,
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: 0,
+                height: 0,
+                borderLeft: "6px solid transparent",
+                borderRight: "6px solid transparent",
+                borderTop: "8px solid #00ff41",
+              },
+            }}
+          />
+
+          {/* Center Dot */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 8,
+              height: 8,
+              backgroundColor: "#00ff41",
+              borderRadius: "50%",
+              border: "1px solid #fff",
+            }}
+          />
+        </Box>
+
+        {/* Direction Display */}
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: -25,
+            left: "50%",
+            transform: "translateX(-50%)",
+            backgroundColor: "rgba(0, 0, 0, 0.9)",
+            color: "#00ff41",
+            padding: "2px 8px",
+            borderRadius: 2,
+            fontSize: "10px",
+            fontFamily: "monospace",
+            fontWeight: "bold",
+            border: "1px solid #00ff41",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {direction}°
+        </Box>
+      </Box>
+    </Box>
+  );
+};
 
 // Triangle Cone Component with Circular Edges
 const TriangleCone: React.FC<{ 
@@ -15,7 +226,8 @@ const TriangleCone: React.FC<{
   angle: number; 
   radius: number;
   direction?: number;
-}> = ({ center, angle = 45, radius = 10000, direction = 0 }) => {
+  jammerActive?: boolean;
+}> = ({ center, angle = 45, radius = 10000, direction = 0, jammerActive = false }) => {
   const toRadians = (degrees: number) => degrees * (Math.PI / 180);
   
   const getConePoints = (): [number, number][] => {
@@ -41,20 +253,37 @@ const TriangleCone: React.FC<{
     return points;
   };
 
-  return (
-    <Polygon
-      positions={getConePoints()}
-      pathOptions={{
+  // Determine colors based on jammer status
+  const getConeColors = () => {
+    if (jammerActive) {
+      return {
+        color: "#FF0000",
+        fillColor: "#FF0000",
+        fillOpacity: 0.25,
+        weight: 3,
+        dashArray: "3, 6",
+      };
+    } else {
+      return {
         color: "#FFD700",
         fillColor: "#FFD700",
         fillOpacity: 0.15,
         weight: 2,
         dashArray: "5, 5",
-      }}
+      };
+    }
+  };
+
+  const coneColors = getConeColors();
+
+  return (
+    <Polygon
+      positions={getConePoints()}
+      pathOptions={coneColors}
     >
       <Popup>
         <div style={{ fontFamily: "monospace", fontSize: "12px" }}>
-          <strong>▲ RADAR CONE</strong>
+          <strong>▲ {jammerActive ? "JAMMING CONE" : "RADAR CONE"}</strong>
           <br />
           <strong>ANGLE:</strong> {angle}°
           <br />
@@ -62,7 +291,19 @@ const TriangleCone: React.FC<{
           <br />
           <strong>DIRECTION:</strong> {direction}°
           <br />
-          <strong>STATUS:</strong> ACTIVE
+          <strong>STATUS:</strong> {jammerActive ? 
+            <span style={{ color: "#FF0000", fontWeight: "bold" }}>JAMMING ACTIVE</span> : 
+            <span style={{ color: "#FFD700" }}>MONITORING</span>}
+          <br />
+          <strong>RF TRANSMISSION:</strong> {jammerActive ? 
+            <span style={{ color: "#FF0000", fontWeight: "bold" }}>ON</span> : 
+            <span style={{ color: "#00ff41" }}>OFF</span>}
+          {jammerActive && (
+            <>
+              <br />
+              <strong style={{ color: "#FF0000" }}>WARNING: RF RADIATION ACTIVE</strong>
+            </>
+          )}
         </div>
       </Popup>
     </Polygon>
@@ -334,9 +575,11 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   // Jammer state management
   const [jammerStatus, setJammerStatus] = useState<'idle' | 'starting' | 'active' | 'stopping'>('idle');
   const [selectedFrequencies, setSelectedFrequencies] = useState<Record<string, boolean>>({
-    "5.8GHz": true,
-    "2.4GHz": true,
-    "1.5GHz": false,
+    "5.8GHz": false,
+    "5.2GHz": false,  
+    "4.0GHz": false, 
+    "2.4GHz": false,
+    "1.4GHz": false,
     "<1GHz": false,
   });
   const [snackbar, setSnackbar] = useState<{
@@ -350,6 +593,14 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   });
 
   const mapRef = useRef<L.Map>(null);
+  
+  // Position zoom controls to top-right
+  useEffect(() => {
+    if (mapRef.current) {
+      // Move zoom control to top-right
+      mapRef.current.zoomControl.setPosition('topright');
+    }
+  }, [mapRef.current]);
 
   // Updated coordinates as requested by user (Islamabad/Rawalpindi area)
   const [latLon, setLatLon] = useState<{ lat: number | null; lon: number | null }>({ lat: null, lon: null });
@@ -539,7 +790,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
     }
   }, [drones, radarActive, systemActive, centerLat, centerLng, radius10km]);
 
-  // Jammer API functions with enhanced token authentication
+  // Updated Jammer API functions with dynamic frequency selection
   const startJammer = async () => {
     if (jammerStatus === 'active' || jammerStatus === 'starting') return;
     
@@ -548,7 +799,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
     try {
       const token = getToken();
       
-      // Get selected frequencies
+      // Get selected frequencies from checkboxes
       const activeFrequencies = Object.keys(selectedFrequencies).filter(
         freq => selectedFrequencies[freq]
       );
@@ -563,6 +814,26 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         return;
       }
 
+      // Frequency priority order (customize this based on your requirements)
+      const frequencyPriority = ["5.8GHz", "5.2GHz", "2.4GHz", "4GHz", "1.5GHz", "<1GHz"];
+      
+      // Find the highest priority selected frequency
+      const primaryFrequency = frequencyPriority.find(freq => 
+        activeFrequencies.includes(freq)
+      ) || activeFrequencies[0]; // Fallback to first selected
+
+      const requestBody = {
+        frequencyBand: primaryFrequency,
+        powerAttenuation: 18,
+        // Optional: include all selected frequencies for reference
+        allSelectedBands: activeFrequencies
+      };
+
+      console.log('Starting jammer with frequencies:', {
+        primary: primaryFrequency,
+        all: activeFrequencies
+      });
+
       const response = await fetch(
         "http://192.168.100.102:8080/api/jammer/1/jam/start",
         {
@@ -571,10 +842,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            frequencyBand: "2.4GHz",
-            powerAttenuation: 18
-          }),
+          body: JSON.stringify(requestBody),
         }
       );
       
@@ -591,7 +859,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         setJammerStatus('active');
         setSnackbar({
           open: true,
-          message: data.message || 'Jamming started successfully',
+          message: `Jamming started on ${primaryFrequency}${activeFrequencies.length > 1 ? ` (${activeFrequencies.length} bands selected)` : ''}`,
           severity: 'success'
         });
       } else {
@@ -664,6 +932,96 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
     }));
   };
 
+  // Add these state variables
+  const [azimuthValue, setAzimuthValue] = useState("0");
+  const [elevationValue, setElevationValue] = useState("0");
+
+  // Single function to set both azimuth and elevation
+  const setAntennaPosition = async (type: 'azimuth' | 'elevation', value: number) => {
+    try {
+      const token = getToken();
+      
+      // Prepare the request body based on your API structure
+      const requestBody = {
+        command_type: "PTZ_CONTROL",
+        ptz_azimuth: type === 'azimuth' ? value : parseFloat(azimuthValue),
+        ptz_elevation: type === 'elevation' ? value : parseFloat(elevationValue)
+      };
+
+      const response = await fetch(
+        "http://192.168.100.102:8080/api/jammer/1/command",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Authentication failed');
+        }
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setSnackbar({
+          open: true,
+          message: `${type === 'azimuth' ? 'Azimuth' : 'Elevation'} set to ${value}°`,
+          severity: 'success'
+        });
+        
+        // Update the local state
+        if (type === 'azimuth') {
+          setAzimuthValue(value.toString());
+        } else {
+          setElevationValue(value.toString());
+        }
+      } else {
+        throw new Error(data.message || `Failed to set ${type}`);
+      }
+    } catch (error) {
+      console.error(`Error setting ${type}:`, error);
+      setSnackbar({
+        open: true,
+        message: error instanceof Error ? error.message : `Failed to set ${type}`,
+        severity: 'error'
+      });
+    }
+  };
+
+  // Individual handlers for azimuth and elevation
+  const setAzimuth = () => {
+    const azimuth = parseFloat(azimuthValue);
+    if (isNaN(azimuth) || azimuth < 0 || azimuth > 360) {
+      setSnackbar({
+        open: true,
+        message: 'Azimuth must be between 0° and 360°',
+        severity: 'warning'
+      });
+      return;
+    }
+    setAntennaPosition('azimuth', azimuth);
+  };
+
+  const setElevation = () => {
+    const elevation = parseFloat(elevationValue);
+    if (isNaN(elevation) || elevation < -80 || elevation > 15) {
+      setSnackbar({
+        open: true,
+        message: 'Elevation must be between -90° and +90°',
+        severity: 'warning'
+      });
+      return;
+    }
+    setAntennaPosition('elevation', elevation);
+  };
+
   const toggleRadar = () => {
     setRadarActive(!radarActive);
   };
@@ -700,6 +1058,9 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   // Fixed TypeScript error by simplifying the condition
   const isStopButtonDisabled = jammerStatus !== 'active';
 
+  // Get count of selected frequencies
+  const selectedFrequencyCount = Object.values(selectedFrequencies).filter(Boolean).length;
+
   return (
     <Box
       sx={{
@@ -729,6 +1090,13 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         </Alert>
       </Snackbar>
 
+      {/* Compass Component */}
+      <Compass 
+        direction={0} 
+        size={100}
+        position="bottom-left"
+      />
+
       {/* Leaflet Map with Satellite Imagery */}
       <MapContainer
         center={centerPosition}
@@ -740,17 +1108,19 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           border: "2px solid #00ff41",
         }}
         ref={mapRef}
+        zoomControl={true}
       >
         {/* Offline Tile Layer */}
         <OfflineTileLayerComponent offlineFirst={offlineMode} />
 
-        {/* Triangle Cone */}
+        {/* Triangle Cone - Changes color based on jammer status */}
         {showTriangleCone && (
           <TriangleCone
             center={centerPosition}
             angle={45}
             radius={coneRadius}
             direction={coneDirection}
+            jammerActive={jammerStatus === 'active'}
           />
         )}
 
@@ -809,6 +1179,12 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
               <strong>RADAR:</strong> {radarActive ? "SCANNING" : "OFFLINE"}
               <br />
               <strong>JAMMER:</strong> {jammerStatus.toUpperCase()}
+              <br />
+              <strong>RF TRANSMISSION:</strong> {jammerStatus === 'active' ? 
+                <span style={{ color: "#ff0000", fontWeight: "bold" }}>ACTIVE 🔴</span> : 
+                <span style={{ color: "#00ff41" }}>INACTIVE</span>}
+              <br />
+              <strong>SELECTED BANDS:</strong> {selectedFrequencyCount}
               <br />
               <strong>COVERAGE:</strong> 10km RADIUS
               <br />
@@ -908,87 +1284,6 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         {drawingToolsEnabled && <MapDrawingTools />}
       </MapContainer>
 
-      {/* Trajectory Control Panel */}
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: 10,
-          left: 10,
-          backgroundColor: "rgba(0, 0, 0, 0.85)",
-          color: "#00ff41",
-          padding: 1.5,
-          borderRadius: 2,
-          fontFamily: "monospace",
-          fontSize: "12px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-          zIndex: 1000,
-          border: "1px solid #00ff41",
-        }}
-      >
-        <Typography
-          variant="caption"
-          display="block"
-          sx={{ fontWeight: "bold", mb: 1 }}
-        >
-          🛤️ TRAJECTORY CONTROL
-        </Typography>
-       
-        <Box
-          sx={{
-            display: "flex",
-            gap: 1,
-            mb: 1,
-            cursor: "pointer",
-            padding: "4px 8px",
-            borderRadius: 1,
-            backgroundColor: showTrajectories
-              ? "rgba(0, 255, 65, 0.2)"
-              : "transparent",
-            "&:hover": { backgroundColor: "rgba(0, 255, 65, 0.1)" },
-          }}
-          onClick={toggleTrajectories}
-        >
-          <Typography variant="caption" display="block">
-            {showTrajectories ? "✅ SHOWING" : "❌ HIDDEN"}
-          </Typography>
-          <Typography variant="caption" display="block">
-            TRAJECTORIES
-          </Typography>
-        </Box>
-
-        <Box
-          sx={{
-            display: "flex",
-            gap: 1,
-            cursor: "pointer",
-            padding: "4px 8px",
-            borderRadius: 1,
-            "&:hover": { backgroundColor: "rgba(255, 0, 0, 0.1)" },
-          }}
-          onClick={clearTrajectories}
-        >
-          <Typography
-            variant="caption"
-            display="block"
-            sx={{ color: "#ff4444" }}
-          >
-            🗑️ CLEAR ALL
-          </Typography>
-        </Box>
-
-        <Typography variant="caption" display="block" sx={{ mt: 1, fontSize: "10px", opacity: 0.8 }}>
-          ACTIVE TRACKS: {trajectories.length}
-        </Typography>
-        <Typography
-          variant="caption"
-          display="block"
-          sx={{ fontSize: "10px", opacity: 0.8 }}
-        >
-          TOTAL POINTS:{" "}
-          {trajectories.reduce((sum, t) => sum + t.points.length, 0)}
-        </Typography>
-      </Box>
-
       {/* Jammer Control Panel */}
       <Box
         sx={{
@@ -1029,6 +1324,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
              jammerStatus === 'starting' ? '🟡 STARTING...' :
              jammerStatus === 'stopping' ? '🟡 STOPPING...' : '🔴 JAMMER IDLE'}
           </Typography>
+         
         </Box>
 
         {/* Checkboxes Section */}
@@ -1044,7 +1340,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
               justifyContent: "center",
             }}
           >
-            JAMMING BANDS
+            JAMMING BANDS 
           </Typography>
           
           <Box sx={{ display: "flex", flexDirection: "row", gap: 1, flexWrap: 'wrap' }}>
@@ -1094,12 +1390,12 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         </Box>
 
         {/* Buttons Section */}
-        <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between" }}>
+        <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between", mb: 2 }}>
           <Button
             variant="outlined"
             size="small"
             onClick={startJammer}
-            disabled={jammerStatus === 'active' || jammerStatus === 'starting' || jammerStatus === 'stopping'}
+            disabled={jammerStatus === 'active' || jammerStatus === 'starting' || jammerStatus === 'stopping' || selectedFrequencyCount === 0}
             sx={{
               color: "#00ff41",
               borderColor: "#00ff41",
@@ -1149,6 +1445,158 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           >
             {jammerStatus === 'stopping' ? 'STOPPING...' : 'STOP'}
           </Button>
+        </Box>
+
+        {/* Azimuth and Elevation Controls */}
+        <Box sx={{ borderTop: '1px solid #00ff41', pt: 2 }}>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              color: "#00ff41", 
+              mb: 1, 
+              fontWeight: "bold",
+              fontSize: "12px",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            ANTENNA CONTROLS
+          </Typography>
+          
+          {/* Current Position Display */}
+          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.5, fontSize: "10px" }}>
+            <Typography sx={{ color: "#00ff41", fontSize: "10px" }}>
+              Current: Az {coneDirection}° El {elevationValue}°
+            </Typography>
+          </Box>
+          
+          {/* Azimuth Control */}
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center", mb: 1.5 }}>
+            <Typography sx={{ fontSize: "10px", color: "#fff", minWidth: 60 }}>
+              Azimuth:
+            </Typography>
+            <TextField
+              size="small"
+              type="number"
+              placeholder="0-360°"
+              value={azimuthValue}
+              onChange={(e) => setAzimuthValue(e.target.value)}
+              disabled={jammerStatus === 'active' || jammerStatus === 'starting' || jammerStatus === 'stopping'}
+              inputProps={{ 
+                min: 0, 
+                max: 360,
+                step: 1 
+              }}
+              sx={{
+                flex: 1,
+                '& .MuiInputBase-root': {
+                  fontSize: "10px",
+                  fontFamily: "monospace",
+                  color: "#00ff41",
+                  backgroundColor: "rgba(0, 255, 65, 0.1)",
+                  '&.Mui-disabled': {
+                    color: 'rgba(0, 255, 65, 0.5)',
+                    backgroundColor: 'rgba(0, 255, 65, 0.05)',
+                  },
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: "#00ff41",
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: "#00ff41",
+                },
+              }}
+            />
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={setAzimuth}
+              disabled={jammerStatus === 'active' || jammerStatus === 'starting' || jammerStatus === 'stopping'}
+              sx={{
+                color: "#00ff41",
+                borderColor: "#00ff41",
+                fontSize: "9px",
+                padding: "2px 8px",
+                fontFamily: "monospace",
+                textTransform: "none",
+                minWidth: 'auto',
+                '&:hover': {
+                  borderColor: "#00ff41",
+                  backgroundColor: "rgba(0, 255, 65, 0.1)",
+                },
+                '&.Mui-disabled': {
+                  color: 'rgba(0, 255, 65, 0.5)',
+                  borderColor: 'rgba(0, 255, 65, 0.3)',
+                },
+              }}
+            >
+              SET
+            </Button>
+          </Box>
+
+          {/* Elevation Control */}
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            <Typography sx={{ fontSize: "10px", color: "#fff", minWidth: 60 }}>
+              Elevation:
+            </Typography>
+            <TextField
+              size="small"
+              type="number"
+              placeholder="-80 to +15°"
+              value={elevationValue}
+              onChange={(e) => setElevationValue(e.target.value)}
+              disabled={jammerStatus === 'active' || jammerStatus === 'starting' || jammerStatus === 'stopping'}
+              inputProps={{ 
+                min: -80, 
+                max: 15,
+                step: 1 
+              }}
+              sx={{
+                flex: 1,
+                '& .MuiInputBase-root': {
+                  fontSize: "10px",
+                  fontFamily: "monospace",
+                  color: "#00ff41",
+                  backgroundColor: "rgba(0, 255, 65, 0.1)",
+                  '&.Mui-disabled': {
+                    color: 'rgba(0, 255, 65, 0.5)',
+                    backgroundColor: 'rgba(0, 255, 65, 0.05)',
+                  },
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: "#00ff41",
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: "#00ff41",
+                },
+              }}
+            />
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={setElevation}
+              disabled={jammerStatus === 'active' || jammerStatus === 'starting' || jammerStatus === 'stopping'}
+              sx={{
+                color: "#00ff41",
+                borderColor: "#00ff41",
+                fontSize: "9px",
+                padding: "2px 8px",
+                fontFamily: "monospace",
+                textTransform: "none",
+                minWidth: 'auto',
+                '&:hover': {
+                  borderColor: "#00ff41",
+                  backgroundColor: "rgba(0, 255, 65, 0.1)",
+                },
+                '&.Mui-disabled': {
+                  color: 'rgba(0, 255, 65, 0.5)',
+                  borderColor: 'rgba(0, 255, 65, 0.3)',
+                },
+              }}
+            >
+              SET
+            </Button>
+          </Box>
         </Box>
       </Box>
 

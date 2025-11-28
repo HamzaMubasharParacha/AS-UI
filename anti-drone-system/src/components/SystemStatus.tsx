@@ -3,7 +3,6 @@ import { Paper, Typography, Box, LinearProgress, Chip } from "@mui/material";
 import {
   Computer,
   Wifi,
-  Battery90,
   Radar,
   CheckCircle,
   Error,
@@ -14,7 +13,6 @@ interface SystemStatusProps {
     radar: string;
     countermeasures: string;
     communications: string;
-    power: number;
   };
 }
 

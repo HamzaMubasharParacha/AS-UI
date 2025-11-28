@@ -7,3 +7,4 @@ export const cone_angle = `${BASE_URL}/jammer/1/status`;
 export const drone_data = `${BASE_URL}/df/drones`;
 export const logout = `${BASE_URL}/auth/logout`;
 export const login = `${BASE_URL}/auth/login`;
+export const azimuth = `${BASE_URL}/jammer/1/command`;
