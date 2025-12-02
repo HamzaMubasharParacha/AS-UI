@@ -25,7 +25,7 @@ import SystemStatus from "./SystemStatus";
 import DataVisualization from "./DataVisualization";
 import SpectrumAnalyzer from "./SpectrumAnalyzer";
 import "../ADSDashboard.css";
-import { drone_data, logout } from "../api/config";
+import { drone_data, logout, df_connectivity } from "../api/config";
 
 interface DashboardProps {
   setToken: (token: string | null) => void;
@@ -99,7 +99,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showSpectrum, setShowSpectrum] = useState(false);
-
+  const [check, setcheck] = useState("");
   // Use refs for better performance
   const dragStateRef = useRef({
     isDragging: false,
@@ -107,7 +107,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     dragOffset: { x: 0, y: 0 },
     startPosition: { x: 0, y: 0 }
   });
-
+ 
   const cardsRef = useRef<FloatingCard[]>([]);
   const handleLogout = async () => {
     setLoading(true);
@@ -182,6 +182,31 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     return () => clearInterval(intervalId);
   }, []);
 
+  
+const check_dfConnectivity = async () => {
+    try {
+      const token = sessionStorage.getItem("token");
+      const response = await fetch(`${df_connectivity}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token || "219498f3-03f9-41a0-9140-eec5bfe0e311"}`,
+        },
+      });
+      const data = await response.json();
+      const check = data.data.available;
+      setcheck(check)
+      console.log(check,"connectivity")
+    } catch (error) {
+      console.error("error");
+    }
+  };
+
+  useEffect(() => {
+    check_dfConnectivity();
+    const intervalId = setInterval(check_dfConnectivity, 5000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   const [floatingCards, setFloatingCards] = useState<FloatingCard[]>([
     {
       id: "system-status",
@@ -226,11 +251,21 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     cardsRef.current = floatingCards;
   }, [floatingCards]);
 
-  const [systemStatus] = useState({
-    radar: "ONLINE",
+  const [systemStatus, setSystemStatus] = useState({
+    radar: "OFFLINE",
     countermeasures: "ONLINE",
-    communications: "ONLINE",
+    communications: "OFFLINE",
   });
+useEffect(() => {
+  if (check !== "") {
+    const radarStatus = check ? "ONLINE" : "OFFLINE"; // boolean check
+    setSystemStatus(prev => ({
+      ...prev,
+      countermeasures: radarStatus
+    }));
+  }
+}, [check]);
+
 
   const activeThreat = detectedDrones.find(
     (drone) =>

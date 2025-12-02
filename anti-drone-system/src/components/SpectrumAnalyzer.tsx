@@ -60,7 +60,7 @@ const SpectrumAnalyzer: React.FC = () => {
         if (!json?.data || !json.data[hardwareSystemId]) return;
  
         const powerSpectrum =
-          json.data[hardwareSystemId].decodedValues?.rawSamples;
+          json.data[hardwareSystemId].decodedValues?.powerSpectrum;
  
         if (!powerSpectrum) return;
  
