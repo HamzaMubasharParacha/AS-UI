@@ -52,21 +52,21 @@ const RadarSweepLine: React.FC<{
  
     cleanup(); // reset before creating new layers
  
-    // Create main sweep line with glow effect
-    lineRef.current = L.polyline([], {
-      color: "#00ff41",
-      weight: 4,
-      opacity: 1,
-      className: "radar-sweep-line",
-    }).addTo(map);
+    // // Create main sweep line with glow effect
+    // lineRef.current = L.polyline([], {
+    //   color: "#00ff41",
+    //   weight: 4,
+    //   opacity: 1,
+    //   className: "radar-sweep-line",
+    // }).addTo(map);
  
     // Create glow cone polygon
-    glowRef.current = L.polygon([], {
-      color: "none",
-      fillColor: "rgba(0,255,65,0.15)",
-      fillOpacity: 0.3,
-      className: "radar-sweep-glow",
-    }).addTo(map);
+    // glowRef.current = L.polygon([], {
+    //   color: "none",
+    //   fillColor: "rgba(0,255,65,0.15)",
+    //   fillOpacity: 0.3,
+    //   className: "radar-sweep-glow",
+    // }).addTo(map);
  
     // Rotation interval
     intervalRef.current = setInterval(() => {

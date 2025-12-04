@@ -9,10 +9,11 @@ import {
   Box,
   Divider,
 } from "@mui/material";
-import { FlightTakeoff } from "@mui/icons-material";
+import { FlightTakeoff, Height } from "@mui/icons-material";
 
 interface DroneData {
   id: string;
+  image: string;
   position: [number, number, number];
   threat_level: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   distance: number;
@@ -53,6 +54,7 @@ const DroneDetectionPanel: React.FC<DroneDetectionPanelProps> = ({
         <FlightTakeoff sx={{ mr: 1, color: "#00ff41" }} />
         <Typography variant="h6" sx={{ color: "#00ff41" }}>
           DRONE DETECTION
+          
         </Typography>
       </Box>
 
@@ -86,6 +88,7 @@ const DroneDetectionPanel: React.FC<DroneDetectionPanelProps> = ({
                         >
                           {drone.id}
                         </Typography>
+                        
                         <Chip
                           size="small"
                           label={drone.threat_level}
@@ -103,6 +106,12 @@ const DroneDetectionPanel: React.FC<DroneDetectionPanelProps> = ({
                         >
                           Distance: {drone.distance.toFixed(0)}m | Speed:{" "}
                           {drone.speed.toFixed(1)} m/s
+                        </Typography>
+                         <Typography
+                          variant="body2"
+                          sx={{ fontFamily: "monospace" }}
+                        >
+                          <img src={drone.image} style={{height:"40px",width:'40px'}} alt="" />
                         </Typography>
                         <Typography
                           variant="caption"

@@ -25,7 +25,7 @@ import SystemStatus from "./SystemStatus";
 import DataVisualization from "./DataVisualization";
 import SpectrumAnalyzer from "./SpectrumAnalyzer";
 import "../ADSDashboard.css";
-import { drone_data, logout, df_connectivity } from "../api/config";
+import { drone_data, logout, df_connectivity,cone_angle } from "../api/config";
 
 interface DashboardProps {
   setToken: (token: string | null) => void;
@@ -69,6 +69,7 @@ const darkTheme = createTheme({
 
 interface DroneData {
   id: string;
+  image : string;
   position: [number, number, number];
   threat_level: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   distance: number;
@@ -159,6 +160,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       const data = await response.json();
       const drones: DroneData[] = data.data.map((drone: any) => ({
         id: drone.name,
+        image:drone.image,
         position: [
           drone.longitude || 0,
           drone.latitude || 0,
@@ -212,7 +214,7 @@ const check_dfConnectivity = async () => {
       id: "system-status",
       title: "System Status",
       component: "SystemStatus",
-      position: { x: 100, y: 100 },
+      position: { x: 300, y: 100 },
       visible: false,
       minimized: false,
       lastActivity: new Date().toLocaleTimeString(),
@@ -221,7 +223,7 @@ const check_dfConnectivity = async () => {
       id: "drone-detection",
       title: "Drone Detection",
       component: "DroneDetectionPanel",
-      position: { x: 450, y: 100 },
+      position: { x: 300, y: 200 },
       visible: false,
       minimized: false,
       lastActivity: new Date().toLocaleTimeString(),
@@ -230,7 +232,7 @@ const check_dfConnectivity = async () => {
       id: "threat-assessment",
       title: "Threat Assessment",
       component: "ThreatAssessment",
-      position: { x: 100, y: 350 },
+      position: { x: 300, y: 350 },
       visible: false,
       minimized: false,
       lastActivity: new Date().toLocaleTimeString(),
@@ -239,13 +241,53 @@ const check_dfConnectivity = async () => {
       id: "spectrum-analyzer",
       title: "Spectrum Analyzer",
       component: "SpectrumAnalyzer",
-      position: { x: 800, y: 100 },
+      position: { x: 300, y: 500 },
       visible: false,
       minimized: false,
       lastActivity: new Date().toLocaleTimeString(),
     },
   ]);
 
+    const [coneAngle, setConeAngle] = useState<number>(0);
+    const [coneElevation, setConeElevation] = useState<number>(0);
+    const [jammerStatus, setjammerStatus] = useState("");
+    useEffect(() => {
+      const interval = setInterval(async () => {
+        try {
+          const token = sessionStorage.getItem("token");
+          
+          if (!token) {
+            console.warn("No token available for cone angle fetch");
+            return;
+          }
+  
+          const response = await fetch(cone_angle, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+  
+          if (!response.ok) {
+            if (response.status === 401) {
+              console.error("Authentication failed for cone angle fetch");
+              return;
+            }
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+  
+          const jam_data = await response.json(); 
+          setConeAngle(jam_data.data.ptz_azimuth);
+          setConeElevation(jam_data.data.ptz_elevation);
+          setjammerStatus(jam_data.data.is_connected);
+        } catch (error) {
+          console.error("Error fetching azimuth:", error);
+        }
+      }, 10000);
+  
+      return () => clearInterval(interval);
+    }, []);
   // Keep ref in sync with state
   useEffect(() => {
     cardsRef.current = floatingCards;
@@ -253,7 +295,7 @@ const check_dfConnectivity = async () => {
 
   const [systemStatus, setSystemStatus] = useState({
     radar: "OFFLINE",
-    countermeasures: "ONLINE",
+    countermeasures: "OFFLINE",
     communications: "OFFLINE",
   });
 useEffect(() => {
@@ -265,7 +307,6 @@ useEffect(() => {
     }));
   }
 }, [check]);
-
 
   const activeThreat = detectedDrones.find(
     (drone) =>
@@ -559,6 +600,8 @@ useEffect(() => {
               drones={detectedDrones}
               systemActive={systemActive}
               drawingToolsEnabled={drawingToolsEnabled}
+              coneangle = {coneAngle}
+              coneelevation = {coneElevation}
             />
           </div>
 
