@@ -1,20 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Typography, Box, IconButton, Button } from "@mui/material";
+import { Typography, Box, IconButton, Button, Snackbar, Alert } from "@mui/material";
 import {
   Dashboard,
   Radar,
   Assessment,
-  Security,
-  ChevronLeft,
-  ChevronRight,
-  Close as CloseIcon,
-  Edit,
-  Polyline,
-  CropFree,
-  Room,
-  Straighten,
   Analytics,
-  SettingsInputAntenna,
+  Close as CloseIcon,
 } from "@mui/icons-material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -22,10 +13,10 @@ import CesiumMap from "./CesiumMap";
 import DroneDetectionPanel from "./DroneDetectionPanel";
 import ThreatAssessment from "./ThreatAssessment";
 import SystemStatus from "./SystemStatus";
-import DataVisualization from "./DataVisualization";
 import SpectrumAnalyzer from "./SpectrumAnalyzer";
+import FloatingSpectrumAnalyzer from "./FloatingSpectrumAnalyzer";
 import "../ADSDashboard.css";
-import { drone_data, logout, df_connectivity,cone_angle } from "../api/config";
+import { drone_data, logout, df_connectivity, cone_angle, spectrum_data, hardwareSystemId } from "../api/config";
 
 interface DashboardProps {
   setToken: (token: string | null) => void;
@@ -69,7 +60,7 @@ const darkTheme = createTheme({
 
 interface DroneData {
   id: string;
-  image : string;
+  image: string;
   position: [number, number, number];
   threat_level: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   distance: number;
@@ -99,8 +90,9 @@ interface CardLog {
 const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showSpectrum, setShowSpectrum] = useState(false);
   const [check, setcheck] = useState("");
+  const [fft, setFft] = useState<number[]>([]);
+  
   // Use refs for better performance
   const dragStateRef = useRef({
     isDragging: false,
@@ -110,6 +102,38 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   });
  
   const cardsRef = useRef<FloatingCard[]>([]);
+  
+  // Floating spectrum analyzer state
+  const [floatingSpectrum, setFloatingSpectrum] = useState<{
+    visible: boolean;
+    position: { x: number; y: number };
+    settings?: {
+      minFreq: number;
+      maxFreq: number;
+      minPower: number;
+      maxPower: number;
+      colorScheme: string;
+    };
+  }>({
+    visible: false,
+    position: { x: 100, y: 100 }
+  });
+
+  // Drag and drop state
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
+  const [showDropHint, setShowDropHint] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info" as "success" | "error" | "info" | "warning"
+  });
+
+  // DEBUG: Log when floating spectrum state changes
+  useEffect(() => {
+    console.log("Floating spectrum state changed:", floatingSpectrum);
+  }, [floatingSpectrum]);
+
   const handleLogout = async () => {
     setLoading(true);
     setError("");
@@ -160,7 +184,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       const data = await response.json();
       const drones: DroneData[] = data.data.map((drone: any) => ({
         id: drone.name,
-        image:drone.image,
+        image: drone.image,
         position: [
           drone.longitude || 0,
           drone.latitude || 0,
@@ -185,7 +209,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   }, []);
 
   
-const check_dfConnectivity = async () => {
+  const check_dfConnectivity = async () => {
     try {
       const token = sessionStorage.getItem("token");
       const response = await fetch(`${df_connectivity}`, {
@@ -196,8 +220,8 @@ const check_dfConnectivity = async () => {
       });
       const data = await response.json();
       const check = data.data.available;
-      setcheck(check)
-      console.log(check,"connectivity")
+      setcheck(check);
+      console.log(check, "connectivity");
     } catch (error) {
       console.error("error");
     }
@@ -207,6 +231,51 @@ const check_dfConnectivity = async () => {
     check_dfConnectivity();
     const intervalId = setInterval(check_dfConnectivity, 5000);
     return () => clearInterval(intervalId);
+  }, []);
+
+  // Fetch spectrum data for floating analyzer
+  const fetchSpectrumData = async () => {
+    try {
+      const token = sessionStorage.getItem("token");
+      const response = await fetch(`${spectrum_data}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const json = await response.json();
+
+      console.log("Spectrum API Response:", json);
+
+      if (!json?.data || !json.data[hardwareSystemId]) {
+        console.log("No data or hardwareSystemId not found");
+        return;
+      }
+
+      const powerSpectrum = json.data[hardwareSystemId].decodedValues?.powerSpectrum;
+
+      if (powerSpectrum) {
+        console.log("Power spectrum found, length:", powerSpectrum.length);
+        const cleaned = powerSpectrum.map((v: number) => isFinite(v) ? v : -100);
+        setFft(cleaned);
+      } else {
+        console.log("No power spectrum in response");
+      }
+    } catch (err) {
+      console.error("Spectrum API Error:", err);
+    }
+  };
+
+  // Fetch spectrum data periodically
+  useEffect(() => {
+    console.log("Setting up spectrum data interval");
+    const interval = setInterval(fetchSpectrumData, 100);
+    fetchSpectrumData(); // Initial fetch
+    
+    return () => {
+      console.log("Clearing spectrum data interval");
+      clearInterval(interval);
+    };
   }, []);
 
   const [floatingCards, setFloatingCards] = useState<FloatingCard[]>([
@@ -248,46 +317,48 @@ const check_dfConnectivity = async () => {
     },
   ]);
 
-    const [coneAngle, setConeAngle] = useState<number>(0);
-    const [coneElevation, setConeElevation] = useState<number>(0);
-    const [jammerStatus, setjammerStatus] = useState("");
-    useEffect(() => {
-      const interval = setInterval(async () => {
-        try {
-          const token = sessionStorage.getItem("token");
-          
-          if (!token) {
-            console.warn("No token available for cone angle fetch");
+  const [coneAngle, setConeAngle] = useState<number>(0);
+  const [coneElevation, setConeElevation] = useState<number>(0);
+  const [jammerStatus, setjammerStatus] = useState("");
+  
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const token = sessionStorage.getItem("token");
+        
+        if (!token) {
+          console.warn("No token available for cone angle fetch");
+          return;
+        }
+
+        const response = await fetch(cone_angle, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            console.error("Authentication failed for cone angle fetch");
             return;
           }
-  
-          const response = await fetch(cone_angle, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          });
-  
-          if (!response.ok) {
-            if (response.status === 401) {
-              console.error("Authentication failed for cone angle fetch");
-              return;
-            }
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-  
-          const jam_data = await response.json(); 
-          setConeAngle(jam_data.data.ptz_azimuth);
-          setConeElevation(jam_data.data.ptz_elevation);
-          setjammerStatus(jam_data.data.is_connected);
-        } catch (error) {
-          console.error("Error fetching azimuth:", error);
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
-      }, 10000);
-  
-      return () => clearInterval(interval);
-    }, []);
+
+        const jam_data = await response.json(); 
+        setConeAngle(jam_data.data.ptz_azimuth);
+        setConeElevation(jam_data.data.ptz_elevation);
+        setjammerStatus(jam_data.data.is_connected);
+      } catch (error) {
+        console.error("Error fetching azimuth:", error);
+      }
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Keep ref in sync with state
   useEffect(() => {
     cardsRef.current = floatingCards;
@@ -298,15 +369,16 @@ const check_dfConnectivity = async () => {
     countermeasures: "OFFLINE",
     communications: "OFFLINE",
   });
-useEffect(() => {
-  if (check !== "") {
-    const radarStatus = check ? "ONLINE" : "OFFLINE"; // boolean check
-    setSystemStatus(prev => ({
-      ...prev,
-      countermeasures: radarStatus
-    }));
-  }
-}, [check]);
+  
+  useEffect(() => {
+    if (check !== "") {
+      const radarStatus = check ? "ONLINE" : "OFFLINE"; // boolean check
+      setSystemStatus(prev => ({
+        ...prev,
+        countermeasures: radarStatus
+      }));
+    }
+  }, [check]);
 
   const activeThreat = detectedDrones.find(
     (drone) =>
@@ -346,7 +418,98 @@ useEffect(() => {
     );
   };
 
-  // INSTANT DRAG START
+  // Global drag and drop handlers
+  useEffect(() => {
+    const handleGlobalDragOver = (e: DragEvent) => {
+      e.preventDefault();
+      setIsDraggingOver(true);
+      setDragPosition({ x: e.clientX, y: e.clientY });
+      
+      // Show drop hint if we're over the map area
+      if (e.clientX > 250 && e.clientX < window.innerWidth - 250) {
+        setShowDropHint(true);
+      } else {
+        setShowDropHint(false);
+      }
+    };
+
+    const handleGlobalDragLeave = (e: DragEvent) => {
+      // Only reset if we're leaving the window entirely
+      if (e.clientX <= 0 || e.clientY <= 0 || 
+          e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
+        setIsDraggingOver(false);
+        setShowDropHint(false);
+      }
+    };
+
+    const handleGlobalDrop = (e: DragEvent) => {
+      e.preventDefault();
+      console.log("Global drop event triggered at:", e.clientX, e.clientY);
+      setIsDraggingOver(false);
+      setShowDropHint(false);
+
+      try {
+        const data = e.dataTransfer?.getData('application/json');
+        console.log("Drag data received:", data);
+        
+        if (data) {
+          const settings = JSON.parse(data);
+          console.log("Parsed settings:", settings);
+          
+          if (settings.type === 'spectrum') {
+            const newPosition = {
+              x: Math.max(10, Math.min(window.innerWidth - 410, e.clientX - 200)),
+              y: Math.max(10, Math.min(window.innerHeight - 260, e.clientY - 125))
+            };
+            
+            console.log("Creating floating spectrum at:", newPosition);
+            
+            setFloatingSpectrum({
+              visible: true,
+              position: newPosition,
+              settings
+            });
+            
+            setSnackbar({
+              open: true,
+              message: "Spectrum Analyzer added to main screen",
+              severity: "success"
+            });
+          }
+        } else {
+          console.log("No drag data found");
+        }
+      } catch (error) {
+        console.error('Error parsing drag data:', error);
+        setSnackbar({
+          open: true,
+          message: "Failed to add Spectrum Analyzer",
+          severity: "error"
+        });
+      }
+    };
+
+    const handleGlobalDragEnd = () => {
+      console.log("Global drag end");
+      setIsDraggingOver(false);
+      setShowDropHint(false);
+    };
+
+    // Add global event listeners
+    document.addEventListener('dragover', handleGlobalDragOver);
+    document.addEventListener('dragleave', handleGlobalDragLeave);
+    document.addEventListener('drop', handleGlobalDrop);
+    document.addEventListener('dragend', handleGlobalDragEnd);
+
+    return () => {
+      document.removeEventListener('dragover', handleGlobalDragOver);
+      document.removeEventListener('dragleave', handleGlobalDragLeave);
+      document.removeEventListener('drop', handleGlobalDrop);
+      document.removeEventListener('dragend', handleGlobalDragEnd);
+    };
+  }, []);
+
+  // INSTANT DRAG START for floating cards
   const handleMouseDown = (e: React.MouseEvent, cardId: string) => {
     if (!(e.target as HTMLElement).closest('.floating-card-header')) {
       return;
@@ -379,35 +542,7 @@ useEffect(() => {
     document.body.style.userSelect = 'none';
   };
 
-  const handleTouchStart = (e: React.TouchEvent, cardId: string) => {
-    if (!(e.target as HTMLElement).closest('.floating-card-header')) {
-      return;
-    }
-    
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const touch = e.touches[0];
-    const cardElement = e.currentTarget as HTMLElement;
-    const rect = cardElement.getBoundingClientRect();
-    
-    dragStateRef.current = {
-      isDragging: true,
-      draggedCardId: cardId,
-      dragOffset: {
-        x: touch.clientX - rect.left,
-        y: touch.clientY - rect.top
-      },
-      startPosition: {
-        x: rect.left,
-        y: rect.top
-      }
-    };
-
-    cardElement.classList.add('floating-card-dragging');
-  };
-
-  // SMOOTH DRAGGING - Immediate response
+  // SMOOTH DRAGGING - Immediate response for floating cards
   const updateCardPositionOptimized = useCallback((clientX: number, clientY: number) => {
     if (!dragStateRef.current.isDragging || !dragStateRef.current.draggedCardId) return;
 
@@ -429,15 +564,7 @@ useEffect(() => {
     updateCardPositionOptimized(e.clientX, e.clientY);
   }, [updateCardPositionOptimized]);
 
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (!dragStateRef.current.isDragging) return;
-    
-    e.preventDefault();
-    const touch = e.touches[0];
-    updateCardPositionOptimized(touch.clientX, touch.clientY);
-  }, [updateCardPositionOptimized]);
-
-  // Clean up drag state - FIXED: Properly sync DOM and React state
+  // Clean up drag state
   const handleMouseUp = useCallback(() => {
     if (!dragStateRef.current.isDragging || !dragStateRef.current.draggedCardId) return;
 
@@ -473,11 +600,7 @@ useEffect(() => {
     };
   }, []);
 
-  const handleTouchEnd = useCallback(() => {
-    handleMouseUp();
-  }, [handleMouseUp]);
-
-  // Event listeners setup - ALWAYS ACTIVE for immediate response
+  // Event listeners setup
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
       if (dragStateRef.current.isDragging) {
@@ -485,24 +608,14 @@ useEffect(() => {
       }
     };
 
-    const handleGlobalTouchMove = (e: TouchEvent) => {
-      if (dragStateRef.current.isDragging) {
-        handleTouchMove(e);
-      }
-    };
-
     document.addEventListener('mousemove', handleGlobalMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-    document.addEventListener('touchmove', handleGlobalTouchMove, { passive: false });
-    document.addEventListener('touchend', handleTouchEnd);
 
     return () => {
       document.removeEventListener('mousemove', handleGlobalMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('touchmove', handleGlobalTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
+  }, [handleMouseMove, handleMouseUp]);
 
   const renderCardContent = (card: FloatingCard) => {
     switch (card.component) {
@@ -514,17 +627,11 @@ useEffect(() => {
         return <ThreatAssessment drones={detectedDrones} />;
       case "SpectrumAnalyzer":
         return <SpectrumAnalyzer />;
-      case "DataVisualization":
-        return <DataVisualization drones={detectedDrones} />;
       default:
         return <Box>Unknown component</Box>;
     }
   };
 
-  const handleSpectrumClick = () => {
-    setShowSpectrum(true);
-    toggleCard("spectrum-analyzer");
-  };
   const leftCardLogs: CardLog[] = [
     {
       id: "system-status",
@@ -559,40 +666,157 @@ useEffect(() => {
       title: "Spectrum Analyzer",
       lastActivity:
         floatingCards.find((c) => c.id === "spectrum-analyzer")?.lastActivity || "",
-      description: "Real-time frequency spectrum analysis",
+      description: "Full spectrum analyzer with waterfall",
       icon: <Analytics />,
     },
   ];
 
+  // DEBUG: Check if FFT data is available
+  console.log("FFT data available:", fft.length > 0);
+  console.log("Floating spectrum visible:", floatingSpectrum.visible);
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          severity={snackbar.severity} 
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+      
       <div className="App">
         {/* Main Container */}
         <div className="main-container">
           {/* Application Header */}
           <div className="app-header">
-            
-            <div className="header_data "><h2>RAPIDEV</h2> </div>
+            <div className="header_data"><h2>RAPIDEV</h2></div>
             <div className="header_data">
               <Typography variant="h5" className="app-title">
-              ANTI-DRONE-SYSTEM
-            </Typography>
+                ANTI-DRONE-SYSTEM
+              </Typography>
             </div>
             <div className="header_data">
               <Button
-              onClick={handleLogout}
-              variant="outlined"
+                onClick={handleLogout}
+                variant="outlined"
+                sx={{
+                  color: "#ff4444",
+                  borderColor: "#ff4444",
+                  ml: 2,
+                  "&:hover": { borderColor: "#ff6666", color: "#ff6666" },
+                }}
+              >
+                Logout
+              </Button>
+            </div>
+          </div>
+
+          {/* Drag overlay - shows when dragging spectrum analyzer */}
+          {isDraggingOver && (
+            <Box
               sx={{
-                color: "#ff4444",
-                borderColor: "#ff4444",
-                ml: 2,
-                "&:hover": { borderColor: "#ff6666", color: "#ff6666" },
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0, 255, 65, 0.05)",
+                border: "3px dashed rgba(0, 255, 65, 0.5)",
+                zIndex: 9998,
+                pointerEvents: "none",
               }}
             >
-              Logout
-            </Button></div>
-          </div>
+              {/* Drag cursor */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  left: dragPosition.x - 40,
+                  top: dragPosition.y - 40,
+                  width: 80,
+                  height: 80,
+                  backgroundColor: "rgba(0, 255, 65, 0.2)",
+                  border: "2px solid #00ff41",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  animation: "pulse 1s infinite",
+                  "@keyframes pulse": {
+                    "0%": {
+                      transform: "scale(1)",
+                      opacity: 0.7
+                    },
+                    "50%": {
+                      transform: "scale(1.1)",
+                      opacity: 1
+                    },
+                    "100%": {
+                      transform: "scale(1)",
+                      opacity: 0.7
+                    }
+                  }
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: "#00ff41",
+                    fontSize: "30px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  📡
+                </Typography>
+              </Box>
+
+              {/* Drop hint in the center */}
+              {showDropHint && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    backgroundColor: "rgba(0, 0, 0, 0.8)",
+                    border: "2px solid #00ff41",
+                    borderRadius: "8px",
+                    padding: "20px 40px",
+                    textAlign: "center",
+                    minWidth: "300px",
+                    boxShadow: "0 0 20px rgba(0, 255, 65, 0.5)",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      color: "#00ff41",
+                      fontFamily: '"Roboto Mono", monospace',
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      mb: 1,
+                    }}
+                  >
+                    Drop Spectrum Analyzer Here
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: "#aaa",
+                      fontFamily: '"Roboto Mono", monospace',
+                      fontSize: "12px",
+                    }}
+                  >
+                    Release to create a floating spectrum analyzer
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          )}
 
           {/* Full Screen Map */}
           <div className="map-container">
@@ -600,10 +824,31 @@ useEffect(() => {
               drones={detectedDrones}
               systemActive={systemActive}
               drawingToolsEnabled={drawingToolsEnabled}
-              coneangle = {coneAngle}
-              coneelevation = {coneElevation}
+              coneangle={coneAngle}
+              coneelevation={coneElevation}
             />
           </div>
+
+          {/* Floating Spectrum Analyzer (when dragged from spectrum tab) */}
+          {floatingSpectrum.visible && (
+            <div style={{
+              position: 'fixed',
+              zIndex: 9999,
+              pointerEvents: 'auto'
+            }}>
+              <FloatingSpectrumAnalyzer
+                spectrumData={fft.length > 0 ? fft : Array(2048).fill(-80)}
+                width={400}
+                height={250}
+                onClose={() => {
+                  console.log("Closing floating spectrum");
+                  setFloatingSpectrum(prev => ({ ...prev, visible: false }));
+                }}
+                initialPosition={floatingSpectrum.position}
+                settings={floatingSpectrum.settings}
+              />
+            </div>
+          )}
 
           {/* Floating Cards */}
           {floatingCards
@@ -624,21 +869,11 @@ useEffect(() => {
                 <Box 
                   className="floating-card-header"
                   onMouseDown={(e) => handleMouseDown(e, card.id)}
-                  onTouchStart={(e) => handleTouchStart(e, card.id)}
                 >
                   <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#00ff41" }}>
                     {card.title}
                   </Typography>
                   <Box>
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        minimizeCard(card.id);
-                      }}
-                      sx={{ color: "#00ff41", p: 0.5 }}
-                    >
-                    </IconButton>
                     <IconButton
                       size="small"
                       onClick={(e) => {
@@ -652,18 +887,14 @@ useEffect(() => {
                   </Box>
                 </Box>
                 {/* Content area */}
-                  <Box className="floating-card-content">
-                    {renderCardContent(card)}
-                  </Box>
+                <Box className="floating-card-content">
+                  {renderCardContent(card)}
+                </Box>
               </Box>
             ))}
 
           {/* Left Fixed Column */}
-          <div className="fixed-column left">
-            <div className="column-header">
-              <Dashboard className="column-icon" />
-              <h3 className="column-title">CONTROL</h3>
-            </div>
+          <div className="fixed-column">
             <div className="column-content">
               {leftCardLogs.map((log) => (
                 <div
@@ -678,8 +909,6 @@ useEffect(() => {
                 >
                   <div className="column-item-icon">{log.icon}</div>
                   <div className="column-item-info">
-                    <div className="column-item-title">{log.title}</div>
-                   
                   </div>
                 </div>
               ))}

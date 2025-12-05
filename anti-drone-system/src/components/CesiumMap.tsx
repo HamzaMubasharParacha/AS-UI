@@ -8,6 +8,7 @@ import { createESRISatelliteOfflineLayer } from "../utils/OfflineTileLayer";
 import OfflineMapControl from "./OfflineMapControl";
 import { command_center } from "../api/config";
 import RadarComponent from "./RadarComponent";
+import MiniSpectrumAnalyzer from './MiniSpectrumAnalyzer';
 import CircularSlider from '@fseehawer/react-circular-slider';
 // Compass Component
 const Compass: React.FC<{
@@ -591,15 +592,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
     severity: 'info'
   });
 
-  const mapRef = useRef<L.Map>(null);
-
-  // Position zoom controls to top-right
-  useEffect(() => {
-    if (mapRef.current) {
-      // Move zoom control to top-right
-      mapRef.current.zoomControl.setPosition('topright');
-    }
-  }, [mapRef.current]);
+ 
 
   // Updated coordinates as requested by user (Islamabad/Rawalpindi area)
   const [latLon, setLatLon] = useState<{ lat: number | null; lon: number | null }>({ lat: null, lon: null });
@@ -608,7 +601,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   const centerPosition: [number, number] = [centerLat, centerLng];
   const radius10km = 10000;
   const coneRadius = 5000;
-  const [showPtzControls, setShowPtzControls] = useState(true); // true = shown, false = hidden
+  const [showPtzControls, setShowPtzControls] = useState(false); // true = shown, false = hidden
 
   // Enhanced getToken function with fallback
   const getToken = () => {
@@ -1101,15 +1094,15 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
       {/* Leaflet Map with Satellite Imagery */}
       <MapContainer
         center={centerPosition}
-        zoom={13}
+        zoomControl={false}
+        zoom={12}
         style={{
           height: "100%",
           width: "100%",
           borderRadius: "8px",
           border: "2px solid #00ff41",
         }}
-        ref={mapRef}
-        zoomControl={true}
+        
       >
         {/* Offline Tile Layer */}
         <OfflineTileLayerComponent offlineFirst={offlineMode} />
@@ -1246,7 +1239,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             </Marker>
           );
         })}
-
+          
         {/* Map Drawing Tools */}
         {drawingToolsEnabled && <MapDrawingTools />}
       </MapContainer>
@@ -1258,7 +1251,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           position: "absolute",
           bottom: 10,
           right: 10,
-          backgroundColor: "rgba(0, 0, 0, 0.85)",
+          backgroundColor: "rgba(0,0,0,0.4)",
           color: "#fff",
           padding: 2,
           borderRadius: 2,
@@ -1271,7 +1264,6 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             }`,
           zIndex: 1000,
           minWidth: 200,
-          backdropFilter: "blur(10px)",
         }}
       >
         {/* Jammer Status */}
@@ -1464,8 +1456,8 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           width={150}
           knobColor="#00ff41"
           knobSize={25}
-          progressColorFrom="#11461d"
-          progressColorTo="#11461d"
+          progressColorFrom="rgba(12, 62, 22, 0.1)"
+          progressColorTo="rgba(12, 62, 22, 0.1)"
           progressSize={6}
           trackColor="rgba(0, 255, 65, 0.2)"
           trackSize={6}
@@ -1480,7 +1472,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           onChange={(value) => {
             const numValue = value as number;
             setAzimuthValue(numValue.toString());
-            // setAntennaPosition('azimuth',numValue);
+            setAntennaPosition('azimuth',numValue);
           }}
         />
 
@@ -1599,20 +1591,23 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
       }}>
         <Slider
           orientation="vertical"
-          min={-45}
-          max={50}
+          min={-80}
+          max={15}
           value={parseFloat(elevationValue) || 0}
           onChange={(event, value) => {
             const numValue = value as number;
             setElevationValue(numValue.toString());
-            // setAntennaPosition('elevation',numValue);
+            setAntennaPosition('elevation',numValue);
           }}
           marks={[
+            { value: -80, label: '-80°' },
+            { value: -60, label: '-60°' },
             { value: -45, label: '-45°' },
-            { value: -20, label: '-20°' },
+            { value: -30, label: '-30°' },
+            { value: -15, label: '-15°' },
             { value: 0, label: '0°' },
-            { value: 25, label: '25°' },
-            { value: 50, label: '50°' },
+            { value: 10, label: '10°' },
+            { value: 15, label: '15' },
           ]}
           valueLabelDisplay="auto"
           sx={{
@@ -1699,6 +1694,24 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   </Box>
 </Box>
       </Box>
+      {/* <Box
+      sx={{
+        position: "absolute",
+        bottom: 270, // Position it above the jammer controls (10 + 160 height)
+        right: 5,
+        zIndex: 1000,
+      }}
+    >
+      <MiniSpectrumAnalyzer 
+        width={300}
+        height={150}
+        frequencyRange={[20, 6000]}
+        amplitudeRange={[-120, 0]}
+        showGrid={true}
+        showLabels={true}
+        updateInterval={100}
+      />
+    </Box> */}
 
       {/* Rest of the component remains the same... */}
       {/* Detailed Threat Information Panel */}
@@ -1757,20 +1770,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             zIndex: 2000,
           }}
         >
-          <OfflineMapControl
-            onOfflineModeChange={setOfflineMode}
-            currentBounds={
-              mapRef.current
-                ? {
-                  north: mapRef.current.getBounds().getNorth(),
-                  south: mapRef.current.getBounds().getSouth(),
-                  east: mapRef.current.getBounds().getEast(),
-                  west: mapRef.current.getBounds().getWest(),
-                }
-                : undefined
-            }
-            currentZoom={mapRef.current?.getZoom()}
-          />
+          
         </Box>
       )}
     </Box>

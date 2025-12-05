@@ -6,6 +6,7 @@ interface SpectrumWaterfallProps {
   height?: number;
   minDb?: number;
   maxDb?: number;
+  onSpectrumDraggedOut?: () => void; // New prop for when spectrum is dragged out
 }
 
 const SpectrumWaterfall: React.FC<SpectrumWaterfallProps> = ({
@@ -14,9 +15,11 @@ const SpectrumWaterfall: React.FC<SpectrumWaterfallProps> = ({
   height = 400,
   minDb = -100,
   maxDb = -20,
+  onSpectrumDraggedOut,
 }) => {
   const waterfallRef = useRef<HTMLCanvasElement>(null);
   const spectrumRef = useRef<HTMLCanvasElement>(null);
+  const spectrumContainerRef = useRef<HTMLDivElement>(null);
   
   const [minFreq, setMinFreq] = useState(0);
   const [maxFreq, setMaxFreq] = useState(6000);
@@ -26,6 +29,8 @@ const SpectrumWaterfall: React.FC<SpectrumWaterfallProps> = ({
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectionStart, setSelectionStart] = useState<number | null>(null);
   const [selectionEnd, setSelectionEnd] = useState<number | null>(null);
+  const [isDraggingSpectrum, setIsDraggingSpectrum] = useState(false);
+  const [dragImage, setDragImage] = useState<string | null>(null);
 
   type ColorMap = (t: number) => [number, number, number];
 
@@ -71,6 +76,92 @@ const SpectrumWaterfall: React.FC<SpectrumWaterfallProps> = ({
   };
 
   const colorMap = colorMaps[colorScheme];
+
+  // Create drag image for spectrum analyzer
+  const createDragImage = () => {
+    if (!spectrumRef.current) return null;
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = 300;
+    canvas.height = 150;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    
+    // Draw simplified spectrum on drag image
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.strokeStyle = '#00ffcc';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    
+    if (spectrumData.length > 0) {
+      const marginLeft = 30;
+      const marginRight = 10;
+      const marginTop = 10;
+      const marginBottom = 20;
+      const plotWidth = canvas.width - marginLeft - marginRight;
+      const plotHeight = canvas.height - marginTop - marginBottom;
+      
+      // Draw mini spectrum
+      for (let i = 0; i <= plotWidth; i++) {
+        const bin = Math.floor((i / plotWidth) * spectrumData.length);
+        const clampedBin = Math.max(0, Math.min(spectrumData.length - 1, bin));
+        
+        let t = (spectrumData[clampedBin] - minPower) / (maxPower - minPower);
+        t = Math.min(1, Math.max(0, t));
+
+        const x = marginLeft + i;
+        const y = marginTop + (1 - t) * plotHeight; // Invert Y for canvas
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+    }
+    
+    ctx.stroke();
+    
+    // Add title
+    ctx.fillStyle = '#00ffcc';
+    ctx.font = '10px Arial';
+    ctx.fillText('Spectrum Analyzer', 10, 20);
+    
+    return canvas.toDataURL();
+  };
+
+  // Handle drag start for spectrum analyzer
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData('text/plain', 'spectrum-analyzer');
+    e.dataTransfer.setData('application/json', JSON.stringify({
+      type: 'spectrum',
+      minFreq,
+      maxFreq,
+      minPower,
+      maxPower,
+      colorScheme
+    }));
+    
+    // Create and set drag image
+    const dragImg = createDragImage();
+    if (dragImg) {
+      const img = new Image();
+      img.src = dragImg;
+      img.onload = () => {
+        e.dataTransfer.setDragImage(img, 150, 75); // Center the image
+      };
+    }
+    
+    setIsDraggingSpectrum(true);
+    
+    // Call the callback to notify parent
+    if (onSpectrumDraggedOut) {
+      onSpectrumDraggedOut();
+    }
+  };
+
+  const handleDragEnd = () => {
+    setIsDraggingSpectrum(false);
+  };
 
   useEffect(() => {
     if (!spectrumData || !waterfallRef.current) return;
@@ -660,7 +751,14 @@ const SpectrumWaterfall: React.FC<SpectrumWaterfallProps> = ({
         </div>
       </div>
 
-      <div style={{ marginBottom: 30 }}>
+      {/* Spectrum Analyzer - Draggable Section */}
+      <div 
+        ref={spectrumContainerRef}
+        style={{ marginBottom: 30, position: 'relative' }}
+        draggable="true"
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
         <div style={{
           fontSize: 16,
           marginBottom: 10,
@@ -670,19 +768,67 @@ const SpectrumWaterfall: React.FC<SpectrumWaterfallProps> = ({
           justifyContent: "space-between",
           alignItems: "center"
         }}>
-          <span>Spectrum Analyzer</span>
-          <span style={{ fontSize: 12, color: "#888", fontWeight: "normal",paddingRight:"50px"}}>
+          <span>
+            Spectrum Analyzer 
+            <span style={{ fontSize: 12, color: "#00ffcc", marginLeft: 10, fontWeight: "normal" }}>
+              (Drag this graph to main screen)
+            </span>
+          </span>
+          <span style={{ fontSize: 12, color: "#888", fontWeight: "normal",paddingRight:"5px"}}>
             Click and drag to zoom into a frequency range
           </span>
         </div>
+        
+        {/* Drag indicator overlay */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: isDraggingSpectrum ? 'rgba(0, 255, 65, 0.1)' : 'transparent',
+          border: isDraggingSpectrum ? '2px dashed #00ff41' : 'none',
+          borderRadius: '4px',
+          pointerEvents: 'none',
+          zIndex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: isDraggingSpectrum ? 1 : 0,
+          transition: 'all 0.2s'
+        }}>
+          {isDraggingSpectrum && (
+            <div style={{
+              color: '#00ff41',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              padding: '10px 20px',
+              borderRadius: '4px',
+              border: '1px solid #00ff41'
+            }}>
+              Dragging Spectrum Analyzer...
+            </div>
+          )}
+        </div>
+        
         <canvas
           ref={spectrumRef}
           width={width}
           height={spectrumHeight}
-          style={{ display: "block", background: "#000", cursor: "crosshair" }}
+          style={{ 
+            display: "block", 
+            background: "#000", 
+            cursor: "crosshair",
+            borderRadius: '4px',
+            border: '1px solid #333'
+          }}
         />
+        
+        
       </div>
 
+      {/* Waterfall Display */}
       <div>
         <div style={{ fontSize: 16, marginBottom: 10, color: "#00ffcc", fontWeight: "bold" }}>
           Waterfall Display
@@ -691,7 +837,7 @@ const SpectrumWaterfall: React.FC<SpectrumWaterfallProps> = ({
           ref={waterfallRef}
           width={width}
           height={waterfallHeight}
-          style={{ display: "block", background: "#000" }}
+          style={{ display: "block", background: "#000", borderRadius: '4px', border: '1px solid #333' }}
         />
       </div>
     </div>

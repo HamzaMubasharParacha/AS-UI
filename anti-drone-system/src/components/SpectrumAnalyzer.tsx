@@ -153,53 +153,20 @@ const SpectrumAnalyzer: React.FC = () => {
           maxWidth: "100%",
         }}
       >
-        <SpectrumWaterfall
-          spectrumData={fft}
-          width={870} // Adjusted to fit better in floating card
-          height={500}
-          // minDb={-100}
-          // maxDb={-20}
-          minDb={-120}
-          maxDb={0}
-        />
+       // In SpectrumAnalyzer.tsx, update the SpectrumWaterfall component:
+<SpectrumWaterfall
+  spectrumData={fft}
+  width={870}
+  height={500}
+  minDb={-120}
+  maxDb={0}
+  onSpectrumDraggedOut={() => {
+    // Optional: you can add any logic here when spectrum is dragged out
+    console.log('Spectrum analyzer dragged out');
+  }}
+/>
       </Box>
  
-      {/* Status Information */}
-      <Box
-        sx={{
-          mt: 2,
-          p: 2,
-          border: "1px solid #333",
-          borderRadius: 1,
-          backgroundColor: "rgba(0, 0, 0, 0.3)",
-          fontSize: "12px",
-        }}
-      >
-        <Typography
-          variant="body2"
-          sx={{ mb: 1, fontWeight: "bold", color: "#00ff41" }}
-        >
-          SYSTEM STATUS
-        </Typography>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 1,
-          }}
-        >
-          <div>FFT Length:</div>
-          <div style={{ color: "#00ff41", fontWeight: "bold" }}>
-            {fft.length || "—"} points
-          </div>
- 
-          <div>Update Rate:</div>
-          <div style={{ color: "#00ff41", fontWeight: "bold" }}>
-            {isPlaying ? "20 Hz" : "PAUSED"}
-          </div>
- 
-        </Box>
-      </Box>
     </Box>
   );
 };

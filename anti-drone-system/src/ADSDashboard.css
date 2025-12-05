@@ -14,7 +14,6 @@ body {
   width: 100%;
   overflow: hidden;
   font-family: "Roboto Mono", monospace;
-  background-color: #0a0a0a;
   color: #ffffff;
 }
 
@@ -28,13 +27,161 @@ body {
   left: 0;
 }
 
+
+/* ===== LEAFLET DRAW TOOLS - ALL ICONS GREEN #00ff41 ===== */
+
+/* Target ALL drawing tool buttons */
+.leaflet-draw-toolbar a {
+  background-image: none !important;
+  position: relative !important;
+  background-color: rgba(0, 255, 65, 0.3) !important;
+  border: 1px solid rgba(0, 255, 65, 0.3) !important;
+  border-radius: 6px !important;
+  margin: 4px !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Specifically target disabled edit/delete buttons */
+.leaflet-draw-toolbar a.leaflet-disabled {
+  background-image: none !important;
+  position: relative !important;
+  background-color: rgba(0, 255, 65, 0.3) !important;
+  border: 1px solid rgba(0, 255, 65, 0.3) !important;
+  border-radius: 6px !important;
+  margin: 4px !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Hover effect for ALL buttons */
+.leaflet-draw-toolbar a:hover:not(.leaflet-disabled) {
+  background-color: rgba(0, 255, 65, 0.3) !important;
+  border-color: rgba(0, 255, 65, 0.8) !important;
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.4) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Active/enabled state */
+.leaflet-draw-toolbar a.leaflet-draw-toolbar-button-enabled {
+ background-image: none !important;
+  position: relative !important;
+  background-color: rgba(0, 255, 65, 0.3) !important;
+  border: 1px solid rgba(0, 255, 65, 0.3) !important;
+  border-radius: 6px !important;
+  margin: 4px !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Custom icons for all buttons */
+.leaflet-draw-toolbar .leaflet-draw-draw-polyline::before,
+.leaflet-draw-toolbar .leaflet-draw-draw-polygon::before,
+.leaflet-draw-toolbar .leaflet-draw-draw-rectangle::before,
+.leaflet-draw-toolbar .leaflet-draw-draw-circle::before,
+.leaflet-draw-toolbar .leaflet-draw-draw-marker::before,
+.leaflet-draw-toolbar .leaflet-draw-edit-edit::before,
+.leaflet-draw-toolbar .leaflet-draw-edit-remove::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* ===== ALL ICONS IN #00ff41 GREEN ===== */
+
+/* Polyline icon - #00ff41 */
+.leaflet-draw-toolbar .leaflet-draw-draw-polyline::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300ff41'%3E%3Cpath d='M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z'/%3E%3C/svg%3E");
+}
+
+/* Polygon icon - #00ff41 */
+.leaflet-draw-toolbar .leaflet-draw-draw-polygon::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300ff41'%3E%3Cpath d='M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z'/%3E%3C/svg%3E");
+}
+
+/* Rectangle icon - #00ff41 */
+.leaflet-draw-toolbar .leaflet-draw-draw-rectangle::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' stroke='%2300ff41' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+}
+
+/* Circle icon - #00ff41 */
+.leaflet-draw-toolbar .leaflet-draw-draw-circle::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' stroke='%2300ff41' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+}
+
+/* Marker icon - #00ff41 */
+.leaflet-draw-toolbar .leaflet-draw-draw-marker::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300ff41'%3E%3Cpath d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/%3E%3C/svg%3E");
+}
+
+/* Edit icon - #00ff41 */
+.leaflet-draw-toolbar .leaflet-draw-edit-edit::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300ff41'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/%3E%3C/svg%3E");
+}
+
+/* Delete/Remove icon - #00ff41 (changed from red to green) */
+.leaflet-draw-toolbar .leaflet-draw-edit-remove::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300ff41'%3E%3Cpath d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3E%3C/svg%3E");
+}
+
+/* Override any default Leaflet styles */
+.leaflet-draw-toolbar a {
+  background-color: transparent !important;
+  background-position: 0 0 !important;
+}
+
+
+/* Target toolbar itself */
+.leaflet-draw-toolbar {
+  background-color: transparent !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ===== FORCE ALL ICONS TO BE GREEN ===== */
+
+/* Use CSS filter to force green color on any remaining icons */
+.leaflet-draw-toolbar a {
+  filter: none !important;
+}
+
+/* Target the background images directly */
+.leaflet-draw-toolbar .leaflet-draw-draw-polyline,
+.leaflet-draw-toolbar .leaflet-draw-draw-polygon,
+.leaflet-draw-toolbar .leaflet-draw-draw-rectangle,
+.leaflet-draw-toolbar .leaflet-draw-draw-circle,
+.leaflet-draw-toolbar .leaflet-draw-draw-marker,
+.leaflet-draw-toolbar .leaflet-draw-edit-edit,
+.leaflet-draw-toolbar .leaflet-draw-edit-remove {
+  background-image: none !important;
+}
+
 .App {
   height: 100vh;
   width: 100vw;
   position: fixed;
   top: 0;
   left: 0;
-  background-color: #0a0a0a;
   color: #ffffff;
   overflow: hidden;
 }
@@ -68,7 +215,6 @@ body {
     rgba(10, 10, 10, 0.9) 100%
   );
   backdrop-filter: blur(20px);
-  border-bottom: 2px solid rgba(0, 255, 65, 0.3);
   z-index: 3000;
   display: flex;
   align-items: center;
@@ -116,12 +262,11 @@ body {
 /* ===== MAP CONTAINER - ADJUSTED FOR SINGLE SIDEBAR ===== */
 .map-container {
   position: absolute;
-  top: 60px;
-  left: 140px; /* Only left sidebar */
+  top: 60px; /* Only left sidebar */
   right: 0; /* No right sidebar */
   bottom: 0;
   height: calc(100vh - 60px);
-  width: calc(100vw - 140px); /* Adjusted for single sidebar */
+  width: 100%; /* Adjusted for single sidebar */
   margin: 0;
   padding: 0;
   z-index: 1;
@@ -132,7 +277,7 @@ body {
 
 .leaflet-container {
   height: calc(100vh - 60px) !important;
-  width: calc(100vw - 140px) !important; /* Adjusted for single sidebar */
+  width: 100% !important; /* Adjusted for single sidebar */
   margin: 0 !important;
   padding: 0 !important;
 }
@@ -148,24 +293,19 @@ body {
   top: 60px;
   height: calc(100vh - 60px);
   width: 140px;
-  background: rgba(10, 10, 10, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 255, 65, 0.3);
+  background-color: transparent !important;
   z-index: 2000;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
 }
 
 .fixed-column.left {
   left: 0;
-  border-right: 2px solid rgba(0, 255, 65, 0.4);
 }
 
 .column-header {
   padding: 12px;
-  border-bottom: 2px solid rgba(0, 255, 65, 0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -197,11 +337,9 @@ body {
 }
 
 .column-item {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(0, 255, 65, 0.2);
   border-radius: 6px;
-  padding: 8px;
-  margin-bottom: 8px;
+  padding: 2px;
+  margin-bottom: 2px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: flex;
@@ -340,7 +478,6 @@ body {
   width: 380px;
   background: rgba(10, 10, 10, 0.98);
   backdrop-filter: blur(15px);
-  border: 2px solid rgba(0, 255, 65, 0.3);
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
   z-index: 1500;
@@ -373,7 +510,6 @@ body {
     rgba(0, 255, 65, 0.05) 100%
   );
   padding: 16px 20px;
-  border-bottom: 2px solid rgba(0, 255, 65, 0.2);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -419,17 +555,15 @@ body {
   }
 
   .fixed-column {
-    width: 160px;
+    width: auto;
   }
 
   .map-container {
-    left: 160px;
-    right: 0;
-    width: calc(100vw - 160px);
+    width: 100%;
   }
 
   .leaflet-container {
-    width: calc(100vw - 160px) !important;
+    width: 100%
   }
 }
 
@@ -441,17 +575,15 @@ body {
   }
 
   .fixed-column {
-    width: 180px;
+    width: auto;
   }
 
   .map-container {
-    left: 180px;
-    right: 0;
-    width: calc(100vw - 180px);
+    width: 100%;
   }
 
   .leaflet-container {
-    width: calc(100vw - 180px) !important;
+    width: 100%
   }
 }
 
@@ -464,17 +596,15 @@ body {
   }
 
   .fixed-column {
-    width: 120px;
+    width: auto;
   }
 
   .map-container {
-    left: 120px;
-    right: 0;
-    width: calc(100vw - 120px);
+    width: 100%;
   }
 
   .leaflet-container {
-    width: calc(100vw - 120px) !important;
+    width: 100%
   }
 
   .floating-card-content {
@@ -519,9 +649,7 @@ body {
 
   .map-container {
     top: 50px;
-    left: 0;
-    right: 0;
-    width: 100vw;
+    width: 100%;
     height: calc(100vh - 50px);
   }
 
@@ -598,7 +726,7 @@ body {
 
 .column-content::-webkit-scrollbar-track,
 .floating-card-content::-webkit-scrollbar-track {
-  background: rgba(26, 26, 26, 0.5);
+  background: rgba(26, 26, 26, 0.8);
 }
 
 .column-content::-webkit-scrollbar-thumb,

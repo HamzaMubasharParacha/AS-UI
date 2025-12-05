@@ -3,7 +3,7 @@ import { useMap } from "react-leaflet";
 import * as L from "leaflet";
 import "leaflet-draw";
 import "leaflet-draw/dist/leaflet.draw.css";
- 
+import "../ADSDashboard.css";
 interface DrawnShape {
   id: string;
   type: string;
