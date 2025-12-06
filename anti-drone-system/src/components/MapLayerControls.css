@@ -1,0 +1,262 @@
+/* MapLayerControls.css - Button Dropdown Style */
+
+.map-layer-controls-container {
+  position: absolute;
+  top: 280px;
+  left: 10px;
+  z-index: 1000;
+  font-family: 'Courier New', monospace;
+}
+
+/* Main Button */
+.map-type-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid #00ff41;
+  border-radius: 6px;
+  color: #00ff41;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  /* width: 30px;
+  height: 30px; */
+  backdrop-filter: blur(10px);
+}
+
+.map-type-button:hover {
+  background: rgba(0, 255, 65, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 255, 65, 0.3);
+  transform: translateY(-1px);
+}
+
+.map-type-button:active {
+  transform: translateY(0);
+}
+
+.button-icon {
+  font-size: 16px;
+}
+
+.button-text {
+  flex: 1;
+  text-align: left;
+  letter-spacing: 0.5px;
+}
+
+.button-arrow {
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+/* Dropdown Menu */
+.layer-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid #00ff41;
+  border-radius: 8px;
+  width: 220px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(15px);
+  overflow: hidden;
+  animation: dropdownFadeIn 0.2s ease;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dropdown Header */
+.dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+  background: rgba(0, 20, 10, 0.7);
+}
+
+.dropdown-title {
+  color: #00ff41;
+  font-weight: bold;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.dropdown-close {
+  background: transparent;
+  border: 1px solid rgba(0, 255, 65, 0.5);
+  color: #00ff41;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.dropdown-close:hover {
+  background: rgba(255, 0, 0, 0.2);
+  border-color: #ff3333;
+  color: #ff3333;
+}
+
+/* Layer Options */
+.layer-options {
+  padding: 8px 0;
+}
+
+.layer-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  position: relative;
+}
+
+.layer-option:hover {
+  background: rgba(0, 255, 65, 0.1);
+  border-left-color: #00ff41;
+}
+
+.layer-option.selected {
+  background: rgba(0, 255, 65, 0.15);
+  border-left-color: #00ff41;
+}
+
+.option-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.option-text {
+  flex: 1;
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.layer-option.selected .option-text {
+  color: #00ff41;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+}
+
+.option-check {
+  color: #00ff41;
+  font-weight: bold;
+  font-size: 14px;
+  animation: checkPulse 2s infinite;
+}
+
+@keyframes checkPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+/* Selected State Indicator */
+.layer-option.selected::before {
+  content: '';
+  position: absolute;
+  right: 16px;
+  width: 8px;
+  height: 8px;
+  background: #00ff41;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #00ff41;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(0, 255, 65, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 65, 0);
+  }
+}
+
+/* Glow effect for the entire control */
+.map-layer-controls-container::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #00ff41, transparent, #00ff41);
+  border-radius: 8px;
+  z-index: -1;
+  opacity: 0.2;
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .map-type-button {
+    min-width: 160px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  
+  .layer-dropdown {
+    width: 200px;
+  }
+  
+  .button-icon {
+    font-size: 14px;
+  }
+  
+  .option-icon {
+    font-size: 16px;
+  }
+}
+
+/* Active state for button when dropdown is open */
+.map-type-button.active {
+  background: rgba(0, 255, 65, 0.15);
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+}
+
+/* Transition for dropdown arrow */
+.button-arrow {
+  transition: transform 0.2s ease;
+}
+
+.map-type-button.active .button-arrow {
+  transform: rotate(180deg);
+}

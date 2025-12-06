@@ -1,0 +1,112 @@
+/* JammerControlPanel.css */
+
+.jammer-control-panel {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  font-family: "monospace";
+  font-size: 11px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  border: 1px solid #00ff41;
+  z-index: 1000;
+  min-width: 200px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.jammer-control-panel:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* Status indicator animation */
+@keyframes statusPulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.jammer-status-active {
+  animation: statusPulse 1.5s infinite;
+  color: #ff4444 !important;
+}
+
+.jammer-status-starting,
+.jammer-status-stopping {
+  animation: statusPulse 1s infinite;
+  color: #ffaa00 !important;
+}
+
+.jammer-status-idle {
+  color: #00ff41 !important;
+}
+
+/* Frequency bands styling */
+.frequency-band {
+  transition: all 0.2s ease;
+}
+
+.frequency-band:hover {
+  transform: scale(1.05);
+}
+
+.frequency-band-selected {
+  background: rgba(0, 255, 65, 0.15) !important;
+  border: 1px solid #00ff41 !important;
+  border-radius: 4px;
+}
+
+/* PTZ Controls */
+.ptz-controls {
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Circular slider custom styling */
+.react-circular-slider {
+  position: relative;
+}
+
+.react-circular-slider .knob {
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.8) !important;
+}
+
+.react-circular-slider .knob:hover {
+  box-shadow: 0 0 20px rgba(0, 255, 65, 1) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .jammer-control-panel {
+    min-width: 180px;
+    padding: 12px;
+    bottom: 5px;
+    right: 5px;
+    font-size: 10px;
+  }
+
+  .ptz-controls {
+    transform: scale(0.9);
+    transform-origin: top center;
+  }
+}

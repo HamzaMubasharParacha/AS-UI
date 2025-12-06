@@ -22,7 +22,7 @@ export const fetchDrones = async (): Promise<DroneAPIResponse[]> => {
     }
     return [];
   } catch (error) {
-    console.error('Error fetching drone data:', error);
+    // console.error('Error fetching drone data:', error);
     return [];
   }
 };

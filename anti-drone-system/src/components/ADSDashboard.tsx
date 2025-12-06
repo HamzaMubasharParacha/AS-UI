@@ -131,7 +131,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
 
   // DEBUG: Log when floating spectrum state changes
   useEffect(() => {
-    console.log("Floating spectrum state changed:", floatingSpectrum);
+    // console.log("Floating spectrum state changed:", floatingSpectrum);
   }, [floatingSpectrum]);
 
   const handleLogout = async () => {
@@ -245,7 +245,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       });
       const json = await response.json();
 
-      console.log("Spectrum API Response:", json);
+      // console.log("Spectrum API Response:", json);
 
       if (!json?.data || !json.data[hardwareSystemId]) {
         console.log("No data or hardwareSystemId not found");
@@ -255,11 +255,11 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       const powerSpectrum = json.data[hardwareSystemId].decodedValues?.powerSpectrum;
 
       if (powerSpectrum) {
-        console.log("Power spectrum found, length:", powerSpectrum.length);
+        // console.log("Power spectrum found, length:", powerSpectrum.length);
         const cleaned = powerSpectrum.map((v: number) => isFinite(v) ? v : -100);
         setFft(cleaned);
       } else {
-        console.log("No power spectrum in response");
+        // console.log("No power spectrum in response");
       }
     } catch (err) {
       console.error("Spectrum API Error:", err);
@@ -319,7 +319,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
 
   const [coneAngle, setConeAngle] = useState<number>(0);
   const [coneElevation, setConeElevation] = useState<number>(0);
-  const [jammerStatus, setjammerStatus] = useState("");
+  const [jammerStatus, setjammerStatus] = useState(false);
   
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -354,7 +354,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       } catch (error) {
         console.error("Error fetching azimuth:", error);
       }
-    }, 10000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -444,17 +444,17 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
 
     const handleGlobalDrop = (e: DragEvent) => {
       e.preventDefault();
-      console.log("Global drop event triggered at:", e.clientX, e.clientY);
+      // console.log("Global drop event triggered at:", e.clientX, e.clientY);
       setIsDraggingOver(false);
       setShowDropHint(false);
 
       try {
         const data = e.dataTransfer?.getData('application/json');
-        console.log("Drag data received:", data);
+        // console.log("Drag data received:", data);
         
         if (data) {
           const settings = JSON.parse(data);
-          console.log("Parsed settings:", settings);
+          // console.log("Parsed settings:", settings);
           
           if (settings.type === 'spectrum') {
             const newPosition = {
@@ -462,7 +462,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
               y: Math.max(10, Math.min(window.innerHeight - 260, e.clientY - 125))
             };
             
-            console.log("Creating floating spectrum at:", newPosition);
+            // console.log("Creating floating spectrum at:", newPosition);
             
             setFloatingSpectrum({
               visible: true,
@@ -477,7 +477,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
             });
           }
         } else {
-          console.log("No drag data found");
+          // console.log("No drag data found");
         }
       } catch (error) {
         console.error('Error parsing drag data:', error);
@@ -490,7 +490,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     };
 
     const handleGlobalDragEnd = () => {
-      console.log("Global drag end");
+      // console.log("Global drag end");
       setIsDraggingOver(false);
       setShowDropHint(false);
     };
@@ -672,8 +672,8 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   ];
 
   // DEBUG: Check if FFT data is available
-  console.log("FFT data available:", fft.length > 0);
-  console.log("Floating spectrum visible:", floatingSpectrum.visible);
+  // console.log("FFT data available:", fft.length > 0);
+  // console.log("Floating spectrum visible:", floatingSpectrum.visible);
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -826,6 +826,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
               drawingToolsEnabled={drawingToolsEnabled}
               coneangle={coneAngle}
               coneelevation={coneElevation}
+              jammerStatus={jammerStatus}
             />
           </div>
 
@@ -841,7 +842,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
                 width={400}
                 height={250}
                 onClose={() => {
-                  console.log("Closing floating spectrum");
+                  // console.log("Closing floating spectrum");
                   setFloatingSpectrum(prev => ({ ...prev, visible: false }));
                 }}
                 initialPosition={floatingSpectrum.position}
