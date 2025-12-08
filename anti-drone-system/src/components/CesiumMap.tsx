@@ -157,7 +157,7 @@ interface CesiumMapProps {
   drawingToolsEnabled?: boolean;
   coneangle: number;
   coneelevation: number;
-  jammerStatus: boolean;
+  jammerStatus: string;
 }
 
 // Fix Leaflet default markers

@@ -23,6 +23,19 @@ interface PTZControlsProps {
   onStartSectorJamming: () => void;
   onStopSectorJamming: () => void;
   onToggleSectorJammingPause: () => void;
+  // Add current sector angle to display
+  currentSectorAngle?: number;
+  // New props for axis selection
+  azimuthSectorEnabled: boolean;
+  setAzimuthSectorEnabled: (enabled: boolean) => void;
+  elevationSectorEnabled: boolean;
+  setElevationSectorEnabled: (enabled: boolean) => void;
+  // New props for elevation sector jamming
+  elevationStartAngle: string;
+  setElevationStartAngle: (angle: string) => void;
+  elevationStopAngle: string;
+  setElevationStopAngle: (angle: string) => void;
+  currentElevationAngle?: number;
 }
 
 const PTZControls: React.FC<PTZControlsProps> = ({
@@ -46,26 +59,29 @@ const PTZControls: React.FC<PTZControlsProps> = ({
   onStartSectorJamming,
   onStopSectorJamming,
   onToggleSectorJammingPause,
+  currentSectorAngle,
+  // New props for axis selection
+  azimuthSectorEnabled,
+  setAzimuthSectorEnabled,
+  elevationSectorEnabled,
+  setElevationSectorEnabled,
+  // New props for elevation sector jamming
+  elevationStartAngle,
+  setElevationStartAngle,
+  elevationStopAngle,
+  setElevationStopAngle,
+  currentElevationAngle,
 }) => {
   const [sliderValue, setSliderValue] = useState<number>(coneangle);
   
   // Sync the circular slider with the real coneangle whenever it changes
   useEffect(() => {
-    // Update slider value to match real antenna position
     setSliderValue(coneangle);
-    
-    // Also update the azimuthValue display to show current position
-    onAzimuthChange(coneangle);
   }, [coneangle]);
 
   const handleAzimuthChange = (value: number) => {
-    // Update local slider value
     setSliderValue(value);
-    
-    // Update the display value
     onAzimuthChange(value);
-    
-    // Send command to move antenna
     setAzimuth(value);
   };
 
@@ -78,17 +94,39 @@ const PTZControls: React.FC<PTZControlsProps> = ({
     setSectorJammingEnabled(e.target.checked);
   };
 
+  const handleAzimuthCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAzimuthSectorEnabled(e.target.checked);
+  };
+
+  const handleElevationCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setElevationSectorEnabled(e.target.checked);
+  };
+
   const handleStartAngleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (/^\d*$/.test(value)) {
+    if (/^[-]?\d*$/.test(value)) {
       setStartAngle(value);
     }
   };
 
   const handleStopAngleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (/^\d*$/.test(value)) {
+    if (/^[-]?\d*$/.test(value)) {
       setStopAngle(value);
+    }
+  };
+
+  const handleElevationStartAngleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (/^[-]?\d*$/.test(value)) {
+      setElevationStartAngle(value);
+    }
+  };
+
+  const handleElevationStopAngleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (/^[-]?\d*$/.test(value)) {
+      setElevationStopAngle(value);
     }
   };
 
@@ -104,7 +142,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
         bgColor: "#00ff41",
         hoverBgColor: "rgba(0, 255, 65, 0.8)",
         onClick: handleStartSectorJamming,
-        disabled: !sectorJammingEnabled,
+        disabled: !sectorJammingEnabled || (!azimuthSectorEnabled && !elevationSectorEnabled),
       };
     } else {
       if (sectorJammingStatus === "paused") {
@@ -131,6 +169,11 @@ const PTZControls: React.FC<PTZControlsProps> = ({
 
   const sectorJammingButtonConfig = getSectorJammingButtonConfig();
 
+  // Display the current angle (use currentSectorAngle during sector jamming, otherwise use coneangle)
+  const displayAzimuth = sectorJammingActive && currentSectorAngle !== undefined 
+    ? currentSectorAngle 
+    : coneangle;
+
   return (
     <Box className="ptz-controls">
       {/* Current Position Display */}
@@ -143,7 +186,8 @@ const PTZControls: React.FC<PTZControlsProps> = ({
         }}
       >
         <Typography sx={{ color: "#00ff41", fontSize: "10px" }}>
-          Current: Az {coneangle}° El {coneelevation}°
+          Current: Az {displayAzimuth.toFixed(1)}° El {coneelevation.toFixed(1)}°
+          {sectorJammingActive && " (Sector Scanning)"}
         </Typography>
       </Box>
 
@@ -157,7 +201,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
           mb: 3,
         }}
       >
-        {/* Circular Slider for Azimuth - Use coneangle as value */}
+        {/* Circular Slider for Azimuth */}
         <Box
           sx={{
             display: "flex",
@@ -192,7 +236,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
               labelFontSize="0px"
               valueFontSize="0px"
               verticalOffset="10px"
-              value={sliderValue} // Use the synchronized value
+              value={sliderValue}
               onChange={(value) => {
                 const numValue = value as number;
                 handleAzimuthChange(numValue);
@@ -210,7 +254,6 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                 pointerEvents: "none",
               }}
             >
-              {/* ... existing markings code ... */}
               {[
                 { angle: 0, value: "0°" },
                 { angle: 45, value: "45°" },
@@ -286,11 +329,11 @@ const PTZControls: React.FC<PTZControlsProps> = ({
               fontWeight: "bold",
             }}
           >
-            Azimuth: {coneangle.toFixed(1)}° {/* Show real angle */}
+            Azimuth: {displayAzimuth.toFixed(1)}°
           </Typography>
         </Box>
 
-        {/* Vertical Slider for Elevation - Already using real elevation */}
+        {/* Vertical Slider for Elevation */}
         <Box
           sx={{
             display: "flex",
@@ -313,21 +356,20 @@ const PTZControls: React.FC<PTZControlsProps> = ({
           >
             <Slider
               orientation="vertical"
-              min={-80}
+              min={-75}
               max={15}
-              value={coneelevation || parseFloat(elevationValue) || 0} // Use real elevation
+              value={coneelevation || parseFloat(elevationValue) || 0}
               onChange={(event, value) => {
                 const numValue = value as number;
                 handleElevationChange(numValue);
               }}
               marks={[
-                { value: -80, label: "-80°" },
+                { value: -75, label: "-75°" },
                 { value: -60, label: "-60°" },
                 { value: -45, label: "-45°" },
                 { value: -30, label: "-30°" },
                 { value: -15, label: "-15°" },
                 { value: 0, label: "0°" },
-                { value: 10, label: "10°" },
                 { value: 15, label: "15" },
               ]}
               valueLabelDisplay="auto"
@@ -409,21 +451,16 @@ const PTZControls: React.FC<PTZControlsProps> = ({
               fontWeight: "bold",
             }}
           >
-            Elevation: {coneelevation.toFixed(1)}° {/* Show real elevation */}
+            Elevation: {coneelevation.toFixed(1)}°
           </Typography>
         </Box>
       </Box>
 
       {/* Sector Jamming Section */}
       <Box
-        sx={{
-          borderTop: "1px solid rgba(0, 255, 65, 0.3)",
-          pt: 2,
-          mt: 2,
-          position: "relative",
-        }}
+       
       >
-        {/* Checkbox and Label */}
+        {/* Main Checkbox and Label */}
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", mb: 2 }}>
           <input 
             type="checkbox" 
@@ -460,6 +497,79 @@ const PTZControls: React.FC<PTZControlsProps> = ({
         {/* Show these controls only when checkbox is checked */}
         {sectorJammingEnabled && (
           <>
+            {/* Azimuth and Elevation Checkboxes */}
+            <Box sx={{ display: "flex", justifyContent: "center", gap: 4, mb: 2 }}>
+              {/* Azimuth Checkbox */}
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <input 
+                  type="checkbox" 
+                  id="azimuth-sector"
+                  checked={azimuthSectorEnabled}
+                  onChange={handleAzimuthCheckboxChange}
+                  disabled={sectorJammingActive}
+                  style={{
+                    appearance: "none",
+                    width: "14px",
+                    height: "14px",
+                    border: "2px solid #00ff41",
+                    borderRadius: "3px",
+                    backgroundColor: azimuthSectorEnabled ? "#00ff41" : "rgba(0, 255, 65, 0.1)",
+                    cursor: sectorJammingActive ? "not-allowed" : "pointer",
+                    marginRight: "6px",
+                    opacity: sectorJammingActive ? 0.7 : 1,
+                    boxShadow: azimuthSectorEnabled ? "0 0 8px rgba(0, 255, 65, 0.8)" : "none",
+                  }}
+                />
+                <label 
+                  htmlFor="azimuth-sector"
+                  style={{
+                    color: azimuthSectorEnabled ? "#00ff41" : "rgba(0, 255, 65, 0.7)",
+                    fontSize: "11px",
+                    fontFamily: "monospace",
+                    fontWeight: "bold",
+                    cursor: sectorJammingActive ? "not-allowed" : "pointer",
+                  }}
+                >
+                  Azimuth
+                </label>
+              </Box>
+
+              {/* Elevation Checkbox */}
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <input 
+                  type="checkbox" 
+                  id="elevation-sector"
+                  checked={elevationSectorEnabled}
+                  onChange={handleElevationCheckboxChange}
+                  disabled={sectorJammingActive}
+                  style={{
+                    appearance: "none",
+                    width: "14px",
+                    height: "14px",
+                    border: "2px solid #00ff41",
+                    borderRadius: "3px",
+                    backgroundColor: elevationSectorEnabled ? "#00ff41" : "rgba(0, 255, 65, 0.1)",
+                    cursor: sectorJammingActive ? "not-allowed" : "pointer",
+                    marginRight: "6px",
+                    opacity: sectorJammingActive ? 0.7 : 1,
+                    boxShadow: elevationSectorEnabled ? "0 0 8px rgba(0, 255, 65, 0.8)" : "none",
+                  }}
+                />
+                <label 
+                  htmlFor="elevation-sector"
+                  style={{
+                    color: elevationSectorEnabled ? "#00ff41" : "rgba(0, 255, 65, 0.7)",
+                    fontSize: "11px",
+                    fontFamily: "monospace",
+                    fontWeight: "bold",
+                    cursor: sectorJammingActive ? "not-allowed" : "pointer",
+                  }}
+                >
+                  Elevation
+                </label>
+              </Box>
+            </Box>
+
             {/* Angle Inputs */}
             <Box
               sx={{
@@ -469,76 +579,199 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                 mb: 2,
               }}
             >
-              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <label 
-                  style={{
-                    color: "#00ff41",
-                    fontSize: "11px",
-                    fontFamily: "monospace",
-                    marginBottom: "4px",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Start Angle
-                </label>
-                <input 
-                  type="text" 
-                  value={startAngle}
-                  onChange={handleStartAngleChange}
-                  disabled={sectorJammingActive}
-                  style={{
-                    width: "80px",
-                    padding: "6px 8px",
-                    backgroundColor: sectorJammingActive 
-                      ? "rgba(0, 255, 65, 0.05)" 
-                      : "rgba(0, 255, 65, 0.05)",
-                    border: "1px solid rgba(0, 255, 65, 0.3)",
-                    borderRadius: "4px",
-                    color: "#00ff41",
-                    fontFamily: "monospace",
-                    fontSize: "12px",
-                    textAlign: "center",
-                    outline: "none",
-                    opacity: sectorJammingActive ? 0.7 : 1,
-                  }}
-                />
-              </Box>
+              {/* Azimuth Angle Inputs (only show if azimuth checkbox is checked) */}
+              {azimuthSectorEnabled && (
+                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <Typography
+                    sx={{
+                      color: "#00ff41",
+                      fontSize: "11px",
+                      fontFamily: "monospace",
+                      mb: 1,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Azimuth Angles
+                  </Typography>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                      <label 
+                        style={{
+                          color: "#00ff41",
+                          fontSize: "10px",
+                          fontFamily: "monospace",
+                          marginBottom: "4px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Start
+                      </label>
+                      <input 
+                        type="text" 
+                        value={startAngle}
+                        onChange={handleStartAngleChange}
+                        disabled={sectorJammingActive}
+                        style={{
+                          width: "60px",
+                          padding: "4px 6px",
+                          backgroundColor: sectorJammingActive 
+                            ? "rgba(0, 255, 65, 0.05)" 
+                            : "rgba(0, 255, 65, 0.05)",
+                          border: "1px solid rgba(0, 255, 65, 0.3)",
+                          borderRadius: "3px",
+                          color: "#00ff41",
+                          fontFamily: "monospace",
+                          fontSize: "11px",
+                          textAlign: "center",
+                          outline: "none",
+                          opacity: sectorJammingActive ? 0.7 : 1,
+                        }}
+                      />
+                    </Box>
 
-              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <label 
-                  style={{
-                    color: "#00ff41",
-                    fontSize: "11px",
+                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                      <label 
+                        style={{
+                          color: "#00ff41",
+                          fontSize: "10px",
+                          fontFamily: "monospace",
+                          marginBottom: "4px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Stop
+                      </label>
+                      <input 
+                        type="text" 
+                        value={stopAngle}
+                        onChange={handleStopAngleChange}
+                        disabled={sectorJammingActive}
+                        style={{
+                          width: "60px",
+                          padding: "4px 6px",
+                          backgroundColor: sectorJammingActive 
+                            ? "rgba(0, 255, 65, 0.05)" 
+                            : "rgba(0, 255, 65, 0.05)",
+                          border: "1px solid rgba(0, 255, 65, 0.3)",
+                          borderRadius: "3px",
+                          color: "#00ff41",
+                          fontFamily: "monospace",
+                          fontSize: "11px",
+                          textAlign: "center",
+                          outline: "none",
+                          opacity: sectorJammingActive ? 0.7 : 1,
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+              )}
+
+              {/* Elevation Angle Inputs (only show if elevation checkbox is checked) */}
+              {elevationSectorEnabled && (
+                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <Typography
+                    sx={{
+                      color: "#00ff41",
+                      fontSize: "11px",
+                      fontFamily: "monospace",
+                      mb: 1,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Elevation Angles
+                  </Typography>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                      <label 
+                        style={{
+                          color: "#00ff41",
+                          fontSize: "10px",
+                          fontFamily: "monospace",
+                          marginBottom: "4px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Start
+                      </label>
+                      <input 
+                        type="text" 
+                        value={elevationStartAngle}
+                        onChange={handleElevationStartAngleChange}
+                        disabled={sectorJammingActive}
+                        style={{
+                          width: "60px",
+                          padding: "4px 6px",
+                          backgroundColor: sectorJammingActive 
+                            ? "rgba(0, 255, 65, 0.05)" 
+                            : "rgba(0, 255, 65, 0.05)",
+                          border: "1px solid rgba(0, 255, 65, 0.3)",
+                          borderRadius: "3px",
+                          color: "#00ff41",
+                          fontFamily: "monospace",
+                          fontSize: "11px",
+                          textAlign: "center",
+                          outline: "none",
+                          opacity: sectorJammingActive ? 0.7 : 1,
+                        }}
+                      />
+                    </Box>
+
+                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                      <label 
+                        style={{
+                          color: "#00ff41",
+                          fontSize: "10px",
+                          fontFamily: "monospace",
+                          marginBottom: "4px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Stop
+                      </label>
+                      <input 
+                        type="text" 
+                        value={elevationStopAngle}
+                        onChange={handleElevationStopAngleChange}
+                        disabled={sectorJammingActive}
+                        style={{
+                          width: "60px",
+                          padding: "4px 6px",
+                          backgroundColor: sectorJammingActive 
+                            ? "rgba(0, 255, 65, 0.05)" 
+                            : "rgba(0, 255, 65, 0.05)",
+                          border: "1px solid rgba(0, 255, 65, 0.3)",
+                          borderRadius: "3px",
+                          color: "#00ff41",
+                          fontFamily: "monospace",
+                          fontSize: "11px",
+                          textAlign: "center",
+                          outline: "none",
+                          opacity: sectorJammingActive ? 0.7 : 1,
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+              )}
+            </Box>
+
+            {/* Status Message when no axis selected */}
+            {!azimuthSectorEnabled && !elevationSectorEnabled && (
+              <Box sx={{ textAlign: "center", mb: 2 }}>
+                <Typography
+                  sx={{
+                    color: "#ffaa00",
+                    fontSize: "10px",
                     fontFamily: "monospace",
-                    marginBottom: "4px",
                     fontWeight: "bold",
+                    fontStyle: "italic",
                   }}
                 >
-                  Stop Angle
-                </label>
-                <input 
-                  type="text" 
-                  value={stopAngle}
-                  onChange={handleStopAngleChange}
-                  disabled={sectorJammingActive}
-                  style={{
-                    width: "80px",
-                    padding: "6px 8px",
-                    backgroundColor: sectorJammingActive 
-                      ? "rgba(0, 255, 65, 0.05)" 
-                      : "rgba(0, 255, 65, 0.05)",
-                    border: "1px solid rgba(0, 255, 65, 0.3)",
-                    borderRadius: "4px",
-                    color: "#00ff41",
-                    fontFamily: "monospace",
-                    fontSize: "12px",
-                    textAlign: "center",
-                    outline: "none",
-                    opacity: sectorJammingActive ? 0.7 : 1,
-                  }}
-                />
+                  Select at least one axis (Azimuth or Elevation) to start sector jamming
+                </Typography>
               </Box>
-            </Box>
+            )}
 
             {/* Control Buttons */}
             <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mb: 1 }}>
@@ -624,7 +857,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                   }}
                 >
                   {sectorJammingStatus === "active" 
-                    ? "▶️ SCANNING SECTOR" 
+                    ? `▶️ SCANNING: ${currentSectorAngle?.toFixed(1) || coneangle.toFixed(1)}°${elevationSectorEnabled ? ` / ${currentElevationAngle?.toFixed(1) || coneelevation.toFixed(1)}°` : ''}` 
                     : "⏸️ PAUSED"}
                 </Typography>
               </Box>

@@ -319,7 +319,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
 
   const [coneAngle, setConeAngle] = useState<number>(0);
   const [coneElevation, setConeElevation] = useState<number>(0);
-  const [jammerStatus, setjammerStatus] = useState(false);
+  const [jammerStatus, setjammerStatus] = useState("");
   
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -370,15 +370,23 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     communications: "OFFLINE",
   });
   
-  useEffect(() => {
-    if (check !== "") {
-      const radarStatus = check ? "ONLINE" : "OFFLINE"; // boolean check
-      setSystemStatus(prev => ({
-        ...prev,
-        countermeasures: radarStatus
-      }));
-    }
-  }, [check]);
+ useEffect(() => {
+  if (check !== "") {
+    const radarStatus = check ? "ONLINE" : "OFFLINE";
+    setSystemStatus(prev => ({
+      ...prev,
+      countermeasures: radarStatus
+    }));
+  }
+  if (jammerStatus !== "") {
+    const jammer = jammerStatus ? "ONLINE" : "OFFLINE";
+    setSystemStatus(prev => ({
+      ...prev,
+      radar: jammer
+    }));
+  }
+}, [check, jammerStatus]);
+ 
 
   const activeThreat = detectedDrones.find(
     (drone) =>

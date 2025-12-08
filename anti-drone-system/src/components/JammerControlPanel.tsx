@@ -16,16 +16,6 @@ interface JammerControlPanelProps {
   onSuccess?: (message: string) => void;
 }
 
-interface SectorJammingConfig {
-  startAngle: number;
-  stopAngle: number;
-  stepSize: number;
-  direction: "forward" | "backward";
-  isActive: boolean;
-  intervalId: NodeJS.Timeout | null;
-  currentAngle: number;
-}
-
 // Enhanced getToken function with fallback
 const getToken = () => {
   const token = sessionStorage.getItem("token");
@@ -158,9 +148,32 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
   const [sectorJammingStatus, setSectorJammingStatus] = useState<"idle" | "active" | "paused">("idle");
   const [currentSectorAngle, setCurrentSectorAngle] = useState<number>(parseFloat(startAngle));
   
+  // New state for elevation sector jamming
+  const [elevationStartAngle, setElevationStartAngle] = useState<string>("0");
+  const [elevationStopAngle, setElevationStopAngle] = useState<string>("45");
+  const [currentElevationAngle, setCurrentElevationAngle] = useState<number>(parseFloat(elevationStartAngle));
+  
+  // New state for axis selection
+  const [azimuthSectorEnabled, setAzimuthSectorEnabled] = useState(true); // Default to true for backward compatibility
+  const [elevationSectorEnabled, setElevationSectorEnabled] = useState(false);
+  
+  // Refs for azimuth sector jamming
   const sectorJammingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isSectorJammingRunningRef = useRef<boolean>(false);
-  const currentDirectionRef = useRef<"forward" | "backward">("forward");
+  const currentAzimuthDirectionRef = useRef<"forward" | "backward">("forward");
+  const currentAzimuthAngleRef = useRef<number>(parseFloat(startAngle));
+  const azimuthStartAngleRef = useRef<number>(parseFloat(startAngle));
+  const azimuthStopAngleRef = useRef<number>(parseFloat(stopAngle));
+  
+  // New refs for elevation sector jamming
+  const currentElevationAngleRef = useRef<number>(parseFloat(elevationStartAngle));
+  const elevationStartAngleRef = useRef<number>(parseFloat(elevationStartAngle));
+  const elevationStopAngleRef = useRef<number>(parseFloat(elevationStopAngle));
+  const currentElevationDirectionRef = useRef<"up" | "down">("up");
+
+  // Step sizes
+  const azimuthStepSize = 10; // 10 degrees per step for azimuth
+  const elevationStepSize = 3; // 3 degrees per step for elevation
 
   // Cleanup on unmount
   useEffect(() => {
@@ -172,156 +185,142 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
   }, []);
 
   // Single toggle function for jammer
-  const toggleJammer = async () => {
-    if (jammerStatus === "starting" || jammerStatus === "stopping") return;
+// Update the toggleJammer function - look for this section:
+const toggleJammer = async () => {
+  if (jammerStatus === "starting" || jammerStatus === "stopping") return;
 
-    const isStarting = jammerStatus !== "active";
+  const isStarting = jammerStatus !== "active";
 
-    if (isStarting) {
-      // Starting jammer
-      setJammerStatus("starting");
+  if (isStarting) {
+    // Starting jammer
+    setJammerStatus("starting");
 
-      try {
-        const token = getToken();
+    try {
+      const token = getToken();
 
-        // Get selected frequencies from checkboxes
-        const activeFrequencies = Object.keys(selectedFrequencies).filter(
-          (freq) => selectedFrequencies[freq]
-        );
+      // Get selected frequencies from checkboxes
+      const activeFrequencies = Object.keys(selectedFrequencies).filter(
+        (freq) => selectedFrequencies[freq]
+      );
 
-        if (activeFrequencies.length === 0) {
-          if (onError) {
-            onError("Please select at least one frequency band");
-          }
-          setJammerStatus("idle");
-          return;
+      if (activeFrequencies.length === 0) {
+        if (onError) {
+          onError("Please select at least one frequency band");
         }
-
-        // Frequency priority order
-        const frequencyPriority = [
-          "5.8GHz",
-          "5.2GHz",
-          "2.4GHz",
-          "4GHz",
-          "1.5GHz",
-          "<1GHz",
-        ];
-
-        // Find the highest priority selected frequency
-        const primaryFrequency =
-          frequencyPriority.find((freq) => activeFrequencies.includes(freq)) ||
-          activeFrequencies[0];
-
-        const requestBody = {
-          frequencyBand: primaryFrequency,
-          powerAttenuation: 18,
-          allSelectedBands: activeFrequencies,
-        };
-
-        console.log("Starting jammer with frequencies:", {
-          primary: primaryFrequency,
-          all: activeFrequencies,
-        });
-
-        const response = await fetch(
-          "http://192.168.100.102:8080/api/jammer/1/jam/start",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(requestBody),
-          }
-        );
-
-        if (!response.ok) {
-          if (response.status === 401) {
-            throw new Error("Authentication failed. Please login again.");
-          }
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (data.success) {
-          setJammerStatus("active");
-          if (onSuccess) {
-            onSuccess(`Jamming started on ${primaryFrequency}${
-              activeFrequencies.length > 1
-                ? ` (${activeFrequencies.length} bands selected)`
-                : ""
-            }`);
-          }
-        } else {
-          throw new Error(data.message || "Failed to start jamming");
-        }
-      } catch (error) {
-        console.error("Error starting jammer:", error);
         setJammerStatus("idle");
-        if (onError) {
-          onError(
-            error instanceof Error ? error.message : "Failed to start jamming"
-          );
-        }
+        return;
       }
-    } else {
-      // Stopping jammer
-      setJammerStatus("stopping");
 
-      try {
-        const token = getToken();
+      // Format frequency bands with commas: "5.8GHz , 5.2GHz , 2.4GHz"
+      const frequencyBandString = activeFrequencies
+        .map(freq => freq.trim()) // Trim any whitespace
+        .join(' , '); // Join with " , " (space-comma-space)
 
-        const response = await fetch(
-          "http://192.168.100.102:8080/api/jammer/1/jam/stop",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+      console.log("Formatted frequency bands:", frequencyBandString);
 
-        if (!response.ok) {
-          if (response.status === 401) {
-            throw new Error("Authentication failed. Please login again.");
-          }
-          throw new Error(`HTTP error! Status: ${response.status}`);
+      // Create request body with the exact format you want
+      const requestBody = {
+        frequencyBand: frequencyBandString,
+        powerAttenuation: 18
+      };
+
+      console.log("Request body:", JSON.stringify(requestBody, null, 2));
+      console.log("Starting jammer with frequencies:", frequencyBandString);
+
+      const response = await fetch(
+        "http://192.168.100.102:8080/api/jammer/1/jam/start",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(requestBody),
         }
+      );
 
-        const data = await response.json();
-
-        if (data.success) {
-          setJammerStatus("idle");
-          if (onSuccess) {
-            onSuccess(data.message || "Jamming stopped successfully");
-          }
-        } else {
-          throw new Error(data.message || "Failed to stop jamming");
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Authentication failed. Please login again.");
         }
-      } catch (error) {
-        console.error("Error stopping jammer:", error);
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
         setJammerStatus("active");
-        if (onError) {
-          onError(
-            error instanceof Error ? error.message : "Failed to stop jamming"
-          );
+        if (onSuccess) {
+          onSuccess(`Jamming started on ${frequencyBandString}`);
         }
+      } else {
+        throw new Error(data.message || "Failed to start jamming");
+      }
+    } catch (error) {
+      console.error("Error starting jammer:", error);
+      setJammerStatus("idle");
+      if (onError) {
+        onError(
+          error instanceof Error ? error.message : "Failed to start jamming"
+        );
       }
     }
-  };
+  } else {
+    // Stopping jammer - this part remains the same
+    setJammerStatus("stopping");
 
+    try {
+      const token = getToken();
+
+      const response = await fetch(
+        "http://192.168.100.102:8080/api/jammer/1/jam/stop",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Authentication failed. Please login again.");
+        }
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setJammerStatus("idle");
+        if (onSuccess) {
+          onSuccess(data.message || "Jamming stopped successfully");
+        }
+      } else {
+        throw new Error(data.message || "Failed to stop jamming");
+      }
+    } catch (error) {
+      console.error("Error stopping jammer:", error);
+      setJammerStatus("active");
+      if (onError) {
+        onError(
+          error instanceof Error ? error.message : "Failed to stop jamming"
+        );
+      }
+    }
+  }
+};
   // Function to set antenna position
-  const setAntennaPosition = async (azimuth: number, elevation?: number) => {
+  const setAntennaPosition = async (azimuth?: number, elevation?: number) => {
     try {
       const token = getToken();
 
       // Prepare the request body
       const requestBody = {
         command_type: "PTZ_CONTROL",
-        ptz_azimuth: azimuth,
-        ptz_elevation: elevation || parseFloat(elevationValue),
+        ptz_azimuth: azimuth !== undefined ? azimuth : parseFloat(azimuthValue),
+        ptz_elevation: elevation !== undefined ? elevation : parseFloat(elevationValue),
       };
 
       const response = await fetch(
@@ -347,7 +346,9 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
 
       if (data.success) {
         // Update local state
-        setAzimuthValue(azimuth.toString());
+        if (azimuth !== undefined) {
+          setAzimuthValue(azimuth.toString());
+        }
         if (elevation !== undefined) {
           setElevationValue(elevation.toString());
         }
@@ -366,95 +367,188 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
     }
   };
 
-  // Function to start sector jamming
- // Function to start sector jamming
-const startSectorJamming = async () => {
-  if (!sectorJammingEnabled || sectorJammingActive) return;
+  // Function to start sector jamming (now handles both azimuth and elevation)
+  const startSectorJamming = async () => {
+    if (!sectorJammingEnabled || sectorJammingActive) return;
 
-  const start = parseFloat(startAngle);
-  const stop = parseFloat(stopAngle);
-  
-  if (isNaN(start) || isNaN(stop)) {
-    if (onError) onError("Please enter valid start and stop angles");
-    return;
-  }
-
-  if (start === stop) {
-    if (onError) onError("Start and stop angles must be different");
-    return;
-  }
-
-  // Start jamming first if not already active
-  if (jammerStatus !== "active") {
-    // Call toggleJammer but don't wait for state update
-    await toggleJammer();
-    // Wait for a moment for the jammer to start
-    await new Promise(resolve => setTimeout(resolve, 1000));
-  }
-
-  setSectorJammingActive(true);
-  setSectorJammingStatus("active");
-  setCurrentSectorAngle(start);
-  isSectorJammingRunningRef.current = true;
-  currentDirectionRef.current = "forward";
-
-  // Set initial position
-  const initialSuccess = await setAntennaPosition(start);
-  if (!initialSuccess) {
-    if (onError) onError("Failed to set initial position");
-    stopSectorJamming();
-    return;
-  }
-
-  // Start continuous movement
-  sectorJammingIntervalRef.current = setInterval(async () => {
-    if (!isSectorJammingRunningRef.current) return;
-
-    let nextAngle = currentSectorAngle;
-    const stepSize = 1; // Degrees per step
-
-    // Calculate next angle based on direction
-    if (currentDirectionRef.current === "forward") {
-      nextAngle += stepSize;
-      if (nextAngle >= stop) {
-        nextAngle = stop;
-        currentDirectionRef.current = "backward";
-      }
-    } else {
-      nextAngle -= stepSize;
-      if (nextAngle <= start) {
-        nextAngle = start;
-        currentDirectionRef.current = "forward";
-      }
+    // Validate at least one axis is selected
+    if (!azimuthSectorEnabled && !elevationSectorEnabled) {
+      if (onError) onError("Please select at least one axis (Azimuth or Elevation)");
+      return;
     }
 
-    // Normalize angle to 0-360 range
-    if (nextAngle < 0) nextAngle += 360;
-    if (nextAngle >= 360) nextAngle -= 360;
+    // Validate azimuth angles if enabled
+    if (azimuthSectorEnabled) {
+      const azimuthStart = parseFloat(startAngle);
+      const azimuthStop = parseFloat(stopAngle);
+      
+      if (isNaN(azimuthStart) || isNaN(azimuthStop)) {
+        if (onError) onError("Please enter valid azimuth start and stop angles");
+        return;
+      }
 
-    // Move antenna to next position
-    const success = await setAntennaPosition(nextAngle);
-    if (success) {
-      setCurrentSectorAngle(nextAngle);
-    } else {
-      // Stop on error
-      if (onError) onError("Failed to move antenna - stopping sector jamming");
+      if (azimuthStart === azimuthStop) {
+        if (onError) onError("Azimuth start and stop angles must be different");
+        return;
+      }
+
+      // Update azimuth refs with current values
+      const actualAzimuthStart = Math.min(azimuthStart, azimuthStop);
+      const actualAzimuthStop = Math.max(azimuthStart, azimuthStop);
+      
+      azimuthStartAngleRef.current = actualAzimuthStart;
+      azimuthStopAngleRef.current = actualAzimuthStop;
+      currentAzimuthAngleRef.current = actualAzimuthStart;
+    }
+
+    // Validate elevation angles if enabled
+    if (elevationSectorEnabled) {
+      const elevationStart = parseFloat(elevationStartAngle);
+      const elevationStop = parseFloat(elevationStopAngle);
+      
+      if (isNaN(elevationStart) || isNaN(elevationStop)) {
+        if (onError) onError("Please enter valid elevation start and stop angles");
+        return;
+      }
+
+      if (elevationStart === elevationStop) {
+        if (onError) onError("Elevation start and stop angles must be different");
+        return;
+      }
+
+      // Update elevation refs with current values
+      const actualElevationStart = Math.min(elevationStart, elevationStop);
+      const actualElevationStop = Math.max(elevationStart, elevationStop);
+      
+      elevationStartAngleRef.current = actualElevationStart;
+      elevationStopAngleRef.current = actualElevationStop;
+      currentElevationAngleRef.current = actualElevationStart;
+    }
+
+    // Start jamming first if not already active
+    if (jammerStatus !== "active") {
+      await toggleJammer();
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    setSectorJammingActive(true);
+    setSectorJammingStatus("active");
+    
+    if (azimuthSectorEnabled) {
+      setCurrentSectorAngle(azimuthStartAngleRef.current);
+    }
+    if (elevationSectorEnabled) {
+      setCurrentElevationAngle(elevationStartAngleRef.current);
+    }
+    
+    isSectorJammingRunningRef.current = true;
+    currentAzimuthDirectionRef.current = "forward";
+    currentElevationDirectionRef.current = "up";
+
+    // Set initial position
+    const initialAzimuth = azimuthSectorEnabled ? azimuthStartAngleRef.current : undefined;
+    const initialElevation = elevationSectorEnabled ? elevationStartAngleRef.current : undefined;
+    
+    const initialSuccess = await setAntennaPosition(initialAzimuth, initialElevation);
+    if (!initialSuccess) {
+      if (onError) onError("Failed to set initial position");
       stopSectorJamming();
+      return;
     }
-  }, 1000); // Move every second
-  
-  if (onSuccess) {
-    onSuccess(`Sector jamming started from ${start}° to ${stop}°`);
-  }
-};
+
+    // Clear any existing interval
+    if (sectorJammingIntervalRef.current) {
+      clearInterval(sectorJammingIntervalRef.current);
+    }
+
+    // Start continuous movement with different step sizes for azimuth and elevation
+    sectorJammingIntervalRef.current = setInterval(async () => {
+      if (!isSectorJammingRunningRef.current) return;
+
+      let nextAzimuth = currentAzimuthAngleRef.current;
+      let nextElevation = currentElevationAngleRef.current;
+      let moveAzimuth = false;
+      let moveElevation = false;
+
+      // Calculate next azimuth angle based on direction (if enabled)
+      if (azimuthSectorEnabled) {
+        moveAzimuth = true;
+        if (currentAzimuthDirectionRef.current === "forward") {
+          nextAzimuth += azimuthStepSize;
+          if (nextAzimuth > azimuthStopAngleRef.current) {
+            nextAzimuth = azimuthStopAngleRef.current;
+            currentAzimuthDirectionRef.current = "backward";
+          }
+        } else {
+          nextAzimuth -= azimuthStepSize;
+          if (nextAzimuth < azimuthStartAngleRef.current) {
+            nextAzimuth = azimuthStartAngleRef.current;
+            currentAzimuthDirectionRef.current = "forward";
+          }
+        }
+      }
+
+      // Calculate next elevation angle based on direction (if enabled)
+      if (elevationSectorEnabled) {
+        moveElevation = true;
+        if (currentElevationDirectionRef.current === "up") {
+          nextElevation += elevationStepSize;
+          if (nextElevation > elevationStopAngleRef.current) {
+            nextElevation = elevationStopAngleRef.current;
+            currentElevationDirectionRef.current = "down";
+          }
+        } else {
+          nextElevation -= elevationStepSize;
+          if (nextElevation < elevationStartAngleRef.current) {
+            nextElevation = elevationStartAngleRef.current;
+            currentElevationDirectionRef.current = "up";
+          }
+        }
+      }
+
+      // Move antenna to next position
+      const success = await setAntennaPosition(
+        moveAzimuth ? nextAzimuth : undefined,
+        moveElevation ? nextElevation : undefined
+      );
+      
+      if (success) {
+        if (moveAzimuth) {
+          currentAzimuthAngleRef.current = nextAzimuth;
+          setCurrentSectorAngle(nextAzimuth);
+        }
+        if (moveElevation) {
+          currentElevationAngleRef.current = nextElevation;
+          setCurrentElevationAngle(nextElevation);
+        }
+      } else {
+        // Stop on error
+        if (onError) onError("Failed to move antenna - stopping sector jamming");
+        stopSectorJamming();
+      }
+    }, 1000); // Move every second
+    
+    if (onSuccess) {
+      let message = "Sector jamming started";
+      if (azimuthSectorEnabled) {
+        message += ` (Azimuth: ${azimuthStartAngleRef.current}° to ${azimuthStopAngleRef.current}° with ${azimuthStepSize}° steps)`;
+      }
+      if (elevationSectorEnabled) {
+        message += ` (Elevation: ${elevationStartAngleRef.current}° to ${elevationStopAngleRef.current}° with ${elevationStepSize}° steps)`;
+      }
+      onSuccess(message);
+    }
+  };
+
   // Function to stop sector jamming
   const stopSectorJamming = () => {
+    isSectorJammingRunningRef.current = false;
+    
     if (sectorJammingIntervalRef.current) {
       clearInterval(sectorJammingIntervalRef.current);
       sectorJammingIntervalRef.current = null;
     }
     
-    isSectorJammingRunningRef.current = false;
     setSectorJammingActive(false);
     setSectorJammingStatus("idle");
     
@@ -545,7 +639,7 @@ const startSectorJamming = async () => {
   return (
     <Box className="jammer-control-panel">
       {/* Jammer Status */}
-      <Box sx={{ mb: 2, textAlign: "center" }}>
+      {/* <Box sx={{ mb: 2, textAlign: "center" }}>
         <Typography
           variant="subtitle2"
           sx={{
@@ -557,20 +651,46 @@ const startSectorJamming = async () => {
           {statusDisplay.text}
         </Typography>
         {sectorJammingActive && (
-          <Typography
-            variant="caption"
-            sx={{
-              color: "#00ff41",
-              fontWeight: "bold",
-              fontSize: "10px",
-              display: "block",
-              mt: 0.5,
-            }}
-          >
-            Sector: {currentSectorAngle.toFixed(1)}° ({sectorJammingStatus})
-          </Typography>
+          <>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "#00ff41",
+                fontWeight: "bold",
+                fontSize: "10px",
+                display: "block",
+                mt: 0.5,
+              }}
+            >
+              Sector Status: {sectorJammingStatus}
+            </Typography>
+            {azimuthSectorEnabled && (
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "#00ff41",
+                  fontSize: "9px",
+                  display: "block",
+                }}
+              >
+                Azimuth: {currentSectorAngle.toFixed(1)}° ({azimuthStepSize}° steps)
+              </Typography>
+            )}
+            {elevationSectorEnabled && (
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "#00ff41",
+                  fontSize: "9px",
+                  display: "block",
+                }}
+              >
+                Elevation: {currentElevationAngle.toFixed(1)}° ({elevationStepSize}° steps)
+              </Typography>
+            )}
+          </>
         )}
-      </Box>
+      </Box> */}
 
       {/* Frequency Checkboxes */}
       <FrequencyCheckboxes
@@ -660,7 +780,7 @@ const startSectorJamming = async () => {
           onAzimuthChange={(value) => setAzimuthValue(value.toString())}
           onElevationChange={(value) => setElevationValue(value.toString())}
           setAzimuth={(value) => setAntennaPosition(value)}
-          setElevation={(value) => setAntennaPosition(parseFloat(azimuthValue), value)}
+          setElevation={(value) => setAntennaPosition(undefined, value)}
           // Sector jamming props
           sectorJammingEnabled={sectorJammingEnabled}
           setSectorJammingEnabled={setSectorJammingEnabled}
@@ -673,6 +793,17 @@ const startSectorJamming = async () => {
           onStartSectorJamming={startSectorJamming}
           onStopSectorJamming={stopSectorJamming}
           onToggleSectorJammingPause={toggleSectorJammingPause}
+          currentSectorAngle={currentSectorAngle}
+          // New props for elevation sector jamming
+          azimuthSectorEnabled={azimuthSectorEnabled}
+          setAzimuthSectorEnabled={setAzimuthSectorEnabled}
+          elevationSectorEnabled={elevationSectorEnabled}
+          setElevationSectorEnabled={setElevationSectorEnabled}
+          elevationStartAngle={elevationStartAngle}
+          setElevationStartAngle={setElevationStartAngle}
+          elevationStopAngle={elevationStopAngle}
+          setElevationStopAngle={setElevationStopAngle}
+          currentElevationAngle={currentElevationAngle}
         />
       )}
     </Box>
