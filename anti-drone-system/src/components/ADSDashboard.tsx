@@ -269,7 +269,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   // Fetch spectrum data periodically
   useEffect(() => {
     console.log("Setting up spectrum data interval");
-    const interval = setInterval(fetchSpectrumData, 100);
+    const interval = setInterval(fetchSpectrumData, 1000);
     fetchSpectrumData(); // Initial fetch
     
     return () => {
@@ -354,7 +354,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       } catch (error) {
         console.error("Error fetching azimuth:", error);
       }
-    }, 1000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
