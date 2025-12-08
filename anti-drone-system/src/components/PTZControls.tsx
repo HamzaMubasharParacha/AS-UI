@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, Slider } from "@mui/material";
 import CircularSlider from "@fseehawer/react-circular-slider";
 
 interface PTZControlsProps {
-  coneangle: number;
+  coneangle: number; // Real current angle from API
   coneelevation: number;
   azimuthValue: string;
   elevationValue: string;
@@ -11,10 +11,22 @@ interface PTZControlsProps {
   onElevationChange: (value: number) => void;
   setAzimuth: (value: number) => void;
   setElevation: (value: number) => void;
+  // Sector jamming props
+  sectorJammingEnabled: boolean;
+  setSectorJammingEnabled: (enabled: boolean) => void;
+  startAngle: string;
+  setStartAngle: (angle: string) => void;
+  stopAngle: string;
+  setStopAngle: (angle: string) => void;
+  sectorJammingActive: boolean;
+  sectorJammingStatus: "idle" | "active" | "paused";
+  onStartSectorJamming: () => void;
+  onStopSectorJamming: () => void;
+  onToggleSectorJammingPause: () => void;
 }
 
 const PTZControls: React.FC<PTZControlsProps> = ({
-  coneangle,
+  coneangle, // Real angle from API
   coneelevation,
   azimuthValue,
   elevationValue,
@@ -22,10 +34,38 @@ const PTZControls: React.FC<PTZControlsProps> = ({
   onElevationChange,
   setAzimuth,
   setElevation,
+  // Sector jamming props
+  sectorJammingEnabled,
+  setSectorJammingEnabled,
+  startAngle,
+  setStartAngle,
+  stopAngle,
+  setStopAngle,
+  sectorJammingActive,
+  sectorJammingStatus,
+  onStartSectorJamming,
+  onStopSectorJamming,
+  onToggleSectorJammingPause,
 }) => {
+  const [sliderValue, setSliderValue] = useState<number>(coneangle);
   
+  // Sync the circular slider with the real coneangle whenever it changes
+  useEffect(() => {
+    // Update slider value to match real antenna position
+    setSliderValue(coneangle);
+    
+    // Also update the azimuthValue display to show current position
+    onAzimuthChange(coneangle);
+  }, [coneangle]);
+
   const handleAzimuthChange = (value: number) => {
+    // Update local slider value
+    setSliderValue(value);
+    
+    // Update the display value
     onAzimuthChange(value);
+    
+    // Send command to move antenna
     setAzimuth(value);
   };
 
@@ -33,6 +73,63 @@ const PTZControls: React.FC<PTZControlsProps> = ({
     onElevationChange(value);
     setElevation(value);
   };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSectorJammingEnabled(e.target.checked);
+  };
+
+  const handleStartAngleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setStartAngle(value);
+    }
+  };
+
+  const handleStopAngleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setStopAngle(value);
+    }
+  };
+
+  const handleStartSectorJamming = () => {
+    onStartSectorJamming();
+  };
+
+  const getSectorJammingButtonConfig = () => {
+    if (!sectorJammingActive) {
+      return {
+        text: "START SECTOR JAMMING",
+        color: "#000",
+        bgColor: "#00ff41",
+        hoverBgColor: "rgba(0, 255, 65, 0.8)",
+        onClick: handleStartSectorJamming,
+        disabled: !sectorJammingEnabled,
+      };
+    } else {
+      if (sectorJammingStatus === "paused") {
+        return {
+          text: "RESUME JAMMING",
+          color: "#000",
+          bgColor: "#ffaa00",
+          hoverBgColor: "rgba(255, 170, 0, 0.8)",
+          onClick: onToggleSectorJammingPause,
+          disabled: false,
+        };
+      } else {
+        return {
+          text: "STOP SECTOR JAMMING",
+          color: "#fff",
+          bgColor: "#ff4444",
+          hoverBgColor: "rgba(255, 68, 68, 0.8)",
+          onClick: onStopSectorJamming,
+          disabled: false,
+        };
+      }
+    }
+  };
+
+  const sectorJammingButtonConfig = getSectorJammingButtonConfig();
 
   return (
     <Box className="ptz-controls">
@@ -57,10 +154,10 @@ const PTZControls: React.FC<PTZControlsProps> = ({
           justifyContent: "center",
           alignItems: "center",
           gap: 3,
-          mb: 2,
+          mb: 3,
         }}
       >
-        {/* Circular Slider for Azimuth */}
+        {/* Circular Slider for Azimuth - Use coneangle as value */}
         <Box
           sx={{
             display: "flex",
@@ -95,6 +192,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
               labelFontSize="0px"
               valueFontSize="0px"
               verticalOffset="10px"
+              value={sliderValue} // Use the synchronized value
               onChange={(value) => {
                 const numValue = value as number;
                 handleAzimuthChange(numValue);
@@ -112,6 +210,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                 pointerEvents: "none",
               }}
             >
+              {/* ... existing markings code ... */}
               {[
                 { angle: 0, value: "0°" },
                 { angle: 45, value: "45°" },
@@ -187,11 +286,11 @@ const PTZControls: React.FC<PTZControlsProps> = ({
               fontWeight: "bold",
             }}
           >
-            Azimuth: {azimuthValue}°
+            Azimuth: {coneangle.toFixed(1)}° {/* Show real angle */}
           </Typography>
         </Box>
 
-        {/* Vertical Slider for Elevation */}
+        {/* Vertical Slider for Elevation - Already using real elevation */}
         <Box
           sx={{
             display: "flex",
@@ -216,7 +315,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
               orientation="vertical"
               min={-80}
               max={15}
-              value={parseFloat(elevationValue) || 0}
+              value={coneelevation || parseFloat(elevationValue) || 0} // Use real elevation
               onChange={(event, value) => {
                 const numValue = value as number;
                 handleElevationChange(numValue);
@@ -310,9 +409,228 @@ const PTZControls: React.FC<PTZControlsProps> = ({
               fontWeight: "bold",
             }}
           >
-            Elevation: {elevationValue}°
+            Elevation: {coneelevation.toFixed(1)}° {/* Show real elevation */}
           </Typography>
         </Box>
+      </Box>
+
+      {/* Sector Jamming Section */}
+      <Box
+        sx={{
+          borderTop: "1px solid rgba(0, 255, 65, 0.3)",
+          pt: 2,
+          mt: 2,
+          position: "relative",
+        }}
+      >
+        {/* Checkbox and Label */}
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", mb: 2 }}>
+          <input 
+            type="checkbox" 
+            id="sector-jamming"
+            checked={sectorJammingEnabled}
+            onChange={handleCheckboxChange}
+            style={{
+              appearance: "none",
+              width: "16px",
+              height: "16px",
+              border: "2px solid #00ff41",
+              borderRadius: "3px",
+              backgroundColor: sectorJammingEnabled ? "#00ff41" : "rgba(0, 255, 65, 0.1)",
+              cursor: "pointer",
+              marginRight: "8px",
+              position: "relative",
+              boxShadow: sectorJammingEnabled ? "0 0 10px rgba(0, 255, 65, 0.8)" : "none",
+            }}
+          />
+          <label 
+            htmlFor="sector-jamming"
+            style={{
+              color: "#00ff41",
+              fontSize: "12px",
+              fontFamily: "monospace",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Sector Jamming
+          </label>
+        </Box>
+
+        {/* Show these controls only when checkbox is checked */}
+        {sectorJammingEnabled && (
+          <>
+            {/* Angle Inputs */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                gap: 3,
+                mb: 2,
+              }}
+            >
+              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <label 
+                  style={{
+                    color: "#00ff41",
+                    fontSize: "11px",
+                    fontFamily: "monospace",
+                    marginBottom: "4px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Start Angle
+                </label>
+                <input 
+                  type="text" 
+                  value={startAngle}
+                  onChange={handleStartAngleChange}
+                  disabled={sectorJammingActive}
+                  style={{
+                    width: "80px",
+                    padding: "6px 8px",
+                    backgroundColor: sectorJammingActive 
+                      ? "rgba(0, 255, 65, 0.05)" 
+                      : "rgba(0, 255, 65, 0.05)",
+                    border: "1px solid rgba(0, 255, 65, 0.3)",
+                    borderRadius: "4px",
+                    color: "#00ff41",
+                    fontFamily: "monospace",
+                    fontSize: "12px",
+                    textAlign: "center",
+                    outline: "none",
+                    opacity: sectorJammingActive ? 0.7 : 1,
+                  }}
+                />
+              </Box>
+
+              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <label 
+                  style={{
+                    color: "#00ff41",
+                    fontSize: "11px",
+                    fontFamily: "monospace",
+                    marginBottom: "4px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Stop Angle
+                </label>
+                <input 
+                  type="text" 
+                  value={stopAngle}
+                  onChange={handleStopAngleChange}
+                  disabled={sectorJammingActive}
+                  style={{
+                    width: "80px",
+                    padding: "6px 8px",
+                    backgroundColor: sectorJammingActive 
+                      ? "rgba(0, 255, 65, 0.05)" 
+                      : "rgba(0, 255, 65, 0.05)",
+                    border: "1px solid rgba(0, 255, 65, 0.3)",
+                    borderRadius: "4px",
+                    color: "#00ff41",
+                    fontFamily: "monospace",
+                    fontSize: "12px",
+                    textAlign: "center",
+                    outline: "none",
+                    opacity: sectorJammingActive ? 0.7 : 1,
+                  }}
+                />
+              </Box>
+            </Box>
+
+            {/* Control Buttons */}
+            <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mb: 1 }}>
+              {sectorJammingActive && (
+                <button
+                  onClick={onToggleSectorJammingPause}
+                  style={{
+                    backgroundColor: sectorJammingStatus === "paused" ? "#00ff41" : "#ffaa00",
+                    color: sectorJammingStatus === "paused" ? "#000" : "#000",
+                    border: "1px solid rgba(0, 255, 65, 0.5)",
+                    borderRadius: "4px",
+                    padding: "8px 16px",
+                    fontFamily: "monospace",
+                    fontSize: "10px",
+                    fontWeight: "bold",
+                    textTransform: "uppercase",
+                    letterSpacing: "1px",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                    boxShadow: `0 0 10px ${
+                      sectorJammingStatus === "paused" 
+                        ? "rgba(0, 255, 65, 0.5)" 
+                        : "rgba(255, 170, 0, 0.5)"
+                    }`,
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.opacity = "0.8";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.opacity = "1";
+                  }}
+                >
+                  {sectorJammingStatus === "paused" ? "RESUME" : "PAUSE"}
+                </button>
+              )}
+
+              {/* Main Sector Jamming Button */}
+              <button
+                onClick={sectorJammingButtonConfig.onClick}
+                disabled={sectorJammingButtonConfig.disabled}
+                style={{
+                  backgroundColor: sectorJammingButtonConfig.bgColor,
+                  color: sectorJammingButtonConfig.color,
+                  border: "1px solid rgba(0, 255, 65, 0.5)",
+                  borderRadius: "4px",
+                  padding: "8px 24px",
+                  fontFamily: "monospace",
+                  fontSize: "11px",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  cursor: sectorJammingButtonConfig.disabled ? "not-allowed" : "pointer",
+                  transition: "all 0.3s ease",
+                  boxShadow: `0 0 15px ${sectorJammingButtonConfig.bgColor}80`,
+                  opacity: sectorJammingButtonConfig.disabled ? 0.5 : 1,
+                }}
+                onMouseOver={(e) => {
+                  if (!sectorJammingButtonConfig.disabled) {
+                    e.currentTarget.style.backgroundColor = sectorJammingButtonConfig.hoverBgColor;
+                    e.currentTarget.style.boxShadow = `0 0 20px ${sectorJammingButtonConfig.bgColor}`;
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (!sectorJammingButtonConfig.disabled) {
+                    e.currentTarget.style.backgroundColor = sectorJammingButtonConfig.bgColor;
+                    e.currentTarget.style.boxShadow = `0 0 15px ${sectorJammingButtonConfig.bgColor}80`;
+                  }
+                }}
+              >
+                {sectorJammingButtonConfig.text}
+              </button>
+            </Box>
+
+            {/* Status Indicator */}
+            {sectorJammingActive && (
+              <Box sx={{ textAlign: "center", mt: 1 }}>
+                <Typography
+                  sx={{
+                    color: sectorJammingStatus === "active" ? "#00ff41" : "#ffaa00",
+                    fontSize: "10px",
+                    fontFamily: "monospace",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {sectorJammingStatus === "active" 
+                    ? "▶️ SCANNING SECTOR" 
+                    : "⏸️ PAUSED"}
+                </Typography>
+              </Box>
+            )}
+          </>
+        )}
       </Box>
     </Box>
   );

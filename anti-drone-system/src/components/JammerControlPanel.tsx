@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -14,6 +14,16 @@ interface JammerControlPanelProps {
   coneelevation: number;
   onError?: (error: string) => void;
   onSuccess?: (message: string) => void;
+}
+
+interface SectorJammingConfig {
+  startAngle: number;
+  stopAngle: number;
+  stepSize: number;
+  direction: "forward" | "backward";
+  isActive: boolean;
+  intervalId: NodeJS.Timeout | null;
+  currentAngle: number;
 }
 
 // Enhanced getToken function with fallback
@@ -139,6 +149,27 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
   const [showPtzControls, setShowPtzControls] = useState(false);
   const [azimuthValue, setAzimuthValue] = useState<string>(coneangle.toString());
   const [elevationValue, setElevationValue] = useState<string>(coneelevation.toString());
+
+  // Sector jamming state
+  const [sectorJammingEnabled, setSectorJammingEnabled] = useState(false);
+  const [startAngle, setStartAngle] = useState<string>("0");
+  const [stopAngle, setStopAngle] = useState<string>("90");
+  const [sectorJammingActive, setSectorJammingActive] = useState(false);
+  const [sectorJammingStatus, setSectorJammingStatus] = useState<"idle" | "active" | "paused">("idle");
+  const [currentSectorAngle, setCurrentSectorAngle] = useState<number>(parseFloat(startAngle));
+  
+  const sectorJammingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isSectorJammingRunningRef = useRef<boolean>(false);
+  const currentDirectionRef = useRef<"forward" | "backward">("forward");
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (sectorJammingIntervalRef.current) {
+        clearInterval(sectorJammingIntervalRef.current);
+      }
+    };
+  }, []);
 
   // Single toggle function for jammer
   const toggleJammer = async () => {
@@ -281,27 +312,16 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
     }
   };
 
-  const handleFrequencyChange =
-    (frequency: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setSelectedFrequencies((prev) => ({
-        ...prev,
-        [frequency]: event.target.checked,
-      }));
-    };
-
-  // Single function to set both azimuth and elevation
-  const setAntennaPosition = async (
-    type: "azimuth" | "elevation",
-    value: number
-  ) => {
+  // Function to set antenna position
+  const setAntennaPosition = async (azimuth: number, elevation?: number) => {
     try {
       const token = getToken();
 
-      // Prepare the request body based on your API structure
+      // Prepare the request body
       const requestBody = {
         command_type: "PTZ_CONTROL",
-        ptz_azimuth: type === "azimuth" ? value : parseFloat(azimuthValue),
-        ptz_elevation: type === "elevation" ? value : parseFloat(elevationValue),
+        ptz_azimuth: azimuth,
+        ptz_elevation: elevation || parseFloat(elevationValue),
       };
 
       const response = await fetch(
@@ -326,28 +346,142 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
       const data = await response.json();
 
       if (data.success) {
-        if (onSuccess) {
-          onSuccess(`${type === "azimuth" ? "Azimuth" : "Elevation"} set to ${value}°`);
+        // Update local state
+        setAzimuthValue(azimuth.toString());
+        if (elevation !== undefined) {
+          setElevationValue(elevation.toString());
         }
-
-        // Update the local state
-        if (type === "azimuth") {
-          setAzimuthValue(value.toString());
-        } else {
-          setElevationValue(value.toString());
-        }
+        return true;
       } else {
-        throw new Error(data.message || `Failed to set ${type}`);
+        throw new Error(data.message || "Failed to set antenna position");
       }
     } catch (error) {
-      console.error(`Error setting ${type}:`, error);
+      console.error("Error setting antenna position:", error);
       if (onError) {
         onError(
-          error instanceof Error ? error.message : `Failed to set ${type}`
+          error instanceof Error ? error.message : "Failed to set antenna position"
         );
       }
+      return false;
     }
   };
+
+  // Function to start sector jamming
+ // Function to start sector jamming
+const startSectorJamming = async () => {
+  if (!sectorJammingEnabled || sectorJammingActive) return;
+
+  const start = parseFloat(startAngle);
+  const stop = parseFloat(stopAngle);
+  
+  if (isNaN(start) || isNaN(stop)) {
+    if (onError) onError("Please enter valid start and stop angles");
+    return;
+  }
+
+  if (start === stop) {
+    if (onError) onError("Start and stop angles must be different");
+    return;
+  }
+
+  // Start jamming first if not already active
+  if (jammerStatus !== "active") {
+    // Call toggleJammer but don't wait for state update
+    await toggleJammer();
+    // Wait for a moment for the jammer to start
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+
+  setSectorJammingActive(true);
+  setSectorJammingStatus("active");
+  setCurrentSectorAngle(start);
+  isSectorJammingRunningRef.current = true;
+  currentDirectionRef.current = "forward";
+
+  // Set initial position
+  const initialSuccess = await setAntennaPosition(start);
+  if (!initialSuccess) {
+    if (onError) onError("Failed to set initial position");
+    stopSectorJamming();
+    return;
+  }
+
+  // Start continuous movement
+  sectorJammingIntervalRef.current = setInterval(async () => {
+    if (!isSectorJammingRunningRef.current) return;
+
+    let nextAngle = currentSectorAngle;
+    const stepSize = 1; // Degrees per step
+
+    // Calculate next angle based on direction
+    if (currentDirectionRef.current === "forward") {
+      nextAngle += stepSize;
+      if (nextAngle >= stop) {
+        nextAngle = stop;
+        currentDirectionRef.current = "backward";
+      }
+    } else {
+      nextAngle -= stepSize;
+      if (nextAngle <= start) {
+        nextAngle = start;
+        currentDirectionRef.current = "forward";
+      }
+    }
+
+    // Normalize angle to 0-360 range
+    if (nextAngle < 0) nextAngle += 360;
+    if (nextAngle >= 360) nextAngle -= 360;
+
+    // Move antenna to next position
+    const success = await setAntennaPosition(nextAngle);
+    if (success) {
+      setCurrentSectorAngle(nextAngle);
+    } else {
+      // Stop on error
+      if (onError) onError("Failed to move antenna - stopping sector jamming");
+      stopSectorJamming();
+    }
+  }, 1000); // Move every second
+  
+  if (onSuccess) {
+    onSuccess(`Sector jamming started from ${start}° to ${stop}°`);
+  }
+};
+  // Function to stop sector jamming
+  const stopSectorJamming = () => {
+    if (sectorJammingIntervalRef.current) {
+      clearInterval(sectorJammingIntervalRef.current);
+      sectorJammingIntervalRef.current = null;
+    }
+    
+    isSectorJammingRunningRef.current = false;
+    setSectorJammingActive(false);
+    setSectorJammingStatus("idle");
+    
+    if (onSuccess) {
+      onSuccess("Sector jamming stopped");
+    }
+  };
+
+  // Function to pause/resume sector jamming
+  const toggleSectorJammingPause = () => {
+    if (!sectorJammingActive) return;
+    
+    isSectorJammingRunningRef.current = !isSectorJammingRunningRef.current;
+    setSectorJammingStatus(isSectorJammingRunningRef.current ? "active" : "paused");
+    
+    if (onSuccess) {
+      onSuccess(isSectorJammingRunningRef.current ? "Sector jamming resumed" : "Sector jamming paused");
+    }
+  };
+
+  const handleFrequencyChange =
+    (frequency: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSelectedFrequencies((prev) => ({
+        ...prev,
+        [frequency]: event.target.checked,
+      }));
+    };
 
   // Get count of selected frequencies
   const selectedFrequencyCount =
@@ -422,6 +556,20 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
         >
           {statusDisplay.text}
         </Typography>
+        {sectorJammingActive && (
+          <Typography
+            variant="caption"
+            sx={{
+              color: "#00ff41",
+              fontWeight: "bold",
+              fontSize: "10px",
+              display: "block",
+              mt: 0.5,
+            }}
+          >
+            Sector: {currentSectorAngle.toFixed(1)}° ({sectorJammingStatus})
+          </Typography>
+        )}
       </Box>
 
       {/* Frequency Checkboxes */}
@@ -511,8 +659,20 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
           elevationValue={elevationValue}
           onAzimuthChange={(value) => setAzimuthValue(value.toString())}
           onElevationChange={(value) => setElevationValue(value.toString())}
-          setAzimuth={(value) => setAntennaPosition("azimuth", value)}
-          setElevation={(value) => setAntennaPosition("elevation", value)}
+          setAzimuth={(value) => setAntennaPosition(value)}
+          setElevation={(value) => setAntennaPosition(parseFloat(azimuthValue), value)}
+          // Sector jamming props
+          sectorJammingEnabled={sectorJammingEnabled}
+          setSectorJammingEnabled={setSectorJammingEnabled}
+          startAngle={startAngle}
+          setStartAngle={setStartAngle}
+          stopAngle={stopAngle}
+          setStopAngle={setStopAngle}
+          sectorJammingActive={sectorJammingActive}
+          sectorJammingStatus={sectorJammingStatus}
+          onStartSectorJamming={startSectorJamming}
+          onStopSectorJamming={stopSectorJamming}
+          onToggleSectorJammingPause={toggleSectorJammingPause}
         />
       )}
     </Box>

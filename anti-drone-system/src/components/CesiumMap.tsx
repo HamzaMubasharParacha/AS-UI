@@ -584,7 +584,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         <MapLayerControls onLayerChange={setActiveLayer} />
         <MapInformationControls activeLayer={activeLayer} />
         <MapRotateTracker onBearingChange={setMapBearing} />
-        <MapDrawingTools></MapDrawingTools>
+        {/* <MapDrawingTools></MapDrawingTools> */}
 
         {/* Triangle Cone */}
         {showTriangleCone && (
