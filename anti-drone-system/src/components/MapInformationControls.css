@@ -1,5 +1,5 @@
 .map-info-control {
-  color: white;
+  color: white !important;
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid #00ff41;
   border-style: solid;

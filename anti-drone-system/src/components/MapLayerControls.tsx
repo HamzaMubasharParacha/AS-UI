@@ -26,16 +26,12 @@ const MapLayerControls: React.FC<MapLayerControlsProps> = ({
     OpenStreetMap: L.tileLayer(
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
       }
     ),
     Satellite: L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
       {
-        attribution:
-          "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
         maxZoom: 19,
       }
     ),
@@ -106,16 +102,16 @@ const MapLayerControls: React.FC<MapLayerControlsProps> = ({
   return (
     <div className="map-layer-controls-container">
       {/* Main Button */}
-<Button
-  ref={buttonRef}
-  className="map-type-button"
-  onClick={toggleDropdown}
-  title="Select Map Type"
->
-  <span className="button-icon">{getLayerIcon(selectedLayer)}</span>
-  <span className="button-text">{selectedLayer}</span>
-  <span className="button-arrow">{isOpen ? "▲" : "▼"}</span>
-</Button>
+      <Button
+        ref={buttonRef}
+        className="map-type-button"
+        onClick={toggleDropdown}
+        title="Select Map Type"
+      >
+        <span className="button-icon">{getLayerIcon(selectedLayer)}</span>
+        <span className="button-text">{selectedLayer}</span>
+        <span className="button-arrow">{isOpen ? "▲" : "▼"}</span>
+      </Button>
       {/* <div
         ref={buttonRef}
         className="map-type-button"

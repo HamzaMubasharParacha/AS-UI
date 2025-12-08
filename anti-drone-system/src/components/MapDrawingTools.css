@@ -1,3 +1,23 @@
-.leaflet-bar{
-    color: black;
+
+.leaflet-bar,
+.leaflet-control{
+  color: black;
+  border: 1px solid #00ff41 !important;
+  background: rgba(0,0,0,0.2) !important;
+  /* width: 250px !important; */
+}
+
+.leaflet-bar.leaflet-control button {
+  background-color: rgba(0, 255, 65, 0.1) !important;
+  color: #00ff41 !important;
+  border: 1px solid #00ff41 !important;
+}
+
+.leaflet-bar.leaflet-control.custom-marker-button{
+  background-color: rgba(0, 255, 65, 0.1) !important;
+}
+
+.leaflet-bar.leaflet-control.custom-dropdown-control{
+  width: 300px !important;
+  background: rgba(0, 255, 65, 0.1) !important;
 }

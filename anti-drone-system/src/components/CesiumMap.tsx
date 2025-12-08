@@ -157,7 +157,7 @@ interface CesiumMapProps {
   drawingToolsEnabled?: boolean;
   coneangle: number;
   coneelevation: number;
-  jammerStatus: boolean;
+  jammerStatus: String;
 }
 
 // Fix Leaflet default markers
@@ -529,25 +529,25 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         <JammerControlPanel
           coneangle={coneangle}
           coneelevation={coneelevation}
-          // onError={(error) => {
-          //   setSnackbar({
-          //     open: true,
-          //     message: error,
-          //     severity: "error",
-          //   });
-          // }}
-          // onSuccess={(message) => {
-          //   setSnackbar({
-          //     open: true,
-          //     message: message,
-          //     severity: "success",
-          //   });
-          // }}
+          onError={(error) => {
+            setSnackbar({
+              open: true,
+              message: error,
+              severity: "error",
+            });
+          }}
+          onSuccess={(message) => {
+            setSnackbar({
+              open: true,
+              message: message,
+              severity: "success",
+            });
+          }}
         />
       )}
 
       {/* Snackbar for notifications */}
-      {/* <Snackbar
+      <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}
         onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
@@ -560,7 +560,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         >
           {snackbar.message}
         </Alert>
-      </Snackbar> */}
+      </Snackbar>
 
       {/* Compass Component */}
       <Compass bearing={mapBearing} size={100} position="bottom-left" />
@@ -584,7 +584,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         <MapLayerControls onLayerChange={setActiveLayer} />
         <MapInformationControls activeLayer={activeLayer} />
         <MapRotateTracker onBearingChange={setMapBearing} />
-        {/* <MapDrawingTools></MapDrawingTools> */}
+        <MapDrawingTools></MapDrawingTools>
 
         {/* Triangle Cone */}
         {showTriangleCone && (
@@ -620,7 +620,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           radius={radius10km}
           pathOptions={{
             color: "#00E676",
-            fillColor: "#00E676",
+            fillColor: "#000000ff",
             fillOpacity: 0.1,
             weight: 2,
             dashArray: "5, 8",
