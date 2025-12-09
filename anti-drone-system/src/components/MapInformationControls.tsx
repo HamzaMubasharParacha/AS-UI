@@ -75,7 +75,7 @@ const MapInformationControls: React.FC<MapInformationControlsProps> = ({ activeL
   useEffect(() => {
     const mapTypeDiv = document.getElementById("map-type");
     if (mapTypeDiv) {
-      mapTypeDiv.innerHTML = `Type: <b>${activeLayer || "OpenStreetMap"}</b>`;
+      mapTypeDiv.innerHTML = `Type: <b>${activeLayer || "Sattelite"}</b>`;
     }
   }, [activeLayer]);
 

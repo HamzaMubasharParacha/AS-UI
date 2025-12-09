@@ -14,12 +14,10 @@
   left: 120px;
 }
 
-.map-info-control .info-header {
-  margin-bottom: 6px;
-  font-size: 14px;
+.map-info-control{
+  margin-bottom: 100px !important;
 }
 
-#units {
-  cursor: pointer;
-  color: #0077ff;
+.map-info-control .info-header {
+  font-size: 14px;
 }

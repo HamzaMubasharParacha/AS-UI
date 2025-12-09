@@ -48,19 +48,22 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
   const map = useMap();
   const [shapes, setShapes] = useState<Shape[]>([]);
   const drawnItems = useRef<L.FeatureGroup>(new L.FeatureGroup()).current;
-  
+
   // State for current marker icon selection
-  const [currentMarkerIcon, setCurrentMarkerIcon] = useState<string>(defaultMarkerIcon);
-  
+  const [currentMarkerIcon, setCurrentMarkerIcon] =
+    useState<string>(defaultMarkerIcon);
+
   // State to control marker icon dropdown
-  const [showMarkerIconDropdown, setShowMarkerIconDropdown] = useState<boolean>(false);
-  
+  const [showMarkerIconDropdown, setShowMarkerIconDropdown] =
+    useState<boolean>(false);
+
   // Track if we're in marker drawing mode
-  const [isMarkerDrawingMode, setIsMarkerDrawingMode] = useState<boolean>(false);
-  
+  const [isMarkerDrawingMode, setIsMarkerDrawingMode] =
+    useState<boolean>(false);
+
   // Ref to store the currently selected icon
   const selectedIconRef = useRef<string>(defaultMarkerIcon);
-  
+
   // Refs for controls
   const drawControlRef = useRef<any>(null);
   const markerControlRef = useRef<any>(null);
@@ -79,13 +82,16 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
   }, []);
 
   // Common polygon style function
-  const commonPolygonStyle = useCallback((): L.PathOptions => ({
-    color: "#00ff41",
-    fillColor: "#00ff41",
-    fillOpacity: 0.2,
-    weight: 2,
-    opacity: 0.8,
-  }), []);
+  const commonPolygonStyle = useCallback(
+    (): L.PathOptions => ({
+      color: "#00ff41",
+      fillColor: "#00ff41",
+      fillOpacity: 0.2,
+      weight: 2,
+      opacity: 0.8,
+    }),
+    []
+  );
 
   // Handle marker icon change
   const handleMarkerIconChange = useCallback((iconType: string) => {
@@ -94,106 +100,118 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
   }, []);
 
   // Custom marker drawing handler
-  const handleMapClickForMarker = useCallback((e: L.LeafletMouseEvent) => {
-    if (!isMarkerDrawingMode) return;
-    
-    // Create marker with selected icon
-    const icon = createIcon(selectedIconRef.current);
-    const marker = L.marker(e.latlng, { icon });
-    
-    // Add to drawn items
-    drawnItems.addLayer(marker);
-    
-    // Generate shape ID
-    const id = `marker_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    (marker as any)._shapeId = id;
-    (marker as any)._iconType = selectedIconRef.current;
-    
-    // Create shape object
-    const shape: Shape = {
-      id,
-      type: 'marker',
-      name: `marker_${id}`,
-      layer: marker,
-      coordinates: [e.latlng.lat, e.latlng.lng],
-      properties: {
-        color: "#00ff41",
-        fillColor: "#00ff41",
-        fillOpacity: 0.2,
-        weight: 2,
-        opacity: 0.8,
-      },
-      iconType: selectedIconRef.current,
-    };
-    
-    setShapes(prev => [...prev, shape]);
-    addShapePopup(marker, shape);
-    onShapeDrawn?.(shape);
-    
-    // Exit marker drawing mode after placing one marker
-    setIsMarkerDrawingMode(false);
-    setShowMarkerIconDropdown(false);
-    
-  }, [isMarkerDrawingMode, createIcon, onShapeDrawn]);
+  const handleMapClickForMarker = useCallback(
+    (e: L.LeafletMouseEvent) => {
+      if (!isMarkerDrawingMode) return;
+
+      // Create marker with selected icon
+      const icon = createIcon(selectedIconRef.current);
+      const marker = L.marker(e.latlng, { icon });
+
+      // Add to drawn items
+      drawnItems.addLayer(marker);
+
+      // Generate shape ID
+      const id = `marker_${Date.now()}_${Math.random()
+        .toString(36)
+        .substring(2, 9)}`;
+      (marker as any)._shapeId = id;
+      (marker as any)._iconType = selectedIconRef.current;
+
+      // Create shape object
+      const shape: Shape = {
+        id,
+        type: "marker",
+        name: `marker_${id}`,
+        layer: marker,
+        coordinates: [e.latlng.lat, e.latlng.lng],
+        properties: {
+          color: "#00ff41",
+          fillColor: "#00ff41",
+          fillOpacity: 0.2,
+          weight: 2,
+          opacity: 0.8,
+        },
+        iconType: selectedIconRef.current,
+      };
+
+      setShapes((prev) => [...prev, shape]);
+      addShapePopup(marker, shape);
+      onShapeDrawn?.(shape);
+
+      // Exit marker drawing mode after placing one marker
+      setIsMarkerDrawingMode(false);
+      setShowMarkerIconDropdown(false);
+    },
+    [isMarkerDrawingMode, createIcon, onShapeDrawn]
+  );
 
   // Create a simple dropdown control
   const createDropdownControl = useCallback((): L.Control => {
     const DropdownControl = L.Control.extend({
       options: {
-        position: 'topright' as L.ControlPosition
+        position: "topright" as L.ControlPosition,
       },
 
-      onAdd: function(map: L.Map): HTMLElement {
-        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control custom-dropdown-control');
-        container.style.backgroundColor = 'white';
-        container.style.padding = '10px';
-        container.style.borderRadius = '4px';
-        container.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-        container.style.width = '200px';
-        container.style.maxHeight = '400px';
-        container.style.overflowY = 'auto';
-        container.style.display = showMarkerIconDropdown ? 'block' : 'none';
-        container.style.zIndex = '1000';
-        container.style.marginRight = '60px'; // Make room for the marker button
+      onAdd: function (map: L.Map): HTMLElement {
+        const container = L.DomUtil.create(
+          "div",
+          "leaflet-bar leaflet-control custom-dropdown-control"
+        );
+        container.style.backgroundColor = "transparent";
+        container.style.padding = "10px";
+        container.style.borderRadius = "4px";
+        container.style.boxShadow = "0 2px 10px rgba(0,0,0,0.2)";
+        container.style.width = "200px";
+        container.style.maxHeight = "400px";
+        container.style.overflowY = "auto";
+        container.style.display = showMarkerIconDropdown ? "block" : "none";
+        container.style.zIndex = "1000";
+        container.style.marginRight = "60px"; // Make room for the marker button
 
         if (showMarkerIconDropdown) {
           // Title
-          const title = document.createElement('div');
-          title.textContent = 'Select Marker Icon';
-          title.style.fontWeight = 'bold';
-          title.style.marginBottom = '10px';
-          title.style.textAlign = 'center';
-          title.style.fontSize = '14px';
+          const title = document.createElement("div");
+          title.textContent = "Select Marker Icon";
+          title.style.fontWeight = "bold";
+          title.style.marginBottom = "10px";
+          title.style.textAlign = "center";
+          title.style.fontSize = "14px";
           container.appendChild(title);
 
           // Simple icon grid - show all icons in a compact grid
-          const iconGrid = document.createElement('div');
-          iconGrid.style.display = 'grid';
-          iconGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
-          iconGrid.style.gap = '5px';
-          iconGrid.style.maxHeight = '300px';
-          iconGrid.style.overflowY = 'auto';
+          const iconGrid = document.createElement("div");
+          iconGrid.style.display = "grid";
+          iconGrid.style.gridTemplateColumns = "repeat(4, 1fr)";
+          iconGrid.style.gap = "5px";
+          iconGrid.style.maxHeight = "300px";
+          iconGrid.style.overflowY = "auto";
 
           Object.entries(MARKER_ICONS).forEach(([key, iconData]) => {
-            const iconButton = document.createElement('div');
-            iconButton.className = 'icon-option';
-            iconButton.style.display = 'flex';
-            iconButton.style.flexDirection = 'column';
-            iconButton.style.alignItems = 'center';
-            iconButton.style.justifyContent = 'center';
-            iconButton.style.padding = '5px';
-            iconButton.style.cursor = 'pointer';
-            iconButton.style.borderRadius = '3px';
-            iconButton.style.border = key === currentMarkerIcon ? '2px solid #00ff41' : '1px solid #ddd';
-            iconButton.style.backgroundColor = key === currentMarkerIcon ? '#f0f0f0' : 'white';
-            iconButton.style.transition = 'all 0.2s';
+            const iconButton = document.createElement("div");
+            iconButton.className = "icon-option";
+            iconButton.style.display = "flex";
+            iconButton.style.flexDirection = "column";
+            iconButton.style.alignItems = "center";
+            iconButton.style.justifyContent = "center";
+            iconButton.style.padding = "5px";
+            iconButton.style.cursor = "pointer";
+            iconButton.style.borderRadius = "3px";
+            iconButton.style.border =
+              key === currentMarkerIcon
+                ? "2px solid #00ff41"
+                : "1px solid #ddd";
+            iconButton.style.backgroundColor =
+              key === currentMarkerIcon ? "transparent" : "transparent";
+            iconButton.style.transition = "all 0.2s";
 
             iconButton.onmouseover = () => {
-              iconButton.style.backgroundColor = '#f5f5f5';
+              iconButton.style.backgroundColor = "transparent";
             };
 
             iconButton.onmouseout = () => {
-              iconButton.style.backgroundColor = key === currentMarkerIcon ? '#f0f0f0' : 'white';
+              iconButton.style.backgroundColor =
+                key === currentMarkerIcon ? "transparent" : "transparent";
             };
 
             iconButton.onclick = () => {
@@ -201,22 +219,22 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
             };
 
             // Icon
-            const icon = document.createElement('div');
+            const icon = document.createElement("div");
             icon.innerHTML = iconData.html;
-            icon.style.width = '16px';
-            icon.style.height = '16px';
-            icon.style.marginBottom = '2px';
+            icon.style.width = "16px";
+            icon.style.height = "16px";
+            icon.style.marginBottom = "2px";
             iconButton.appendChild(icon);
 
             // Icon name (abbreviated)
-            const iconName = document.createElement('div');
-            iconName.textContent = iconData.name.split(' ')[0];
-            iconName.style.fontSize = '8px';
-            iconName.style.textAlign = 'center';
-            iconName.style.whiteSpace = 'nowrap';
-            iconName.style.overflow = 'hidden';
-            iconName.style.textOverflow = 'ellipsis';
-            iconName.style.maxWidth = '100%';
+            const iconName = document.createElement("div");
+            iconName.textContent = iconData.name.split(" ")[0];
+            iconName.style.fontSize = "8px";
+            iconName.style.textAlign = "center";
+            iconName.style.whiteSpace = "nowrap";
+            iconName.style.overflow = "hidden";
+            iconName.style.textOverflow = "ellipsis";
+            iconName.style.maxWidth = "100%";
             iconButton.appendChild(iconName);
 
             iconGrid.appendChild(iconButton);
@@ -225,17 +243,17 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
           container.appendChild(iconGrid);
 
           // Done button
-          const doneButton = document.createElement('button');
-          doneButton.textContent = 'Done';
-          doneButton.style.width = '100%';
-          doneButton.style.marginTop = '10px';
-          doneButton.style.padding = '8px';
-          doneButton.style.cursor = 'pointer';
-          doneButton.style.border = '1px solid #00ff41';
-          doneButton.style.borderRadius = '4px';
-          doneButton.style.backgroundColor = '#00ff41';
-          doneButton.style.color = 'white';
-          doneButton.style.fontWeight = 'bold';
+          const doneButton = document.createElement("button");
+          doneButton.textContent = "Done";
+          doneButton.style.width = "100%";
+          doneButton.style.marginTop = "10px";
+          doneButton.style.padding = "8px";
+          doneButton.style.cursor = "pointer";
+          doneButton.style.border = "1px solid #00ff41";
+          doneButton.style.borderRadius = "4px";
+          doneButton.style.backgroundColor = "#00ff41";
+          doneButton.style.color = "white";
+          doneButton.style.fontWeight = "bold";
 
           doneButton.onclick = () => {
             setShowMarkerIconDropdown(false);
@@ -245,15 +263,15 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
         }
 
         // Prevent map events when interacting with control
-        L.DomUtil.addClass(container, 'leaflet-control');
+        L.DomUtil.addClass(container, "leaflet-control");
         L.DomEvent.disableClickPropagation(container);
 
         return container;
       },
 
-      onRemove: function() {
+      onRemove: function () {
         // Empty to avoid errors
-      }
+      },
     });
 
     return new DropdownControl();
@@ -263,34 +281,36 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
   const createMarkerButtonControl = useCallback((): L.Control => {
     const MarkerButtonControl = L.Control.extend({
       options: {
-        position: 'topright' as L.ControlPosition
+        position: "topright" as L.ControlPosition,
       },
 
-      onAdd: function(map: L.Map): HTMLElement {
-        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control custom-marker-button');
-        container.style.backgroundColor = 'white';
-        container.style.padding = '5px';
-        container.style.borderRadius = '4px';
-        container.style.boxShadow = '0 1px 5px rgba(0,0,0,0.4)';
-        container.style.cursor = 'pointer';
+      onAdd: function (map: L.Map): HTMLElement {
+        const container = L.DomUtil.create(
+          "div",
+          "leaflet-bar leaflet-control custom-marker-button"
+        );
+        container.style.backgroundColor = "transparent";
+        container.style.padding = "5px";
+        container.style.borderRadius = "4px";
+        container.style.boxShadow = "0 1px 5px rgba(0,0,0,0.4)";
+        container.style.cursor = "pointer";
 
         // Create the marker button
-        const markerButton = L.DomUtil.create('a', '', container);
-        markerButton.href = '#';
-        markerButton.title = 'Draw Marker';
+        const markerButton = L.DomUtil.create("a", "", container);
+        markerButton.href = "#";
+        markerButton.title = "Draw Marker";
         markerButton.innerHTML = `
-          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z" fill="#00ff41"/>
-            </svg>
-            <div style="font-size: 9px; margin-top: 2px; color: #333;">Marker</div>
-          </div>
+  <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z" fill="#00ff41"/>
+    </svg>
+  </div>
         `;
 
         markerButton.onclick = (e) => {
           e.preventDefault();
           e.stopPropagation();
-          
+
           // Toggle marker drawing mode
           if (isMarkerDrawingMode) {
             setIsMarkerDrawingMode(false);
@@ -299,25 +319,25 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
             setIsMarkerDrawingMode(true);
             setShowMarkerIconDropdown(true);
           }
-          
+
           // Change cursor when in marker mode
           if (isMarkerDrawingMode) {
-            map.getContainer().style.cursor = '';
+            map.getContainer().style.cursor = "";
           } else {
-            map.getContainer().style.cursor = 'crosshair';
+            map.getContainer().style.cursor = "crosshair";
           }
         };
 
         // Prevent map events when interacting with control
-        L.DomUtil.addClass(container, 'leaflet-control');
+        L.DomUtil.addClass(container, "leaflet-control");
         L.DomEvent.disableClickPropagation(container);
 
         return container;
       },
 
-      onRemove: function() {
+      onRemove: function () {
         // Empty to avoid errors
-      }
+      },
     });
 
     return new MarkerButtonControl();
@@ -380,10 +400,12 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
     // Handle drawing events for non-marker shapes
     const handleShapeCreated = (e: any) => {
       const { layerType, layer } = e;
-      
-      if (layerType === 'marker') return; // Skip markers from Leaflet draw
-      
-      const id = `shape_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+      if (layerType === "marker") return; // Skip markers from Leaflet draw
+
+      const id = `shape_${Date.now()}_${Math.random()
+        .toString(36)
+        .substring(2, 9)}`;
       drawnItems.addLayer(layer);
       (layer as any)._shapeId = id;
 
@@ -450,7 +472,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
     };
 
     // Add map click listener for markers
-    map.on('click', handleMapClick);
+    map.on("click", handleMapClick);
 
     // Add Leaflet draw event listeners
     map.on((L as any).Draw.Event.CREATED, handleShapeCreated);
@@ -459,33 +481,33 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
 
     return () => {
       // Cleanup
-      map.off('click', handleMapClick);
+      map.off("click", handleMapClick);
       map.off((L as any).Draw.Event.CREATED, handleShapeCreated);
       map.off((L as any).Draw.Event.EDITED, handleShapeEditedInternal);
       map.off((L as any).Draw.Event.DELETED, handleShapeDeletedInternal);
-      
+
       if (drawControlRef.current) {
         map.removeControl(drawControlRef.current);
       }
-      
+
       if (markerControlRef.current) {
         map.removeControl(markerControlRef.current);
       }
-      
+
       // Remove any custom dropdown controls
-      const dropdowns = document.querySelectorAll('.custom-dropdown-control');
-      dropdowns.forEach(dropdown => dropdown.remove());
+      const dropdowns = document.querySelectorAll(".custom-dropdown-control");
+      dropdowns.forEach((dropdown) => dropdown.remove());
     };
   }, [
-    map, 
-    createMarkerButtonControl, 
-    createDropdownControl, 
+    map,
+    createMarkerButtonControl,
+    createDropdownControl,
     commonPolygonStyle,
     handleMapClickForMarker,
     onShapeDrawn,
     onShapeEdited,
     onShapeDeleted,
-    shapes
+    shapes,
   ]);
 
   // Update cursor when marker drawing mode changes
@@ -493,9 +515,9 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
     if (!map) return;
 
     if (isMarkerDrawingMode) {
-      map.getContainer().style.cursor = 'crosshair';
+      map.getContainer().style.cursor = "crosshair";
     } else {
-      map.getContainer().style.cursor = '';
+      map.getContainer().style.cursor = "";
     }
   }, [map, isMarkerDrawingMode]);
 
@@ -532,75 +554,79 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
     return null;
   }, []);
 
-  const calculateMeasurements = useCallback((layer: L.Layer, type: string): ShapeMeasurements | undefined => {
-    const m: ShapeMeasurements = {};
+  const calculateMeasurements = useCallback(
+    (layer: L.Layer, type: string): ShapeMeasurements | undefined => {
+      const m: ShapeMeasurements = {};
 
-    if (type === "polygon" || type === "rectangle") {
-      const polygonLayer = layer as L.Polygon;
-      const latLngs = polygonLayer.getLatLngs();
-      
-      if (Array.isArray(latLngs[0])) {
-        const pts = latLngs[0] as L.LatLng[];
+      if (type === "polygon" || type === "rectangle") {
+        const polygonLayer = layer as L.Polygon;
+        const latLngs = polygonLayer.getLatLngs();
 
-        // perimeter (m → km)
-        const perimeterMeters = pts.reduce(
-          (acc: number, p1: L.LatLng, i: number) =>
-            acc + p1.distanceTo(pts[(i + 1) % pts.length]),
+        if (Array.isArray(latLngs[0])) {
+          const pts = latLngs[0] as L.LatLng[];
+
+          // perimeter (m → km)
+          const perimeterMeters = pts.reduce(
+            (acc: number, p1: L.LatLng, i: number) =>
+              acc + p1.distanceTo(pts[(i + 1) % pts.length]),
+            0
+          );
+          m.perimeter = perimeterMeters / 1000;
+
+          // area rough calculation → convert m² to km²
+          const areaMeters2 = Math.abs(
+            (pts.reduce((sum: number, p: L.LatLng, i: number) => {
+              const j = (i + 1) % pts.length;
+              return sum + p.lat * pts[j].lng - pts[j].lat * p.lng;
+            }, 0) /
+              2) *
+              111320 *
+              111320
+          );
+          m.area = areaMeters2 / 1_000_000;
+        }
+      }
+
+      if (type === "polyline") {
+        const polylineLayer = layer as L.Polyline;
+        const points = polylineLayer.getLatLngs() as L.LatLng[];
+
+        const mDist = points.reduce(
+          (sum: number, p: L.LatLng, i: number, arr: L.LatLng[]) =>
+            i === arr.length - 1 ? sum : sum + p.distanceTo(arr[i + 1]),
           0
         );
-        m.perimeter = perimeterMeters / 1000;
 
-        // area rough calculation → convert m² to km²
-        const areaMeters2 = Math.abs(
-          pts.reduce((sum: number, p: L.LatLng, i: number) => {
-            const j = (i + 1) % pts.length;
-            return sum + p.lat * pts[j].lng - pts[j].lat * p.lng;
-          }, 0) /
-            2 *
-            111320 *
-            111320
-        );
-        m.area = areaMeters2 / 1_000_000;
+        m.distance = mDist / 1000;
       }
-    }
 
-    if (type === "polyline") {
-      const polylineLayer = layer as L.Polyline;
-      const points = polylineLayer.getLatLngs() as L.LatLng[];
-      
-      const mDist = points.reduce(
-        (sum: number, p: L.LatLng, i: number, arr: L.LatLng[]) =>
-          i === arr.length - 1 ? sum : sum + p.distanceTo(arr[i + 1]),
-        0
-      );
+      if (type === "circle") {
+        const circleLayer = layer as L.Circle;
+        const r = circleLayer.getRadius(); // meters
+        m.area = (Math.PI * r * r) / 1_000_000;
+        m.perimeter = (2 * Math.PI * r) / 1000;
+      }
 
-      m.distance = mDist / 1000;
-    }
+      return Object.keys(m).length > 0 ? m : undefined;
+    },
+    []
+  );
 
-    if (type === "circle") {
-      const circleLayer = layer as L.Circle;
-      const r = circleLayer.getRadius(); // meters
-      m.area = (Math.PI * r * r) / 1_000_000;
-      m.perimeter = (2 * Math.PI * r) / 1000;
-    }
+  const addShapePopup = useCallback(
+    (layer: L.Layer, shape: Shape) => {
+      const popupDiv = document.createElement("div");
+      popupDiv.style.color = "#00ff41";
+      popupDiv.style.fontFamily = "Courier New, monospace";
 
-    return Object.keys(m).length > 0 ? m : undefined;
-  }, []);
+      const { area, perimeter, distance } = shape.measurements || {};
 
-  const addShapePopup = useCallback((layer: L.Layer, shape: Shape) => {
-    const popupDiv = document.createElement("div");
-    popupDiv.style.color = "#00ff41";
-    popupDiv.style.fontFamily = "Courier New, monospace";
+      // Check if this is a marker
+      const isMarker = shape.type === "marker";
+      const currentIcon = isMarker ? shape.iconType || "default" : "default";
 
-    const { area, perimeter, distance } = shape.measurements || {};
+      const iconData = MARKER_ICONS[currentIcon as keyof typeof MARKER_ICONS];
 
-    // Check if this is a marker
-    const isMarker = shape.type === 'marker';
-    const currentIcon = isMarker ? (shape.iconType || 'default') : 'default';
-    
-    const iconData = MARKER_ICONS[currentIcon as keyof typeof MARKER_ICONS];
-
-    popupDiv.innerHTML = `
+      popupDiv.innerHTML = `
       <strong>${shape.type.toUpperCase()}</strong><br/>
       <strong>ID:</strong> ${shape.id}<br/><br/>
 
@@ -613,7 +639,9 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
              background:black;color:#00ff41;border:1px solid #00ff41;
              padding:4px;" />
 
-      ${isMarker ? `
+      ${
+        isMarker
+          ? `
         <br/><br/>
         <strong>Icon:</strong>
         <div id="current-icon-display" style="margin-top:4px;">
@@ -625,165 +653,184 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
                 border:1px solid #00ff41;padding:4px 8px;cursor:pointer;">
           Change Icon
         </button>
-      ` : ''}
+      `
+          : ""
+      }
 
       <br/><br/>
 
-      ${area !== undefined ? `<strong>Area:</strong> ${area.toFixed(3)} km²<br/>` : ""}
-      ${perimeter !== undefined ? `<strong>Perimeter:</strong> ${perimeter.toFixed(3)} km<br/>` : ""}
-      ${distance !== undefined ? `<strong>Distance:</strong> ${distance.toFixed(3)} km<br/>` : ""}
+      ${
+        area !== undefined
+          ? `<strong>Area:</strong> ${area.toFixed(3)} km²<br/>`
+          : ""
+      }
+      ${
+        perimeter !== undefined
+          ? `<strong>Perimeter:</strong> ${perimeter.toFixed(3)} km<br/>`
+          : ""
+      }
+      ${
+        distance !== undefined
+          ? `<strong>Distance:</strong> ${distance.toFixed(3)} km<br/>`
+          : ""
+      }
     `;
 
-    layer.bindPopup(popupDiv, { className: "drawing-popup", maxWidth: 300 });
+      layer.bindPopup(popupDiv, { className: "drawing-popup", maxWidth: 300 });
 
-    layer.on("popupopen", () => {
-      const popupEl = document.querySelector(".leaflet-popup");
-      if (!popupEl) return;
+      layer.on("popupopen", () => {
+        const popupEl = document.querySelector(".leaflet-popup");
+        if (!popupEl) return;
 
-      // Remove previous buttons
-      popupEl.querySelector("#edit-icon-btn")?.remove();
+        // Remove previous buttons
+        popupEl.querySelector("#edit-icon-btn")?.remove();
 
-      // Create edit button for name
-      const editBtn = document.createElement("button");
-      editBtn.id = "edit-icon-btn";
-      editBtn.innerHTML = "✏️ Edit Name";
-      editBtn.style.position = "absolute";
-      editBtn.style.top = "4px";
-      editBtn.style.right = "28px";
-      editBtn.style.padding = "2px 6px";
-      editBtn.style.cursor = "pointer";
-      editBtn.style.fontSize = "12px";
+        // Create edit button for name
+        const editBtn = document.createElement("button");
+        editBtn.id = "edit-icon-btn";
+        editBtn.innerHTML = "✏️ Edit Name";
+        editBtn.style.position = "absolute";
+        editBtn.style.top = "4px";
+        editBtn.style.right = "28px";
+        editBtn.style.padding = "2px 6px";
+        editBtn.style.cursor = "pointer";
+        editBtn.style.fontSize = "12px";
 
-      popupEl.appendChild(editBtn);
+        popupEl.appendChild(editBtn);
 
-      // Get name UI elements
-      const nameText = popupDiv.querySelector("#shape-name-text");
-      const nameInput = popupDiv.querySelector("#shape-name-input") as HTMLInputElement;
+        // Get name UI elements
+        const nameText = popupDiv.querySelector("#shape-name-text");
+        const nameInput = popupDiv.querySelector(
+          "#shape-name-input"
+        ) as HTMLInputElement;
 
-      // Get icon change button if marker
-      const changeIconBtn = popupDiv.querySelector("#change-icon-btn");
+        // Get icon change button if marker
+        const changeIconBtn = popupDiv.querySelector("#change-icon-btn");
 
-      // EDIT NAME MODE
-      const enableEdit = () => {
-        if (nameText) (nameText as HTMLElement).style.display = "none";
-        if (nameInput) (nameInput as HTMLElement).style.display = "block";
-        if (nameInput) nameInput.focus();
-        editBtn.innerHTML = "💾 Save";
+        // EDIT NAME MODE
+        const enableEdit = () => {
+          if (nameText) (nameText as HTMLElement).style.display = "none";
+          if (nameInput) (nameInput as HTMLElement).style.display = "block";
+          if (nameInput) nameInput.focus();
+          editBtn.innerHTML = "💾 Save";
 
-        editBtn.removeEventListener("click", enableEdit);
-        editBtn.addEventListener("click", saveName);
-      };
+          editBtn.removeEventListener("click", enableEdit);
+          editBtn.addEventListener("click", saveName);
+        };
 
-      // SAVE NAME
-      const saveName = () => {
-        const newName = nameInput ? nameInput.value : shape.name;
-        shape.name = newName;
+        // SAVE NAME
+        const saveName = () => {
+          const newName = nameInput ? nameInput.value : shape.name;
+          shape.name = newName;
 
-        setShapes((prev) =>
-          prev.map((s) => (s.id === shape.id ? { ...s, name: newName } : s))
-        );
+          setShapes((prev) =>
+            prev.map((s) => (s.id === shape.id ? { ...s, name: newName } : s))
+          );
 
-        addShapePopup(layer, shape);
-        layer.openPopup();
-      };
+          addShapePopup(layer, shape);
+          layer.openPopup();
+        };
 
-      // CHANGE ICON (for markers only)
-      if (changeIconBtn && isMarker) {
-        changeIconBtn.addEventListener("click", () => {
-          const iconSelector = document.createElement("div");
-          iconSelector.style.position = "fixed";
-          iconSelector.style.top = "50%";
-          iconSelector.style.left = "50%";
-          iconSelector.style.transform = "translate(-50%, -50%)";
-          iconSelector.style.backgroundColor = "white";
-          iconSelector.style.padding = "15px";
-          iconSelector.style.borderRadius = "8px";
-          iconSelector.style.boxShadow = "0 2px 10px rgba(0,0,0,0.3)";
-          iconSelector.style.zIndex = "1000";
-          iconSelector.style.maxWidth = "300px";
-          iconSelector.style.maxHeight = "400px";
-          iconSelector.style.overflowY = "auto";
+        // CHANGE ICON (for markers only)
+        if (changeIconBtn && isMarker) {
+          changeIconBtn.addEventListener("click", () => {
+            const iconSelector = document.createElement("div");
+            iconSelector.style.position = "fixed";
+            iconSelector.style.top = "50%";
+            iconSelector.style.left = "50%";
+            iconSelector.style.transform = "translate(-50%, -50%)";
+            iconSelector.style.backgroundColor = "transparent";
+            iconSelector.style.padding = "15px";
+            iconSelector.style.borderRadius = "8px";
+            iconSelector.style.boxShadow = "0 2px 10px rgba(0,0,0,0.3)";
+            iconSelector.style.zIndex = "1000";
+            iconSelector.style.maxWidth = "300px";
+            iconSelector.style.maxHeight = "400px";
+            iconSelector.style.overflowY = "auto";
 
-          const title = document.createElement("div");
-          title.innerHTML = "<strong>Select Icon</strong>";
-          title.style.marginBottom = "10px";
-          title.style.textAlign = "center";
-          iconSelector.appendChild(title);
+            const title = document.createElement("div");
+            title.innerHTML = "<strong>Select Icon</strong>";
+            title.style.marginBottom = "10px";
+            title.style.textAlign = "center";
+            iconSelector.appendChild(title);
 
-          Object.entries(MARKER_ICONS).forEach(([key, iconData]) => {
-            const iconOption = document.createElement("div");
-            iconOption.style.display = "flex";
-            iconOption.style.alignItems = "center";
-            iconOption.style.padding = "8px";
-            iconOption.style.cursor = "pointer";
-            iconOption.style.marginBottom = "4px";
-            iconOption.style.borderRadius = "4px";
-            iconOption.style.border = key === shape.iconType ? "2px solid #00ff41" : "1px solid #ddd";
+            Object.entries(MARKER_ICONS).forEach(([key, iconData]) => {
+              const iconOption = document.createElement("div");
+              iconOption.style.display = "flex";
+              iconOption.style.alignItems = "center";
+              iconOption.style.padding = "8px";
+              iconOption.style.cursor = "pointer";
+              iconOption.style.marginBottom = "4px";
+              iconOption.style.borderRadius = "4px";
+              iconOption.style.border =
+                key === shape.iconType ? "2px solid #00ff41" : "1px solid #ddd";
 
-            iconOption.onmouseover = () => {
-              iconOption.style.backgroundColor = "#f5f5f5";
-            };
-            iconOption.onmouseout = () => {
-              iconOption.style.backgroundColor = "transparent";
-            };
+              iconOption.onmouseover = () => {
+                iconOption.style.backgroundColor = "transparent";
+              };
+              iconOption.onmouseout = () => {
+                iconOption.style.backgroundColor = "transparent";
+              };
 
-            iconOption.onclick = () => {
-              // Update marker icon
-              shape.iconType = key;
-              const newIcon = createIcon(key);
-              (layer as L.Marker).setIcon(newIcon);
+              iconOption.onclick = () => {
+                // Update marker icon
+                shape.iconType = key;
+                const newIcon = createIcon(key);
+                (layer as L.Marker).setIcon(newIcon);
 
-              // Update shape data
-              setShapes((prev) =>
-                prev.map((s: Shape) => 
-                  s.id === shape.id ? { ...s, iconType: key } : s
-                )
-              );
-              
-              // Update popup
-              addShapePopup(layer, shape);
-              layer.openPopup();
+                // Update shape data
+                setShapes((prev) =>
+                  prev.map((s: Shape) =>
+                    s.id === shape.id ? { ...s, iconType: key } : s
+                  )
+                );
 
-              // Remove selector
+                // Update popup
+                addShapePopup(layer, shape);
+                layer.openPopup();
+
+                // Remove selector
+                document.body.removeChild(iconSelector);
+              };
+
+              // Icon preview
+              const iconPreview = document.createElement("div");
+              iconPreview.innerHTML = iconData.html;
+              iconPreview.style.width = "24px";
+              iconPreview.style.height = "24px";
+              iconPreview.style.marginRight = "12px";
+              iconPreview.style.flexShrink = "0";
+
+              // Icon name
+              const iconName = document.createElement("div");
+              iconName.textContent = iconData.name;
+              iconName.style.fontSize = "14px";
+
+              iconOption.appendChild(iconPreview);
+              iconOption.appendChild(iconName);
+              iconSelector.appendChild(iconOption);
+            });
+
+            const closeBtn = document.createElement("button");
+            closeBtn.textContent = "Close";
+            closeBtn.style.marginTop = "10px";
+            closeBtn.style.padding = "6px 12px";
+            closeBtn.style.cursor = "pointer";
+            closeBtn.style.width = "100%";
+            closeBtn.onclick = () => {
               document.body.removeChild(iconSelector);
             };
+            iconSelector.appendChild(closeBtn);
 
-            // Icon preview
-            const iconPreview = document.createElement("div");
-            iconPreview.innerHTML = iconData.html;
-            iconPreview.style.width = "24px";
-            iconPreview.style.height = "24px";
-            iconPreview.style.marginRight = "12px";
-            iconPreview.style.flexShrink = "0";
-
-            // Icon name
-            const iconName = document.createElement("div");
-            iconName.textContent = iconData.name;
-            iconName.style.fontSize = "14px";
-
-            iconOption.appendChild(iconPreview);
-            iconOption.appendChild(iconName);
-            iconSelector.appendChild(iconOption);
+            document.body.appendChild(iconSelector);
           });
+        }
 
-          const closeBtn = document.createElement("button");
-          closeBtn.textContent = "Close";
-          closeBtn.style.marginTop = "10px";
-          closeBtn.style.padding = "6px 12px";
-          closeBtn.style.cursor = "pointer";
-          closeBtn.style.width = "100%";
-          closeBtn.onclick = () => {
-            document.body.removeChild(iconSelector);
-          };
-          iconSelector.appendChild(closeBtn);
-
-          document.body.appendChild(iconSelector);
-        });
-      }
-
-      editBtn.addEventListener("click", enableEdit);
-    });
-  }, [createIcon]);
+        editBtn.addEventListener("click", enableEdit);
+      });
+    },
+    [createIcon]
+  );
 
   return null;
 };

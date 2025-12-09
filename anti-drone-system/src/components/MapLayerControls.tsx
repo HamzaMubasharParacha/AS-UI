@@ -5,7 +5,7 @@ import "./MapLayerControls.css";
 import { Button } from "@mui/material";
 
 // Store selected layer outside the component to persist between mounts
-let lastSelectedLayer: string = "OpenStreetMap";
+let lastSelectedLayer: string = "Satellite";
 
 interface MapLayerControlsProps {
   onLayerChange?: (layerName: string) => void;
@@ -104,9 +104,19 @@ const MapLayerControls: React.FC<MapLayerControlsProps> = ({
       {/* Main Button */}
       <Button
         ref={buttonRef}
-        className="map-type-button"
         onClick={toggleDropdown}
         title="Select Map Type"
+        sx={{
+          backgroundColor: "rgba(0,0,0,0.2)",
+          minWidth: "30px !important",
+          width: "40px !important",
+          height: "40px !important",
+          padding: "0 !important",
+          margin: "0 !important",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
         <span className="button-icon">{getLayerIcon(selectedLayer)}</span>
         <span className="button-text">{selectedLayer}</span>

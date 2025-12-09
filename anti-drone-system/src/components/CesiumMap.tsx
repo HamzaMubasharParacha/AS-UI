@@ -580,10 +580,10 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         }}
       >
         {/* Offline Tile Layer */}
-        <TileLayer url={"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"} />
-        <MapLayerControls onLayerChange={setActiveLayer} />
+        <TileLayer url={"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"} />
         <MapInformationControls activeLayer={activeLayer} />
         <MapRotateTracker onBearingChange={setMapBearing} />
+        <MapLayerControls onLayerChange={setActiveLayer} />
         <MapDrawingTools></MapDrawingTools>
 
         {/* Triangle Cone */}

@@ -2,11 +2,12 @@
 
 .map-layer-controls-container {
   position: absolute;
-  top: 50px; /* Adjust based on MapDrawingTools height */
-  right: 10px;
+  top: 10px !important;
+  right: 10px !important;
   z-index: 1000;
   font-family: 'Courier New', monospace;
-  margin-top: 300px;
+    border: 2px solid #00ff41;
+
 }
 
 /* Main Button - Icon Only */
@@ -14,7 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  padding: 0;
   background: rgba(0, 0, 0, 0.1);
   border: 2px solid #00ff41;
   border-radius: 50%;
@@ -24,7 +25,7 @@
   user-select: none;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  width: 44px;
+  width: 30px;
   height: 44px;
   backdrop-filter: blur(10px);
 }
@@ -54,8 +55,8 @@
 /* Dropdown Menu - Adjusted for top-right positioning */
 .layer-dropdown {
   position: absolute;
-  top: 100%;
-  right: 0; /* Align to right */
+  top: -10px;
+  right: 50px; /*Align to right*/
   left: auto; /* Reset left positioning */
   margin-top: 8px;
   background: rgba(0, 0, 0, 0.95);

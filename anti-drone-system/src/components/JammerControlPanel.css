@@ -12,7 +12,7 @@
   font-size: 11px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   border: 1px solid #00ff41;
-  z-index: 1000;
+  z-index: 1005;
   min-width: 200px;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
