@@ -291,7 +291,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
         );
         container.style.backgroundColor = "transparent";
         container.style.padding = "5px";
-        container.style.borderRadius = "4px";
+        container.style.borderRadius = "0px";
         container.style.boxShadow = "0 1px 5px rgba(0,0,0,0.4)";
         container.style.cursor = "pointer";
 

@@ -1,29 +1,33 @@
 
 .leaflet-bar,
 .leaflet-control{
-  border: 1px solid #00ff41 !important;
   top: 90px !important;
   color: white;
   background: rgba(0,0,0,0.2) !important;
-  width: 40px;
+  border: 1px solid #00ff41 !important;
+  
+  width: 42px;
 }
 
 .leaflet-bar.leaflet-control button {
   background-color: rgba(0, 255, 65, 0.1) !important;
   color: #00ff41 !important;
-  border: 1px solid #00ff41 !important;
 }
 
 .custom-dropdown-control{
-top: -223px !important;
+  top: -223px !important;
   width: 310px !important;
 }
 
-.leaflet-bar.leaflet-control.custom-marker-button{
+.custom-marker-button{
+  height: 40px !important;
   top: -170px !important;
+  border-bottom: none !important;
 }
+
 .leaflet-bar a{
   background-color: transparent;
+  
 }
 .leaflet-bar a:hover{
   background-color: transparent;
