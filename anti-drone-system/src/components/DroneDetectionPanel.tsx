@@ -89,12 +89,12 @@ const DroneDetectionPanel: React.FC<DroneDetectionPanelProps> = ({
                           {drone.id}
                         </Typography>
                         
-                        <Chip
-                          size="small"
-                          label={drone.threat_level}
-                          color={getThreatColor(drone.threat_level) as any}
-                          variant="outlined"
-                        />
+                        <Typography
+                          variant="body2"
+                          sx={{ fontFamily: "monospace" }}
+                        >
+                          <img src={drone.image} style={{height:"3.5vh",width:'6vh'}} alt="" />
+                        </Typography>
                       </Box>
                     }
                     secondary={
@@ -106,12 +106,6 @@ const DroneDetectionPanel: React.FC<DroneDetectionPanelProps> = ({
                         >
                           Distance: {drone.distance.toFixed(0)}m | Speed:{" "}
                           {drone.speed.toFixed(1)} m/s
-                        </Typography>
-                         <Typography
-                          variant="body2"
-                          sx={{ fontFamily: "monospace" }}
-                        >
-                          <img src={drone.image} style={{height:"40px",width:'40px'}} alt="" />
                         </Typography>
                         <Typography
                           variant="caption"

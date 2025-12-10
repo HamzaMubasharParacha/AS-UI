@@ -186,6 +186,8 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
           iconGrid.style.gap = "5px";
           iconGrid.style.maxHeight = "300px";
           iconGrid.style.overflowY = "auto";
+          iconGrid.style.setProperty("scrollbar-width", "thin");
+          iconGrid.style.setProperty("scrollbar-color", "rgba(0, 255, 65, 0.5) transparent");
 
           Object.entries(MARKER_ICONS).forEach(([key, iconData]) => {
             const iconButton = document.createElement("div");

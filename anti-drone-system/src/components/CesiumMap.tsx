@@ -337,7 +337,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   const [showTrajectories, setShowTrajectories] = useState(true);
   const [showTriangleCone, setShowTriangleCone] = useState(true);
   const [mapBearing, setMapBearing] = useState<number>(0);
-
+  const [jammerActive, setJammerActive] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -347,7 +347,10 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
     message: "",
     severity: "info",
   });
-
+  const handleJammerActiveChange = (isActive: boolean) => {
+    setJammerActive(isActive);
+    console.log("Jammer active status:", isActive);
+  };
   // Updated coordinates as requested by user (Islamabad/Rawalpindi area)
   const [latLon, setLatLon] = useState<{
     lat: number | null;
@@ -529,6 +532,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         <JammerControlPanel
           coneangle={coneangle}
           coneelevation={coneelevation}
+          onJammerActiveChange={handleJammerActiveChange}
           onError={(error) => {
             setSnackbar({
               open: true,
@@ -587,12 +591,12 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         <MapDrawingTools></MapDrawingTools>
 
         {/* Triangle Cone */}
-        {showTriangleCone && (
-          <TriangleCone
-            center={centerPosition}
-            direction={coneangle}
-            jammerActive={false}
-          />
+       {showTriangleCone && (
+        <TriangleCone
+          center={centerPosition}
+          direction={coneangle}
+          jammerActive={jammerActive} // Use the state
+        />
         )}
 
         {/* Drone Trajectories */}
@@ -656,8 +660,8 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
               )}
             >
               <Popup>
-                <div style={{ fontFamily: "monospace", fontSize: "11px" }}>
-                  <strong style={{ color: isDetected ? "#ff0000" : "#333" }}>
+                <div style={{ fontFamily: "monospace", fontSize: "11px", color:"white" }}>
+                  <strong style={{ color:"#ff0000" }}>
                     {isDetected ? "🚨 DETECTED THREAT" : "🎯 DRONE"}
                   </strong>
                   <br />

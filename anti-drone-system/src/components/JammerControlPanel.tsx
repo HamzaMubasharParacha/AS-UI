@@ -14,6 +14,7 @@ interface JammerControlPanelProps {
   coneelevation: number;
   onError?: (error: string) => void;
   onSuccess?: (message: string) => void;
+  onJammerActiveChange?: (isActive: boolean) => void; // ADDED: Callback to parent
 }
 
 // Enhanced getToken function with fallback
@@ -119,6 +120,7 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
   coneelevation,
   onError,
   onSuccess,
+  onJammerActiveChange, // ADDED: Receive callback from parent
 }) => {
   // Jammer state management
   const [jammerStatus, setJammerStatus] = useState<
@@ -154,7 +156,7 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
   const [currentElevationAngle, setCurrentElevationAngle] = useState<number>(parseFloat(elevationStartAngle));
   
   // New state for axis selection
-  const [azimuthSectorEnabled, setAzimuthSectorEnabled] = useState(true); // Default to true for backward compatibility
+  const [azimuthSectorEnabled, setAzimuthSectorEnabled] = useState(true);
   const [elevationSectorEnabled, setElevationSectorEnabled] = useState(false);
   
   // Refs for azimuth sector jamming
@@ -172,8 +174,8 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
   const currentElevationDirectionRef = useRef<"up" | "down">("up");
 
   // Step sizes
-  const azimuthStepSize = 10; // 10 degrees per step for azimuth
-  const elevationStepSize = 3; // 3 degrees per step for elevation
+  const azimuthStepSize = 10;
+  const elevationStepSize = 3;
 
   // Cleanup on unmount
   useEffect(() => {
@@ -184,133 +186,152 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
     };
   }, []);
 
-  // Single toggle function for jammer
-// Update the toggleJammer function - look for this section:
-const toggleJammer = async () => {
-  if (jammerStatus === "starting" || jammerStatus === "stopping") return;
+  // Helper function to notify parent about jammer active status
+  const notifyParentJammerActive = (isActive: boolean) => {
+    if (onJammerActiveChange) {
+      onJammerActiveChange(isActive);
+      console.log(`Notified parent: Jammer is ${isActive ? 'ACTIVE' : 'IDLE'}`);
+    }
+  };
 
-  const isStarting = jammerStatus !== "active";
+  // Single toggle function for jammer - UPDATED to notify parent
+  const toggleJammer = async () => {
+    if (jammerStatus === "starting" || jammerStatus === "stopping") return;
 
-  if (isStarting) {
-    // Starting jammer
-    setJammerStatus("starting");
+    const isStarting = jammerStatus !== "active";
 
-    try {
-      const token = getToken();
+    if (isStarting) {
+      // Starting jammer
+      setJammerStatus("starting");
+      notifyParentJammerActive(false); // Not active yet during starting
 
-      // Get selected frequencies from checkboxes
-      const activeFrequencies = Object.keys(selectedFrequencies).filter(
-        (freq) => selectedFrequencies[freq]
-      );
+      try {
+        const token = getToken();
 
-      if (activeFrequencies.length === 0) {
+        // Get selected frequencies from checkboxes
+        const activeFrequencies = Object.keys(selectedFrequencies).filter(
+          (freq) => selectedFrequencies[freq]
+        );
+
+        if (activeFrequencies.length === 0) {
+          if (onError) {
+            onError("Please select at least one frequency band");
+          }
+          setJammerStatus("idle");
+          notifyParentJammerActive(false);
+          return;
+        }
+
+        // Format frequency bands with commas: "5.8GHz , 5.2GHz , 2.4GHz"
+        const frequencyBandString = activeFrequencies
+          .map(freq => freq.trim())
+          .join(' , ');
+
+        console.log("Formatted frequency bands:", frequencyBandString);
+
+        // Create request body with the exact format you want
+        const requestBody = {
+          frequencyBand: frequencyBandString,
+          powerAttenuation: 18
+        };
+
+        console.log("Request body:", JSON.stringify(requestBody, null, 2));
+        console.log("Starting jammer with frequencies:", frequencyBandString);
+
+        const response = await fetch(
+          "http://192.168.100.102:8080/api/jammer/1/jam/start",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(requestBody),
+          }
+        );
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error("Authentication failed. Please login again.");
+          }
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          setJammerStatus("active");
+          notifyParentJammerActive(true); // NOW ACTIVE!
+          
+          if (onSuccess) {
+            onSuccess(`Jamming started on ${frequencyBandString}`);
+          }
+        } else {
+          throw new Error(data.message || "Failed to start jamming");
+        }
+      } catch (error) {
+        console.error("Error starting jammer:", error);
+        setJammerStatus("idle");
+        notifyParentJammerActive(false);
+        
         if (onError) {
-          onError("Please select at least one frequency band");
+          onError(
+            error instanceof Error ? error.message : "Failed to start jamming"
+          );
         }
-        setJammerStatus("idle");
-        return;
       }
+    } else {
+      // Stopping jammer
+      setJammerStatus("stopping");
+      notifyParentJammerActive(true); // Still active during stopping
 
-      // Format frequency bands with commas: "5.8GHz , 5.2GHz , 2.4GHz"
-      const frequencyBandString = activeFrequencies
-        .map(freq => freq.trim()) // Trim any whitespace
-        .join(' , '); // Join with " , " (space-comma-space)
+      try {
+        const token = getToken();
 
-      console.log("Formatted frequency bands:", frequencyBandString);
+        const response = await fetch(
+          "http://192.168.100.102:8080/api/jammer/1/jam/stop",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      // Create request body with the exact format you want
-      const requestBody = {
-        frequencyBand: frequencyBandString,
-        powerAttenuation: 18
-      };
-
-      console.log("Request body:", JSON.stringify(requestBody, null, 2));
-      console.log("Starting jammer with frequencies:", frequencyBandString);
-
-      const response = await fetch(
-        "http://192.168.100.102:8080/api/jammer/1/jam/start",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(requestBody),
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error("Authentication failed. Please login again.");
+          }
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
-      );
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Authentication failed. Please login again.");
+        const data = await response.json();
+
+        if (data.success) {
+          setJammerStatus("idle");
+          notifyParentJammerActive(false); // NOW IDLE!
+          
+          if (onSuccess) {
+            onSuccess(data.message || "Jamming stopped successfully");
+          }
+        } else {
+          throw new Error(data.message || "Failed to stop jamming");
         }
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data.success) {
+      } catch (error) {
+        console.error("Error stopping jammer:", error);
         setJammerStatus("active");
-        if (onSuccess) {
-          onSuccess(`Jamming started on ${frequencyBandString}`);
+        notifyParentJammerActive(true); // Still active due to error
+        
+        if (onError) {
+          onError(
+            error instanceof Error ? error.message : "Failed to stop jamming"
+          );
         }
-      } else {
-        throw new Error(data.message || "Failed to start jamming");
-      }
-    } catch (error) {
-      console.error("Error starting jammer:", error);
-      setJammerStatus("idle");
-      if (onError) {
-        onError(
-          error instanceof Error ? error.message : "Failed to start jamming"
-        );
       }
     }
-  } else {
-    // Stopping jammer - this part remains the same
-    setJammerStatus("stopping");
+  };
 
-    try {
-      const token = getToken();
-
-      const response = await fetch(
-        "http://192.168.100.102:8080/api/jammer/1/jam/stop",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Authentication failed. Please login again.");
-        }
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data.success) {
-        setJammerStatus("idle");
-        if (onSuccess) {
-          onSuccess(data.message || "Jamming stopped successfully");
-        }
-      } else {
-        throw new Error(data.message || "Failed to stop jamming");
-      }
-    } catch (error) {
-      console.error("Error stopping jammer:", error);
-      setJammerStatus("active");
-      if (onError) {
-        onError(
-          error instanceof Error ? error.message : "Failed to stop jamming"
-        );
-      }
-    }
-  }
-};
   // Function to set antenna position
   const setAntennaPosition = async (azimuth?: number, elevation?: number) => {
     try {
@@ -367,7 +388,7 @@ const toggleJammer = async () => {
     }
   };
 
-  // Function to start sector jamming (now handles both azimuth and elevation)
+  // Function to start sector jamming
   const startSectorJamming = async () => {
     if (!sectorJammingEnabled || sectorJammingActive) return;
 
@@ -638,60 +659,6 @@ const toggleJammer = async () => {
 
   return (
     <Box className="jammer-control-panel">
-      {/* Jammer Status */}
-      {/* <Box sx={{ mb: 2, textAlign: "center" }}>
-        <Typography
-          variant="subtitle2"
-          sx={{
-            color: statusDisplay.color,
-            fontWeight: "bold",
-            fontSize: "12px",
-          }}
-        >
-          {statusDisplay.text}
-        </Typography>
-        {sectorJammingActive && (
-          <>
-            <Typography
-              variant="caption"
-              sx={{
-                color: "#00ff41",
-                fontWeight: "bold",
-                fontSize: "10px",
-                display: "block",
-                mt: 0.5,
-              }}
-            >
-              Sector Status: {sectorJammingStatus}
-            </Typography>
-            {azimuthSectorEnabled && (
-              <Typography
-                variant="caption"
-                sx={{
-                  color: "#00ff41",
-                  fontSize: "9px",
-                  display: "block",
-                }}
-              >
-                Azimuth: {currentSectorAngle.toFixed(1)}° ({azimuthStepSize}° steps)
-              </Typography>
-            )}
-            {elevationSectorEnabled && (
-              <Typography
-                variant="caption"
-                sx={{
-                  color: "#00ff41",
-                  fontSize: "9px",
-                  display: "block",
-                }}
-              >
-                Elevation: {currentElevationAngle.toFixed(1)}° ({elevationStepSize}° steps)
-              </Typography>
-            )}
-          </>
-        )}
-      </Box> */}
-
       {/* Frequency Checkboxes */}
       <FrequencyCheckboxes
         frequencies={selectedFrequencies}
