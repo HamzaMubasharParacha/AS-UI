@@ -67,6 +67,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
   // Refs for controls
   const drawControlRef = useRef<any>(null);
   const markerControlRef = useRef<any>(null);
+  const dropdownControlRef = useRef<any>(null);
 
   // Create icon from type
   const createIcon = useCallback((iconType: string = "default"): L.Icon => {
@@ -99,10 +100,28 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
     selectedIconRef.current = iconType;
   }, []);
 
+    // Toggle marker drawing mode
+  const toggleMarkerDrawingMode = useCallback(() => {
+    const newMode = !isMarkerDrawingMode;
+    setIsMarkerDrawingMode(newMode);
+    
+    // Always show dropdown when entering marker mode
+    if (newMode) {
+      setShowMarkerIconDropdown(true);
+    } else {
+      setShowMarkerIconDropdown(false);
+    }
+    
+    // Update cursor
+    if (map) {
+      map.getContainer().style.cursor = newMode ? "crosshair" : "";
+    }
+  }, [isMarkerDrawingMode, map]);
+
   // Custom marker drawing handler
   const handleMapClickForMarker = useCallback(
     (e: L.LeafletMouseEvent) => {
-      if (!isMarkerDrawingMode) return;
+      if (!isMarkerDrawingMode || !showMarkerIconDropdown) return;
 
       // Create marker with selected icon
       const icon = createIcon(selectedIconRef.current);
@@ -139,11 +158,11 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
       addShapePopup(marker, shape);
       onShapeDrawn?.(shape);
 
-      // Exit marker drawing mode after placing one marker
-      setIsMarkerDrawingMode(false);
-      setShowMarkerIconDropdown(false);
+      // // Exit marker drawing mode after placing one marker
+      // setIsMarkerDrawingMode(false);
+      // setShowMarkerIconDropdown(false);
     },
-    [isMarkerDrawingMode, createIcon, onShapeDrawn]
+    [isMarkerDrawingMode, showMarkerIconDropdown, createIcon, onShapeDrawn]
   );
 
   // Create a simple dropdown control
@@ -184,6 +203,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
           iconGrid.style.display = "grid";
           iconGrid.style.gridTemplateColumns = "repeat(4, 1fr)";
           iconGrid.style.gap = "5px";
+          iconGrid.style.zIndex = "1009";
           iconGrid.style.maxHeight = "300px";
           iconGrid.style.overflowY = "auto";
           iconGrid.style.setProperty("scrollbar-width", "thin");
@@ -259,6 +279,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
 
           doneButton.onclick = () => {
             setShowMarkerIconDropdown(false);
+            setIsMarkerDrawingMode(false);
           };
 
           container.appendChild(doneButton);
@@ -690,13 +711,16 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
         // Create edit button for name
         const editBtn = document.createElement("button");
         editBtn.id = "edit-icon-btn";
-        editBtn.innerHTML = "✏️ Edit Name";
+        editBtn.innerHTML = "Edit Name";
         editBtn.style.position = "absolute";
+        editBtn.style.color = "#ffffff";
         editBtn.style.top = "4px";
         editBtn.style.right = "28px";
         editBtn.style.padding = "2px 6px";
         editBtn.style.cursor = "pointer";
         editBtn.style.fontSize = "12px";
+        editBtn.style.background = "#21231b";
+        editBtn.style.border = "1px solid #00ff41";
 
         popupEl.appendChild(editBtn);
 
@@ -714,7 +738,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
           if (nameText) (nameText as HTMLElement).style.display = "none";
           if (nameInput) (nameInput as HTMLElement).style.display = "block";
           if (nameInput) nameInput.focus();
-          editBtn.innerHTML = "💾 Save";
+          editBtn.innerHTML = "Save";
 
           editBtn.removeEventListener("click", enableEdit);
           editBtn.addEventListener("click", saveName);
@@ -741,14 +765,20 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
             iconSelector.style.top = "50%";
             iconSelector.style.left = "50%";
             iconSelector.style.transform = "translate(-50%, -50%)";
-            iconSelector.style.backgroundColor = "transparent";
+            iconSelector.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
             iconSelector.style.padding = "15px";
+            iconSelector.style.border = "1px solid #00ff41";
             iconSelector.style.borderRadius = "8px";
             iconSelector.style.boxShadow = "0 2px 10px rgba(0,0,0,0.3)";
             iconSelector.style.zIndex = "1000";
             iconSelector.style.maxWidth = "300px";
             iconSelector.style.maxHeight = "400px";
             iconSelector.style.overflowY = "auto";
+            iconSelector.style.setProperty("scrollbar-width", "thin");
+            iconSelector.style.setProperty(
+              "scrollbar-color",
+              "rgba(0, 255, 65, 0.5) transparent"
+            );
 
             const title = document.createElement("div");
             title.innerHTML = "<strong>Select Icon</strong>";

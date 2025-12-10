@@ -5,9 +5,8 @@
   top: 10px !important;
   right: 10px !important;
   z-index: 1000;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   border: 1px solid #00ff41;
-
 }
 
 /* Main Button - Icon Only */
@@ -173,7 +172,8 @@
 }
 
 @keyframes checkPulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -185,7 +185,7 @@
 
 /* Selected State Indicator */
 .layer-option.selected::before {
-  content: '';
+  content: "";
   position: absolute;
   right: 16px;
   width: 8px;
@@ -210,7 +210,7 @@
 
 /* Glow effect for the entire control */
 .map-layer-controls-container::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -2px;
   left: -2px;
@@ -237,21 +237,21 @@
     top: 8px;
     right: 8px;
   }
-  
+
   .map-type-button {
     width: 40px;
     height: 40px;
     font-size: 16px;
   }
-  
+
   .layer-dropdown {
     width: 200px;
   }
-  
+
   .button-icon {
     font-size: 18px;
   }
-  
+
   .option-icon {
     font-size: 16px;
   }
