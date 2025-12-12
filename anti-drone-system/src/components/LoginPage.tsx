@@ -80,6 +80,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             fullWidth
             label="Username"
             variant="outlined"
+            required
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             sx={{

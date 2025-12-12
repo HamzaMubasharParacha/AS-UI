@@ -6,7 +6,7 @@ interface SpectrumWaterfallProps {
   height?: number;
   minDb?: number;
   maxDb?: number;
-  onSpectrumDraggedOut?: () => void; // New prop for when spectrum is dragged out
+  onSpectrumDraggedOut?: () => void;
 }
 
 const SpectrumWaterfall: React.FC<SpectrumWaterfallProps> = ({
@@ -751,81 +751,59 @@ const SpectrumWaterfall: React.FC<SpectrumWaterfallProps> = ({
         </div>
       </div>
 
-      {/* Spectrum Analyzer - Draggable Section */}
-      <div 
-        ref={spectrumContainerRef}
-        style={{ marginBottom: 30, position: 'relative' }}
-        draggable="true"
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <div style={{
-          fontSize: 16,
-          marginBottom: 10,
-          color: "#00ffcc",
-          fontWeight: "bold",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center"
-        }}>
+      {/* Spectrum Analyzer Section */}
+      <div style={{ marginBottom: 30, position: 'relative' }}>
+        {/* Draggable Header */}
+        <div 
+          style={{
+            fontSize: 16,
+            marginBottom: 10,
+            color: "#00ffcc",
+            fontWeight: "bold",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            cursor: "grab",
+            userSelect: "none",
+            padding: "5px 10px",
+            backgroundColor: isDraggingSpectrum ? "rgba(0, 255, 65, 0.1)" : "transparent",
+            border: isDraggingSpectrum ? "1px dashed #00ff41" : "1px solid #333",
+            borderRadius: "4px 4px 0 0",
+            borderBottom: "none"
+          }}
+          draggable="true"
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
           <span>
             Spectrum Analyzer 
             <span style={{ fontSize: 12, color: "#00ffcc", marginLeft: 10, fontWeight: "normal" }}>
-              (Drag this graph to main screen)
+              (Drag this header to main screen)
             </span>
           </span>
-          <span style={{ fontSize: 12, color: "#888", fontWeight: "normal",paddingRight:"5px"}}>
-            Click and drag to zoom into a frequency range
+          <span style={{ fontSize: 12, color: "#888", fontWeight: "normal", paddingRight: "5px" }}>
+            Click and drag on graph to zoom into a frequency range
           </span>
         </div>
         
-        {/* Drag indicator overlay */}
+        {/* Graph Container */}
         <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: isDraggingSpectrum ? 'rgba(0, 255, 65, 0.1)' : 'transparent',
-          border: isDraggingSpectrum ? '2px dashed #00ff41' : 'none',
-          borderRadius: '4px',
-          pointerEvents: 'none',
-          zIndex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          opacity: isDraggingSpectrum ? 1 : 0,
-          transition: 'all 0.2s'
+          border: "1px solid #333",
+          borderTop: "none",
+          borderRadius: "0 0 4px 4px",
+          overflow: "hidden"
         }}>
-          {isDraggingSpectrum && (
-            <div style={{
-              color: '#00ff41',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-              padding: '10px 20px',
-              borderRadius: '4px',
-              border: '1px solid #00ff41'
-            }}>
-              Dragging Spectrum Analyzer...
-            </div>
-          )}
+          <canvas
+            ref={spectrumRef}
+            width={width}
+            height={spectrumHeight}
+            style={{ 
+              display: "block", 
+              background: "#000", 
+              cursor: "crosshair"
+            }}
+          />
         </div>
-        
-        <canvas
-          ref={spectrumRef}
-          width={width}
-          height={spectrumHeight}
-          style={{ 
-            display: "block", 
-            background: "#000", 
-            cursor: "crosshair",
-            borderRadius: '4px',
-            border: '1px solid #333'
-          }}
-        />
-        
-        
       </div>
 
       {/* Waterfall Display */}

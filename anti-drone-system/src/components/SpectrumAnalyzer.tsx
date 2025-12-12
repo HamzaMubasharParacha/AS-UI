@@ -97,7 +97,7 @@ const SpectrumAnalyzer: React.FC = () => {
       // }, 50);
 
       subscribe_user();
-      simulate_data();
+      // simulate_data();
       timer = setInterval(fetchSpectrum, 50); // 20Hz
     }
 

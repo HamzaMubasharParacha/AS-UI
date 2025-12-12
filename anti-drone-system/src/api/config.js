@@ -18,7 +18,7 @@ export const freqStop = 6000000;
 export const spanPoints = 910;
  
  
-export const subscribe = `http://192.168.100.102:8084/api/websocket/start-continuous-reception/${hardwareSystemId}/subscribe?sensorId=${sensorId}&freqStart=${freqStart}&freqStop=${freqStop}&spanPoints=${spanPoints}`;
+export const subscribe = `http://192.168.100.102:8084/api/websocket/start-continuous-reception?sensorId=${sensorId}&freqStart=${freqStart}&freqStop=${freqStop}&spanPoints=${spanPoints}`;
 export const simulate = `${BASE_URL}/df/${hardwareSystemId}/simulate`;
 export const spectrum_data = "http://192.168.100.102:8084/api/decoded/data/all";
  
