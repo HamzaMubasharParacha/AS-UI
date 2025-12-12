@@ -51,8 +51,8 @@ const DroneDetectionPanel: React.FC<DroneDetectionPanelProps> = ({
   return (
     <Paper sx={{ p: 2, height: "300px", overflow: "auto" }}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <FlightTakeoff sx={{ mr: 1, color: "#00ff41" }} />
-        <Typography variant="h6" sx={{ color: "#00ff41" }}>
+        <FlightTakeoff sx={{ mr: 1, color: "var(--primary-color)" }} />
+        <Typography variant="h6" sx={{ color: "var(--primary-color)" }}>
           DRONE DETECTION
           
         </Typography>

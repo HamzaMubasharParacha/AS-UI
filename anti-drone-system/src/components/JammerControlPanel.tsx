@@ -39,7 +39,7 @@ const FrequencyCheckboxes: React.FC<{
       <Typography
         variant="subtitle2"
         sx={{
-          color: "#00ff41",
+          color: "var(--primary-color)",
           mb: 1,
           fontWeight: "bold",
           fontSize: "12px",
@@ -94,9 +94,9 @@ const FrequencyCheckboxes: React.FC<{
               onChange={onFrequencyChange(frequency)}
               disabled={isDisabled}
               sx={{
-                color: "#00ff41",
+                color: "var(--primary-color)",
                 "&.Mui-checked": {
-                  color: "#00ff41",
+                  color: "var(--primary-color)",
                 },
                 "&.Mui-disabled": {
                   color: "rgba(0, 255, 65, 0.5)",
@@ -646,9 +646,9 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
       default:
         return {
           text: "START JAMMING",
-          color: "#00ff41",
+          color: "var(--primary-color)",
           backgroundColor: "rgba(0, 255, 65, 0.3)",
-          hoverColor: "#00ff41",
+          hoverColor: "var(--primary-color)",
           disabled: selectedFrequencyCount === 0,
         };
     }
@@ -708,7 +708,7 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
         <Typography
           variant="subtitle2"
           sx={{
-            color: "#00ff41",
+            color: "var(--primary-color)",
             fontWeight: "bold",
             fontSize: "12px",
             mr: 1,
@@ -725,7 +725,7 @@ const JammerControlPanel: React.FC<JammerControlPanelProps> = ({
             minWidth: "30px",
             minHeight: "30px",
             padding: "4px",
-            color: "#00ff41",
+            color: "var(--primary-color)",
             fontSize: "14px",
             fontFamily: "monospace",
             "&:hover": {

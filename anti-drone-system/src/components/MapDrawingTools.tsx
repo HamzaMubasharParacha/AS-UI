@@ -85,8 +85,8 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
   // Common polygon style function
   const commonPolygonStyle = useCallback(
     (): L.PathOptions => ({
-      color: "#00ff41",
-      fillColor: "#00ff41",
+      color: "var(--primary-color)",
+      fillColor: "var(--primary-color)",
       fillOpacity: 0.2,
       weight: 2,
       opacity: 0.8,
@@ -145,8 +145,8 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
         layer: marker,
         coordinates: [e.latlng.lat, e.latlng.lng],
         properties: {
-          color: "#00ff41",
-          fillColor: "#00ff41",
+          color: "var(--primary-color)",
+          fillColor: "var(--primary-color)",
           fillOpacity: 0.2,
           weight: 2,
           opacity: 0.8,
@@ -221,7 +221,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
             iconButton.style.borderRadius = "3px";
             iconButton.style.border =
               key === currentMarkerIcon
-                ? "2px solid #00ff41"
+                ? "2px solid var(--primary-color)"
                 : "1px solid #ddd";
             iconButton.style.backgroundColor =
               key === currentMarkerIcon ? "transparent" : "transparent";
@@ -271,9 +271,9 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
           doneButton.style.marginTop = "10px";
           doneButton.style.padding = "8px";
           doneButton.style.cursor = "pointer";
-          doneButton.style.border = "1px solid #00ff41";
+          doneButton.style.border = "1px solid var(--primary-color)";
           doneButton.style.borderRadius = "4px";
-          doneButton.style.backgroundColor = "#00ff41";
+          doneButton.style.backgroundColor = "var(--primary-color)";
           doneButton.style.color = "white";
           doneButton.style.fontWeight = "bold";
 
@@ -325,7 +325,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
         markerButton.innerHTML = `
   <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z" fill="#00ff41"/>
+      <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z" fill="var(--primary-color)"/>
     </svg>
   </div>
         `;
@@ -388,7 +388,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
         },
         polyline: {
           shapeOptions: {
-            color: "#00ff41",
+            color: "var(--primary-color)",
             weight: 3,
             opacity: 0.8,
           },
@@ -439,8 +439,8 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
         layer,
         coordinates: getCoordinates(layer, layerType),
         properties: {
-          color: "#00ff41",
-          fillColor: "#00ff41",
+          color: "var(--primary-color)",
+          fillColor: "var(--primary-color)",
           fillOpacity: 0.2,
           weight: 2,
           opacity: 0.8,
@@ -638,7 +638,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
   const addShapePopup = useCallback(
     (layer: L.Layer, shape: Shape) => {
       const popupDiv = document.createElement("div");
-      popupDiv.style.color = "#00ff41";
+      popupDiv.style.color = "var(--primary-color)";
       popupDiv.style.fontFamily = "Courier New, monospace";
 
       const { area, perimeter, distance } = shape.measurements || {};
@@ -659,7 +659,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
              type="text"
              value="${shape.name}"
              style="display:none;width:100%;margin-top:6px;
-             background:black;color:#00ff41;border:1px solid #00ff41;
+             background:black;color:var(--primary-color);border:1px solid var(--primary-color);
              padding:4px;" />
 
       ${
@@ -672,8 +672,8 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
           <span style="margin-left:8px;vertical-align:middle;">${iconData.name}</span>
         </div>
         <button id="change-icon-btn" 
-                style="margin-top:6px;background:black;color:#00ff41;
-                border:1px solid #00ff41;padding:4px 8px;cursor:pointer;">
+                style="margin-top:6px;background:black;color:var(--primary-color);
+                border:1px solid var(--primary-color);padding:4px 8px;cursor:pointer;">
           Change Icon
         </button>
       `
@@ -720,7 +720,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
         editBtn.style.cursor = "pointer";
         editBtn.style.fontSize = "12px";
         editBtn.style.background = "#21231b";
-        editBtn.style.border = "1px solid #00ff41";
+        editBtn.style.border = "1px solid var(--primary-color)";
 
         popupEl.appendChild(editBtn);
 
@@ -767,7 +767,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
             iconSelector.style.transform = "translate(-50%, -50%)";
             iconSelector.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
             iconSelector.style.padding = "15px";
-            iconSelector.style.border = "1px solid #00ff41";
+            iconSelector.style.border = "1px solid var(--primary-color)";
             iconSelector.style.borderRadius = "8px";
             iconSelector.style.boxShadow = "0 2px 10px rgba(0,0,0,0.3)";
             iconSelector.style.zIndex = "1000";
@@ -795,7 +795,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
               iconOption.style.marginBottom = "4px";
               iconOption.style.borderRadius = "4px";
               iconOption.style.border =
-                key === shape.iconType ? "2px solid #00ff41" : "1px solid #ddd";
+                key === shape.iconType ? "2px solid var(--primary-color)" : "1px solid #ddd";
 
               iconOption.onmouseover = () => {
                 iconOption.style.backgroundColor = "transparent";

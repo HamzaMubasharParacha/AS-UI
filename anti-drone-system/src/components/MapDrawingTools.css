@@ -3,13 +3,13 @@
   top: 90px !important;
   color: white;
   background: rgba(0, 0, 0, 0.2) !important;
-  border: 1px solid #00ff41 !important;
+  border: 1px solid var(--primary-color) !important;
   width: 42px;
 }
 
 .leaflet-bar.leaflet-control button {
   background-color: rgba(0, 255, 65, 0.1) !important;
-  color: #00ff41 !important;
+  color: var(--primary-color) !important;
 }
 
 .custom-dropdown-control {
@@ -33,6 +33,6 @@
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
   color: white;
-  border: 1px solid #00ff41;
+  border: 1px solid var(--primary-color);
   background-color: rgba(0, 0, 0, 0.5);
 }

@@ -21,7 +21,7 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ status }) => {
     switch (statusValue) {
       case "ONLINE":
       case "READY":
-        return "#00ff41";
+        return "var(--primary-color)";
       case "WARNING":
         return "#ffaa00";
       case "OFFLINE":
@@ -36,7 +36,7 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ status }) => {
     switch (statusValue) {
       case "ONLINE":
       case "READY":
-        return <CheckCircle sx={{ color: "#00ff41" }} />;
+        return <CheckCircle sx={{ color: "var(--primary-color)" }} />;
       case "WARNING":
         return <Error sx={{ color: "#ffaa00" }} />;
       case "OFFLINE":
@@ -48,7 +48,7 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ status }) => {
   };
 
   const getPowerColor = (power: number) => {
-    if (power > 75) return "#00ff41";
+    if (power > 75) return "var(--primary-color)";
     if (power > 50) return "#ffaa00";
     return "#ff4444";
   };
@@ -74,8 +74,8 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ status }) => {
   return (
     <Paper sx={{ p: 1, height: "200px" }}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <Computer sx={{ mr: 1, color: "#00ff41" }} />
-        <Typography variant="h6" sx={{ color: "#00ff41" }}>
+        <Computer sx={{ mr: 1, color: "var(--primary-color)" }} />
+        <Typography variant="h6" sx={{ color: "var(--primary-color)" }}>
           SYSTEM STATUS
         </Typography>
       </Box>

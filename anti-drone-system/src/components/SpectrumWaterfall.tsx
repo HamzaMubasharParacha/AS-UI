@@ -787,7 +787,7 @@ const SpectrumWaterfall: React.FC<SpectrumWaterfallProps> = ({
           right: 0,
           bottom: 0,
           backgroundColor: isDraggingSpectrum ? 'rgba(0, 255, 65, 0.1)' : 'transparent',
-          border: isDraggingSpectrum ? '2px dashed #00ff41' : 'none',
+          border: isDraggingSpectrum ? '2px dashed var(--primary-color)' : 'none',
           borderRadius: '4px',
           pointerEvents: 'none',
           zIndex: 1,
@@ -799,13 +799,13 @@ const SpectrumWaterfall: React.FC<SpectrumWaterfallProps> = ({
         }}>
           {isDraggingSpectrum && (
             <div style={{
-              color: '#00ff41',
+              color: 'var(--primary-color)',
               fontSize: '14px',
               fontWeight: 'bold',
               backgroundColor: 'rgba(0, 0, 0, 0.8)',
               padding: '10px 20px',
               borderRadius: '4px',
-              border: '1px solid #00ff41'
+              border: '1px solid var(--primary-color)'
             }}>
               Dragging Spectrum Analyzer...
             </div>

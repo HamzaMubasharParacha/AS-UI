@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Snackbar, Alert } from "@mui/material";
 import L from "leaflet";
-import { TileLayer } from "react-leaflet";
+import { TileLayer, useMap } from "react-leaflet";
 import {
   MapContainer,
   Circle,
@@ -111,7 +111,7 @@ const TriangleCone: React.FC<{
           {jammerActive ? (
             <span style={{ color: "#FF0000", fontWeight: "bold" }}>ON</span>
           ) : (
-            <span style={{ color: "#00ff41" }}>OFF</span>
+            <span style={{ color: "var(--primary-color)" }}>OFF</span>
           )}
           {jammerActive && (
             <>
@@ -153,7 +153,7 @@ interface DroneTrajectory {
 
 interface CesiumMapProps {
   drones: DroneData[];
-  systemActive: boolean;
+  systemActive: string;
   drawingToolsEnabled?: boolean;
   coneangle: number;
   coneelevation: number;
@@ -515,6 +515,25 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
     ]);
   };
 
+// const DynamicZoom = () => {
+//   const map = useMap();
+//   const newZoom = jammerStatus ? 12 : 5;
+
+//   useEffect(() => {
+//     // Skip if already at same zoom (prevents re-firing)
+//     if (map.getZoom() === newZoom) return;
+
+//     map.flyTo(centerPosition, newZoom, {
+//       animate: true,
+//       duration: 1.5,
+//       easeLinearity: 0.25,
+//     });
+//   }, [newZoom, centerPosition, map]);  // 🔥 must depend on newZoom
+
+//   return null;
+// };
+
+
   return (
     <Box
       sx={{
@@ -573,32 +592,34 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
       <MapContainer
         center={centerPosition}
         zoomControl={false}
-        zoom={12}
+        zoom={11}
         rotate={true}
         rotateControl={false}
         style={{
           height: "100%",
           width: "100%",
           borderRadius: "8px",
-          border: "2px solid #00ff41",
+          border: "2px solid var(--primary-color)",
         }}
       >
         {/* Offline Tile Layer */}
-        <TileLayer url={"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"} />
+        <TileLayer
+          url={
+            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+          }
+        />
         <MapInformationControls activeLayer={activeLayer} />
         <MapRotateTracker onBearingChange={setMapBearing} />
         <MapLayerControls onLayerChange={setActiveLayer} />
         <MapDrawingTools></MapDrawingTools>
-
         {/* Triangle Cone */}
-       {showTriangleCone && (
-        <TriangleCone
-          center={centerPosition}
-          direction={coneangle}
-          jammerActive={jammerActive} // Use the state
-        />
+        {jammerStatus && (
+          <TriangleCone
+            center={centerPosition}
+            direction={coneangle}
+            jammerActive={jammerActive} // Use the state
+          />
         )}
-
         {/* Drone Trajectories */}
         {showTrajectories &&
           trajectories.map((trajectory) => (
@@ -617,27 +638,26 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
               }}
             />
           ))}
-
         {/* GEOGRAPHICALLY FIXED 10km Coverage Circle */}
+
         <Circle
           center={centerPosition}
           radius={radius10km}
           pathOptions={{
-            color: "#00E676",
+            color: "var(--primary-color)",
             fillColor: "#000000ff",
             fillOpacity: 0.1,
             weight: 2,
             dashArray: "5, 8",
           }}
         />
-
         <RadarComponent
           center={centerPosition}
           radius={radius10km}
           radarActive={radarActive}
           systemActive={systemActive}
         />
-
+        {/* <DynamicZoom /> */}
         {/* Drone Markers */}
         {drones.map((drone) => {
           const isDetected = detectedThreats.includes(drone.id);
@@ -660,8 +680,14 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
               )}
             >
               <Popup>
-                <div style={{ fontFamily: "monospace", fontSize: "11px", color:"white" }}>
-                  <strong style={{ color:"#ff0000" }}>
+                <div
+                  style={{
+                    fontFamily: "monospace",
+                    fontSize: "11px",
+                    color: "white",
+                  }}
+                >
+                  <strong style={{ color: "#ff0000" }}>
                     {isDetected ? "🚨 DETECTED THREAT" : "🎯 DRONE"}
                   </strong>
                   <br />

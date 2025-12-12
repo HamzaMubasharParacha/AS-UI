@@ -88,8 +88,8 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({ drones }) => {
   return (
     <Paper sx={{ p: 2, height: "300px" }}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <Assessment sx={{ mr: 1, color: "#00ff41" }} />
-        <Typography variant="h6" sx={{ color: "#00ff41" }}>
+        <Assessment sx={{ mr: 1, color: "var(--primary-color)" }} />
+        <Typography variant="h6" sx={{ color: "var(--primary-color)" }}>
           DATA VISUALIZATION
         </Typography>
       </Box>
@@ -151,7 +151,7 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({ drones }) => {
                   color: "#fff",
                 }}
               />
-              <Bar dataKey="count" fill="#00ff41" />
+              <Bar dataKey="count" fill="var(--primary-color)" />
             </BarChart>
           </ResponsiveContainer>
         </Box>
@@ -184,9 +184,9 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({ drones }) => {
               <Line
                 type="monotone"
                 dataKey="distance"
-                stroke="#00ff41"
+                stroke="var(--primary-color)"
                 strokeWidth={2}
-                dot={{ fill: "#00ff41", strokeWidth: 2, r: 3 }}
+                dot={{ fill: "var(--primary-color)", strokeWidth: 2, r: 3 }}
               />
             </LineChart>
           </ResponsiveContainer>

@@ -214,7 +214,7 @@ const MiniSpectrumAnalyzer = ({
 
     // Draw spectrum line
     ctx.beginPath();
-    ctx.strokeStyle = '#00ff41';
+    ctx.strokeStyle = 'var(--primary-color)';
     ctx.lineWidth = 2;
     
     const xStep = width / (spectrumData.length - 1);
@@ -254,7 +254,7 @@ const MiniSpectrumAnalyzer = ({
       ctx.beginPath();
       ctx.arc(x, y, 4, 0, Math.PI * 2);
       ctx.fillStyle = peak.type === 'HIGH' ? '#ff4444' : 
-                     peak.type === 'MEDIUM' ? '#ffaa00' : '#00ff41';
+                     peak.type === 'MEDIUM' ? '#ffaa00' : 'var(--primary-color)';
       ctx.fill();
       ctx.strokeStyle = '#fff';
       ctx.lineWidth = 1;
@@ -263,7 +263,7 @@ const MiniSpectrumAnalyzer = ({
 
     // Draw labels if enabled
     if (showLabels) {
-      ctx.fillStyle = '#00ff41';
+      ctx.fillStyle = 'var(--primary-color)';
       ctx.font = '10px monospace';
       ctx.textAlign = 'center';
       
@@ -291,7 +291,7 @@ const MiniSpectrumAnalyzer = ({
     switch(type) {
       case 'HIGH': return '#ff4444';
       case 'MEDIUM': return '#ffaa00';
-      default: return '#00ff41';
+      default: return 'var(--primary-color)';
     }
   };
 
@@ -314,7 +314,7 @@ const MiniSpectrumAnalyzer = ({
         <Typography
           variant="subtitle2"
           sx={{
-            color: '#00ff41',
+            color: 'var(--primary-color)',
             fontFamily: 'monospace',
             textAlign: 'center',
           }}
@@ -329,7 +329,7 @@ const MiniSpectrumAnalyzer = ({
           padding: '2px 8px',
           fontSize: '10px',
           fontFamily: 'monospace',
-          color: '#00ff41',
+          color: 'var(--primary-color)',
         }}>
           {getActiveSignalCount()} ACTIVE SIGNALS
         </Box>

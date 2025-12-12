@@ -35,8 +35,8 @@ const ThreatAssessment: React.FC<ThreatAssessmentProps> = ({ drones }) => {
     if (threatCounts.MEDIUM > 0)
       return { level: "MEDIUM", color: "#ffaa00", progress: 60 };
     if (threatCounts.LOW > 0)
-      return { level: "LOW", color: "#00ff41", progress: 30 };
-    return { level: "SECURE", color: "#00ff41", progress: 0 };
+      return { level: "LOW", color: "var(--primary-color)", progress: 30 };
+    return { level: "SECURE", color: "var(--primary-color)", progress: 0 };
   };
 
   const threat = overallThreatLevel();
@@ -53,8 +53,8 @@ const ThreatAssessment: React.FC<ThreatAssessmentProps> = ({ drones }) => {
   return (
     <Paper sx={{ p: 2, height: "250px" }}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <Security sx={{ mr: 1, color: "#00ff41" }} />
-        <Typography variant="h6" sx={{ color: "#00ff41" }}>
+        <Security sx={{ mr: 1, color: "var(--primary-color)" }} />
+        <Typography variant="h6" sx={{ color: "var(--primary-color)" }}>
           THREAT ASSESSMENT
         </Typography>
       </Box>
@@ -90,7 +90,7 @@ const ThreatAssessment: React.FC<ThreatAssessmentProps> = ({ drones }) => {
         <Box sx={{ flex: 1, textAlign: "center" }}>
           <Typography
             variant="h4"
-            sx={{ color: "#00ff41", fontFamily: "monospace" }}
+            sx={{ color: "var(--primary-color)", fontFamily: "monospace" }}
           >
             {totalThreats}
           </Typography>

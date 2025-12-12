@@ -16,6 +16,7 @@ import SystemStatus from "./SystemStatus";
 import SpectrumAnalyzer from "./SpectrumAnalyzer";
 import FloatingSpectrumAnalyzer from "./FloatingSpectrumAnalyzer";
 import "../ADSDashboard.css";
+// import "../index.css";
 import { drone_data, logout, df_connectivity, cone_angle, spectrum_data, hardwareSystemId } from "../api/config";
 
 interface DashboardProps {
@@ -751,7 +752,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
                   width: 80,
                   height: 80,
                   backgroundColor: "rgba(0, 255, 65, 0.2)",
-                  border: "2px solid #00ff41",
+                  border: "2px solid var(--primary-color)",
                   borderRadius: "50%",
                   display: "flex",
                   alignItems: "center",
@@ -775,7 +776,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
               >
                 <Typography
                   sx={{
-                    color: "#00ff41",
+                    color: "var(--primary-color)",
                     fontSize: "30px",
                     fontWeight: "bold",
                   }}
@@ -793,7 +794,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
                     left: "50%",
                     transform: "translate(-50%, -50%)",
                     backgroundColor: "rgba(0, 0, 0, 0.8)",
-                    border: "2px solid #00ff41",
+                    border: "2px solid var(--primary-color)",
                     borderRadius: "8px",
                     padding: "20px 40px",
                     textAlign: "center",
@@ -803,7 +804,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
                 >
                   <Typography
                     sx={{
-                      color: "#00ff41",
+                      color: "var(--primary-color)",
                       fontFamily: '"Roboto Mono", monospace',
                       fontSize: "18px",
                       fontWeight: "bold",
@@ -830,7 +831,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
           <div className="map-container">
             <CesiumMap
               drones={detectedDrones}
-              systemActive={systemActive}
+              systemActive={check}
               drawingToolsEnabled={drawingToolsEnabled}
               coneangle={coneAngle}
               coneelevation={coneElevation}
@@ -879,7 +880,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
                   className="floating-card-header"
                   onMouseDown={(e) => handleMouseDown(e, card.id)}
                 >
-                  <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#00ff41" }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "var(--primary-color)" }}>
                     {card.title}
                   </Typography>
                   <Box>
