@@ -9,7 +9,7 @@ export const logout = `${BASE_URL}/auth/logout`;
 export const login = `${BASE_URL}/auth/login`;
 export const azimuth = `${BASE_URL}/jammer/1/command`;
 export const df_connectivity = `${BASE_URL}/df/connectivity`;
-
+export const detectedDrones = `http://192.168.100.102:8084/api/drone-history/drones/1/list`;
  
 export const hardwareSystemId = 1;
 export const sensorId = 1;

@@ -16,6 +16,7 @@ import SystemStatus from "./SystemStatus";
 import SpectrumAnalyzer from "./SpectrumAnalyzer";
 import FloatingSpectrumAnalyzer from "./FloatingSpectrumAnalyzer";
 import "../ADSDashboard.css";
+// import "../index.css";
 import { drone_data, logout, df_connectivity, cone_angle, spectrum_data, hardwareSystemId } from "../api/config";
 
 interface DashboardProps {
@@ -139,7 +140,6 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     setError("");
     try {
       const token = sessionStorage.getItem("token");
-      console.log("Logging out with token :", token);
       if (!token) {
         setError("No authentication token found");
         setLoading(false);
@@ -153,7 +153,6 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
         },
       });
       if (response.ok) {
-        console.log("Logout successful");
         sessionStorage.removeItem("token");
         setToken(null);
       } else {
@@ -221,7 +220,6 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       const data = await response.json();
       const check = data.data.available;
       setcheck(check);
-      console.log(check, "connectivity");
     } catch (error) {
       console.error("error");
     }
@@ -248,7 +246,6 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       // console.log("Spectrum API Response:", json);
 
       if (!json?.data || !json.data[hardwareSystemId]) {
-        console.log("No data or hardwareSystemId not found");
         return;
       }
 
@@ -268,12 +265,10 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
 
   // Fetch spectrum data periodically
   useEffect(() => {
-    console.log("Setting up spectrum data interval");
     const interval = setInterval(fetchSpectrumData, 1000);
     fetchSpectrumData(); // Initial fetch
     
     return () => {
-      console.log("Clearing spectrum data interval");
       clearInterval(interval);
     };
   }, []);
@@ -290,7 +285,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     },
     {
       id: "drone-detection",
-      title: "Drone Detection",
+      title: "Drone Detection Panel",
       component: "DroneDetectionPanel",
       position: { x: 300, y: 200 },
       visible: false,
@@ -452,17 +447,14 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
 
     const handleGlobalDrop = (e: DragEvent) => {
       e.preventDefault();
-      // console.log("Global drop event triggered at:", e.clientX, e.clientY);
       setIsDraggingOver(false);
       setShowDropHint(false);
 
       try {
         const data = e.dataTransfer?.getData('application/json');
-        // console.log("Drag data received:", data);
         
         if (data) {
           const settings = JSON.parse(data);
-          // console.log("Parsed settings:", settings);
           
           if (settings.type === 'spectrum') {
             const newPosition = {
@@ -470,7 +462,6 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
               y: Math.max(10, Math.min(window.innerHeight - 260, e.clientY - 125))
             };
             
-            // console.log("Creating floating spectrum at:", newPosition);
             
             setFloatingSpectrum({
               visible: true,
@@ -485,7 +476,6 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
             });
           }
         } else {
-          // console.log("No drag data found");
         }
       } catch (error) {
         console.error('Error parsing drag data:', error);
@@ -498,7 +488,6 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     };
 
     const handleGlobalDragEnd = () => {
-      // console.log("Global drag end");
       setIsDraggingOver(false);
       setShowDropHint(false);
     };
@@ -630,7 +619,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       case "SystemStatus":
         return <SystemStatus status={systemStatus} />;
       case "DroneDetectionPanel":
-        return <DroneDetectionPanel drones={detectedDrones} />;
+        return <DroneDetectionPanel />;
       case "ThreatAssessment":
         return <ThreatAssessment drones={detectedDrones} />;
       case "SpectrumAnalyzer":
@@ -678,10 +667,6 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       icon: <Analytics />,
     },
   ];
-
-  // DEBUG: Check if FFT data is available
-  // console.log("FFT data available:", fft.length > 0);
-  // console.log("Floating spectrum visible:", floatingSpectrum.visible);
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -751,7 +736,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
                   width: 80,
                   height: 80,
                   backgroundColor: "rgba(0, 255, 65, 0.2)",
-                  border: "2px solid #00ff41",
+                  border: "2px solid var(--primary-color)",
                   borderRadius: "50%",
                   display: "flex",
                   alignItems: "center",
@@ -775,7 +760,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
               >
                 <Typography
                   sx={{
-                    color: "#00ff41",
+                    color: "var(--primary-color)",
                     fontSize: "30px",
                     fontWeight: "bold",
                   }}
@@ -793,7 +778,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
                     left: "50%",
                     transform: "translate(-50%, -50%)",
                     backgroundColor: "rgba(0, 0, 0, 0.8)",
-                    border: "2px solid #00ff41",
+                    border: "2px solid var(--primary-color)",
                     borderRadius: "8px",
                     padding: "20px 40px",
                     textAlign: "center",
@@ -803,7 +788,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
                 >
                   <Typography
                     sx={{
-                      color: "#00ff41",
+                      color: "var(--primary-color)",
                       fontFamily: '"Roboto Mono", monospace',
                       fontSize: "18px",
                       fontWeight: "bold",
@@ -830,7 +815,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
           <div className="map-container">
             <CesiumMap
               drones={detectedDrones}
-              systemActive={systemActive}
+              systemActive={check}
               drawingToolsEnabled={drawingToolsEnabled}
               coneangle={coneAngle}
               coneelevation={coneElevation}
@@ -879,7 +864,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
                   className="floating-card-header"
                   onMouseDown={(e) => handleMouseDown(e, card.id)}
                 >
-                  <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#00ff41" }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "var(--primary-color)" }}>
                     {card.title}
                   </Typography>
                   <Box>

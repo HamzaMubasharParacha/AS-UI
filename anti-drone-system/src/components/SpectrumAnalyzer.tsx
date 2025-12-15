@@ -4,7 +4,7 @@ import { PlayArrow, Pause } from "@mui/icons-material";
 import SpectrumWaterfall from "./SpectrumWaterfall";
 import {
   hardwareSystemId,
-  simulate,
+  // simulate,
   spectrum_data,
   subscribe,
 } from "../api/config";
@@ -34,21 +34,21 @@ const SpectrumAnalyzer: React.FC = () => {
       }
     };
 
-    const simulate_data = async () => {
-      try {
-        const token = sessionStorage.getItem("token");
-        // const res = await fetch(spectrum_data);
-        const res = await fetch(`${simulate}`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!res.ok) return;
-      } catch (err) {
-        console.error("Subscribe API Error:", err);
-      }
-    };
+    // const simulate_data = async () => {
+    //   try {
+    //     const token = sessionStorage.getItem("token");
+    //     // const res = await fetch(spectrum_data);
+    //     const res = await fetch(`${simulate}`, {
+    //       method: "POST",
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     });
+    //     if (!res.ok) return;
+    //   } catch (err) {
+    //     console.error("Simulate API Error:", err);
+    //   }
+    // };
 
     const fetchSpectrum = async () => {
       try {
@@ -114,7 +114,7 @@ const SpectrumAnalyzer: React.FC = () => {
     <Box
       sx={{
         p: 2,
-        color: "#00ff41",
+        color: "var(--primary-color)",
         fontFamily: '"Roboto Mono", monospace',
         height: "100%",
         backgroundColor: "#0a0a0a",
@@ -129,19 +129,19 @@ const SpectrumAnalyzer: React.FC = () => {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 2,
-          borderBottom: "1px solid #00ff41",
+          borderBottom: "1px solid var(--primary-color)",
           pb: 1,
         }}
       >
-        <Typography variant="h6" sx={{ color: "#00ff41", fontWeight: "bold" }}>
+        <Typography variant="h6" sx={{ color: "var(--primary-color)", fontWeight: "bold" }}>
           📡 ADVANCED SPECTRUM ANALYZER
         </Typography>
         <IconButton
           size="small"
           onClick={() => setIsPlaying(!isPlaying)}
           sx={{
-            color: "#00ff41",
-            border: "1px solid #00ff41",
+            color: "var(--primary-color)",
+            border: "1px solid var(--primary-color)",
             "&:hover": { backgroundColor: "rgba(0, 255, 65, 0.1)" },
           }}
         >
@@ -152,7 +152,7 @@ const SpectrumAnalyzer: React.FC = () => {
       {/* Spectrum Waterfall Component */}
       <Box
         sx={{
-          border: "2px solid #00ff41",
+          border: "2px solid var(--primary-color)",
           borderRadius: 1,
           overflow: "auto",
           maxWidth: "100%",

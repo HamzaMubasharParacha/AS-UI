@@ -23,8 +23,8 @@ const SpectrumWaterfall: React.FC<SpectrumWaterfallProps> = ({
   
   const [minFreq, setMinFreq] = useState(0);
   const [maxFreq, setMaxFreq] = useState(6000);
-  const [minPower, setMinPower] = useState(-110);
-  const [maxPower, setMaxPower] = useState(-10);
+  const [minPower, setMinPower] = useState(1000);
+  const [maxPower, setMaxPower] = useState(-20);
   const [colorScheme, setColorScheme] = useState("viridis");
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectionStart, setSelectionStart] = useState<number | null>(null);
@@ -627,8 +627,8 @@ const SpectrumWaterfall: React.FC<SpectrumWaterfallProps> = ({
               </button>
               <button
                 onClick={() => {
-                  setMinPower(-110);
-                  setMaxPower(-10);
+                  setMinPower(1000);
+                  setMaxPower(-20);
                 }}
                 style={{
                   padding: "5px 15px",
@@ -788,22 +788,51 @@ const SpectrumWaterfall: React.FC<SpectrumWaterfallProps> = ({
         
         {/* Graph Container */}
         <div style={{
-          border: "1px solid #333",
-          borderTop: "none",
-          borderRadius: "0 0 4px 4px",
-          overflow: "hidden"
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: isDraggingSpectrum ? 'rgba(0, 255, 65, 0.1)' : 'transparent',
+          border: isDraggingSpectrum ? '2px dashed #00ff41' : 'none',
+          borderRadius: '4px',
+          pointerEvents: 'none',
+          zIndex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: isDraggingSpectrum ? 1 : 0,
+          transition: 'all 0.2s'
         }}>
-          <canvas
-            ref={spectrumRef}
-            width={width}
-            height={spectrumHeight}
-            style={{ 
-              display: "block", 
-              background: "#000", 
-              cursor: "crosshair"
-            }}
-          />
+          {isDraggingSpectrum && (
+            <div style={{
+              color: '#00ff41',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              padding: '10px 20px',
+              borderRadius: '4px',
+              border: '1px solid #00ff41'
+            }}>
+              Dragging Spectrum Analyzer...
+            </div>
+          )}
         </div>
+        
+        <canvas
+          ref={spectrumRef}
+          width={width}
+          height={spectrumHeight}
+          style={{ 
+            display: "block", 
+            background: "#000", 
+            cursor: "crosshair",
+            borderRadius: '4px',
+            border: '1px solid #333'
+          }}
+        />
+        
+        
       </div>
 
       {/* Waterfall Display */}

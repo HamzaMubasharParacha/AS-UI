@@ -255,7 +255,7 @@ const FloatingSpectrumAnalyzer: React.FC<FloatingSpectrumAnalyzerProps> = ({
         backgroundColor: "#000",
         borderRadius: "8px",
         overflow: "hidden",
-        border: "2px solid #00ff41",
+        border: "2px solid var(--primary-color)",
         boxShadow: "0 4px 20px rgba(0, 0, 0, 0.7)",
         userSelect: "none",
       }}
@@ -267,14 +267,14 @@ const FloatingSpectrumAnalyzer: React.FC<FloatingSpectrumAnalyzerProps> = ({
         style={{
           padding: "8px 10px",
           background: "linear-gradient(90deg, #1a1a1a 0%, #0a0a0a 100%)",
-          borderBottom: "2px solid #00ff41",
+          borderBottom: "2px solid var(--primary-color)",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           cursor: "grab",
         }}
       >
-        <div style={{ fontSize: "12px", color: "#00ff41", fontWeight: "bold", fontFamily: '"Roboto Mono", monospace' }}>
+        <div style={{ fontSize: "12px", color: "var(--primary-color)", fontWeight: "bold", fontFamily: '"Roboto Mono", monospace' }}>
           📡 FLOATING SPECTRUM
         </div>
         {onClose && (
@@ -339,7 +339,7 @@ const FloatingSpectrumAnalyzer: React.FC<FloatingSpectrumAnalyzerProps> = ({
           }}
           style={{
             padding: "4px 10px",
-            background: "#00ff41",
+            background: "var(--primary-color)",
             color: "#000",
             border: "none",
             borderRadius: "4px",
@@ -361,8 +361,8 @@ const FloatingSpectrumAnalyzer: React.FC<FloatingSpectrumAnalyzerProps> = ({
           style={{
             padding: "4px 10px",
             background: "#222",
-            color: "#00ff41",
-            border: "1px solid #00ff41",
+            color: "var(--primary-color)",
+            border: "1px solid var(--primary-color)",
             borderRadius: "4px",
             cursor: "pointer",
             fontSize: "10px",

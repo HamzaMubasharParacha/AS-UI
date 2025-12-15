@@ -139,7 +139,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
       return {
         text: "START SECTOR JAMMING",
         color: "#000",
-        bgColor: "#00ff41",
+        bgColor: "var(--primary-color)",
         hoverBgColor: "rgba(0, 255, 65, 0.8)",
         onClick: handleStartSectorJamming,
         disabled: !sectorJammingEnabled || (!azimuthSectorEnabled && !elevationSectorEnabled),
@@ -185,7 +185,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
           fontSize: "10px",
         }}
       >
-        <Typography sx={{ color: "#00ff41", fontSize: "10px" }}>
+        <Typography sx={{ color: "var(--primary-color)", fontSize: "10px" }}>
           Current: Az {displayAzimuth.toFixed(1)}° El {coneelevation.toFixed(1)}°
           {sectorJammingActive && " (Sector Scanning)"}
         </Typography>
@@ -221,7 +221,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
           >
             <CircularSlider
               width={150}
-              knobColor="#00ff41"
+              knobColor="var(--primary-color)"
               knobSize={25}
               progressColorFrom="rgba(12, 62, 22, 0.1)"
               progressColorTo="rgba(12, 62, 22, 0.1)"
@@ -231,7 +231,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
               min={0}
               max={360}
               label=""
-              labelColor="#00ff41"
+              labelColor="var(--primary-color)"
               labelBottom={true}
               labelFontSize="0px"
               valueFontSize="0px"
@@ -275,14 +275,14 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                       y1={center + (radius - 12) * Math.sin(rad)}
                       x2={center + (radius + 5) * Math.cos(rad)}
                       y2={center + (radius + 5) * Math.sin(rad)}
-                      stroke="#00ff41"
+                      stroke="var(--primary-color)"
                       strokeWidth="1.5"
                       strokeLinecap="round"
                     />
                     <text
                       x={center + (radius - 25) * Math.cos(rad)}
                       y={center + (radius - 25) * Math.sin(rad)}
-                      fill="#00ff41"
+                      fill="var(--primary-color)"
                       fontSize="10"
                       fontFamily="monospace"
                       fontWeight="bold"
@@ -310,7 +310,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                     y1={center + (radius - 8) * Math.sin(rad)}
                     x2={center + (radius - 8 + markLength) * Math.cos(rad)}
                     y2={center + (radius - 8 + markLength) * Math.sin(rad)}
-                    stroke="#00ff41"
+                    stroke="var(--primary-color)"
                     strokeWidth="1"
                     strokeOpacity="0.5"
                     strokeLinecap="round"
@@ -322,7 +322,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
 
           <Typography
             sx={{
-              color: "#00ff41",
+              color: "var(--primary-color)",
               fontSize: "12px",
               fontFamily: "monospace",
               mt: 1,
@@ -374,7 +374,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
               ]}
               valueLabelDisplay="auto"
               sx={{
-                color: "#00ff41",
+                color: "var(--primary-color)",
                 height: "140px",
                 "& .MuiSlider-track": {
                   background: "linear-gradient(to top, #11461d, #11461d)",
@@ -388,7 +388,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                   left: "calc(50% - 2px)",
                 },
                 "& .MuiSlider-thumb": {
-                  backgroundColor: "#00ff41",
+                  backgroundColor: "var(--primary-color)",
                   width: 20,
                   height: 20,
                   border: "2px solid #000",
@@ -401,21 +401,21 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                   },
                 },
                 "& .MuiSlider-mark": {
-                  backgroundColor: "#00ff41",
+                  backgroundColor: "var(--primary-color)",
                   width: "8px",
                   height: "2px",
                   borderRadius: "0",
                   left: "calc(50% - 4px)",
                 },
                 "& .MuiSlider-markLabel": {
-                  color: "#00ff41",
+                  color: "var(--primary-color)",
                   fontSize: "9px",
                   fontFamily: "monospace",
                   left: "30px",
                   right: "auto",
                 },
                 "& .MuiSlider-valueLabel": {
-                  backgroundColor: "#00ff41",
+                  backgroundColor: "var(--primary-color)",
                   color: "#000",
                   fontFamily: "monospace",
                   fontSize: "10px",
@@ -444,7 +444,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
 
           <Typography
             sx={{
-              color: "#00ff41",
+              color: "var(--primary-color)",
               fontSize: "12px",
               fontFamily: "monospace",
               mt: 1,
@@ -471,9 +471,9 @@ const PTZControls: React.FC<PTZControlsProps> = ({
               appearance: "none",
               width: "16px",
               height: "16px",
-              border: "2px solid #00ff41",
+              border: "2px solid var(--primary-color)",
               borderRadius: "3px",
-              backgroundColor: sectorJammingEnabled ? "#00ff41" : "rgba(0, 255, 65, 0.1)",
+              backgroundColor: sectorJammingEnabled ? "var(--primary-color)" : "rgba(0, 255, 65, 0.1)",
               cursor: "pointer",
               marginRight: "8px",
               position: "relative",
@@ -483,7 +483,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
           <label 
             htmlFor="sector-jamming"
             style={{
-              color: "#00ff41",
+              color: "var(--primary-color)",
               fontSize: "12px",
               fontFamily: "monospace",
               fontWeight: "bold",
@@ -511,9 +511,9 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                     appearance: "none",
                     width: "14px",
                     height: "14px",
-                    border: "2px solid #00ff41",
+                    border: "2px solid var(--primary-color)",
                     borderRadius: "3px",
-                    backgroundColor: azimuthSectorEnabled ? "#00ff41" : "rgba(0, 255, 65, 0.1)",
+                    backgroundColor: azimuthSectorEnabled ? "var(--primary-color)" : "rgba(0, 255, 65, 0.1)",
                     cursor: sectorJammingActive ? "not-allowed" : "pointer",
                     marginRight: "6px",
                     opacity: sectorJammingActive ? 0.7 : 1,
@@ -523,7 +523,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                 <label 
                   htmlFor="azimuth-sector"
                   style={{
-                    color: azimuthSectorEnabled ? "#00ff41" : "rgba(0, 255, 65, 0.7)",
+                    color: azimuthSectorEnabled ? "var(--primary-color)" : "rgba(0, 255, 65, 0.7)",
                     fontSize: "11px",
                     fontFamily: "monospace",
                     fontWeight: "bold",
@@ -546,9 +546,9 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                     appearance: "none",
                     width: "14px",
                     height: "14px",
-                    border: "2px solid #00ff41",
+                    border: "2px solid var(--primary-color)",
                     borderRadius: "3px",
-                    backgroundColor: elevationSectorEnabled ? "#00ff41" : "rgba(0, 255, 65, 0.1)",
+                    backgroundColor: elevationSectorEnabled ? "var(--primary-color)" : "rgba(0, 255, 65, 0.1)",
                     cursor: sectorJammingActive ? "not-allowed" : "pointer",
                     marginRight: "6px",
                     opacity: sectorJammingActive ? 0.7 : 1,
@@ -558,7 +558,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                 <label 
                   htmlFor="elevation-sector"
                   style={{
-                    color: elevationSectorEnabled ? "#00ff41" : "rgba(0, 255, 65, 0.7)",
+                    color: elevationSectorEnabled ? "var(--primary-color)" : "rgba(0, 255, 65, 0.7)",
                     fontSize: "11px",
                     fontFamily: "monospace",
                     fontWeight: "bold",
@@ -584,7 +584,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                 <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                   <Typography
                     sx={{
-                      color: "#00ff41",
+                      color: "var(--primary-color)",
                       fontSize: "11px",
                       fontFamily: "monospace",
                       mb: 1,
@@ -597,7 +597,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                       <label 
                         style={{
-                          color: "#00ff41",
+                          color: "var(--primary-color)",
                           fontSize: "10px",
                           fontFamily: "monospace",
                           marginBottom: "4px",
@@ -619,7 +619,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                             : "rgba(0, 255, 65, 0.05)",
                           border: "1px solid rgba(0, 255, 65, 0.3)",
                           borderRadius: "3px",
-                          color: "#00ff41",
+                          color: "var(--primary-color)",
                           fontFamily: "monospace",
                           fontSize: "11px",
                           textAlign: "center",
@@ -632,7 +632,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                       <label 
                         style={{
-                          color: "#00ff41",
+                          color: "var(--primary-color)",
                           fontSize: "10px",
                           fontFamily: "monospace",
                           marginBottom: "4px",
@@ -654,7 +654,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                             : "rgba(0, 255, 65, 0.05)",
                           border: "1px solid rgba(0, 255, 65, 0.3)",
                           borderRadius: "3px",
-                          color: "#00ff41",
+                          color: "var(--primary-color)",
                           fontFamily: "monospace",
                           fontSize: "11px",
                           textAlign: "center",
@@ -672,7 +672,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                 <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                   <Typography
                     sx={{
-                      color: "#00ff41",
+                      color: "var(--primary-color)",
                       fontSize: "11px",
                       fontFamily: "monospace",
                       mb: 1,
@@ -685,7 +685,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                       <label 
                         style={{
-                          color: "#00ff41",
+                          color: "var(--primary-color)",
                           fontSize: "10px",
                           fontFamily: "monospace",
                           marginBottom: "4px",
@@ -707,7 +707,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                             : "rgba(0, 255, 65, 0.05)",
                           border: "1px solid rgba(0, 255, 65, 0.3)",
                           borderRadius: "3px",
-                          color: "#00ff41",
+                          color: "var(--primary-color)",
                           fontFamily: "monospace",
                           fontSize: "11px",
                           textAlign: "center",
@@ -720,7 +720,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                       <label 
                         style={{
-                          color: "#00ff41",
+                          color: "var(--primary-color)",
                           fontSize: "10px",
                           fontFamily: "monospace",
                           marginBottom: "4px",
@@ -742,7 +742,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                             : "rgba(0, 255, 65, 0.05)",
                           border: "1px solid rgba(0, 255, 65, 0.3)",
                           borderRadius: "3px",
-                          color: "#00ff41",
+                          color: "var(--primary-color)",
                           fontFamily: "monospace",
                           fontSize: "11px",
                           textAlign: "center",
@@ -779,7 +779,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
                 <button
                   onClick={onToggleSectorJammingPause}
                   style={{
-                    backgroundColor: sectorJammingStatus === "paused" ? "#00ff41" : "#ffaa00",
+                    backgroundColor: sectorJammingStatus === "paused" ? "var(--primary-color)" : "#ffaa00",
                     color: sectorJammingStatus === "paused" ? "#000" : "#000",
                     border: "1px solid rgba(0, 255, 65, 0.5)",
                     borderRadius: "4px",
@@ -850,7 +850,7 @@ const PTZControls: React.FC<PTZControlsProps> = ({
               <Box sx={{ textAlign: "center", mt: 1 }}>
                 <Typography
                   sx={{
-                    color: sectorJammingStatus === "active" ? "#00ff41" : "#ffaa00",
+                    color: sectorJammingStatus === "active" ? "var(--primary-color)" : "#ffaa00",
                     fontSize: "10px",
                     fontFamily: "monospace",
                     fontWeight: "bold",

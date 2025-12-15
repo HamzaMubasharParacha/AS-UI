@@ -71,7 +71,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       >
         <Typography
           variant="h5"
-          sx={{ mb: 3, color: "#00ff41", textAlign: "center" }}
+          sx={{ mb: 3, color: "var(--primary-color)", textAlign: "center" }}
         >
           Anti-Drone System Login
         </Typography>
@@ -90,16 +90,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   borderColor: "#888", // default border
                 },
                 "&:hover fieldset": {
-                  borderColor: "#00ff41", // hover border
+                  borderColor: "var(--primary-color)", // hover border
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#00ff41", // focused border
+                  borderColor: "var(--primary-color)", // focused border
                 },
               },
               "& .MuiInputLabel-root": {
                 color: "#888", // label color
                 "&.Mui-focused": {
-                  color: "#00ff41", // focused label color
+                  color: "var(--primary-color)", // focused label color
                 },
               },
               "& .MuiInputBase-input": {
@@ -113,6 +113,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             variant="outlined"
             type="password"
             value={password}
+            required
             onChange={(e) => setPassword(e.target.value)}
             sx={{
               mb: 2,
@@ -121,16 +122,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   borderColor: "#888", // default border
                 },
                 "&:hover fieldset": {
-                  borderColor: "#00ff41", // hover border
+                  borderColor: "var(--primary-color)", // hover border
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#00ff41", // focused border
+                  borderColor: "var(--primary-color)", // focused border
                 },
               },
               "& .MuiInputLabel-root": {
                 color: "#888", // label color
                 "&.Mui-focused": {
-                  color: "#00ff41", // focused label color
+                  color: "var(--primary-color)", // focused label color
                 },
               },
               "& .MuiInputBase-input": {
@@ -149,7 +150,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             type="submit"
             disabled={loading}
             sx={{
-              bgcolor: "#00ff41",
+              bgcolor: "var(--primary-color)",
               color: "black",
               fontWeight: "bold",
               "&:hover": { bgcolor: "#00cc33" },

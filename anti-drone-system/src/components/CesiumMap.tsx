@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Snackbar, Alert } from "@mui/material";
 import L from "leaflet";
-import { TileLayer } from "react-leaflet";
+import { TileLayer, useMap } from "react-leaflet";
 import {
   MapContainer,
   Circle,
@@ -111,7 +111,7 @@ const TriangleCone: React.FC<{
           {jammerActive ? (
             <span style={{ color: "#FF0000", fontWeight: "bold" }}>ON</span>
           ) : (
-            <span style={{ color: "#00ff41" }}>OFF</span>
+            <span style={{ color: "var(--primary-color)" }}>OFF</span>
           )}
           {jammerActive && (
             <>
@@ -149,11 +149,12 @@ interface DroneTrajectory {
   points: TrajectoryPoint[];
   color: string;
   threat_level: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  lastSeenTime: number; // Add timestamp for last seen
 }
 
 interface CesiumMapProps {
   drones: DroneData[];
-  systemActive: boolean;
+  systemActive: string;
   drawingToolsEnabled?: boolean;
   coneangle: number;
   coneelevation: number;
@@ -170,6 +171,11 @@ L.Icon.Default.mergeOptions({
   shadowUrl:
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
+
+// Helper function to check if coordinates are 0.0
+const isZeroCoordinate = (lat: number, lng: number): boolean => {
+  return Math.abs(lat) < 0.0001 && Math.abs(lng) < 0.0001;
+};
 
 // Create drone icons based on threat level with enhanced detection highlighting
 const createDroneIcon = (
@@ -429,6 +435,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   useEffect(() => {
     if (drones.length === 0) return;
 
+    const currentTime = Date.now();
     setTrajectories((prevTrajectories) => {
       const updatedTrajectories = [...prevTrajectories];
 
@@ -436,6 +443,17 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         const existingTrajectoryIndex = updatedTrajectories.findIndex(
           (t) => t.id === drone.id
         );
+
+        // Check if coordinates are valid (not 0.0)
+        const isValidCoordinate = !isZeroCoordinate(
+          drone.position[1],
+          drone.position[0]
+        );
+
+        if (!isValidCoordinate) {
+          // Skip adding this point if coordinates are 0.0
+          return;
+        }
 
         const newPoint: TrajectoryPoint = {
           position: drone.position,
@@ -462,27 +480,60 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
               newPoint,
             ];
           }
+          // Update last seen time for existing trajectory
+          updatedTrajectories[existingTrajectoryIndex].lastSeenTime =
+            currentTime;
         } else {
+          // Create new trajectory with valid coordinates
           updatedTrajectories.push({
             id: drone.id,
             points: [newPoint],
             color: getTrajectoryColor(drone.threat_level),
             threat_level: drone.threat_level,
+            lastSeenTime: currentTime,
           });
         }
       });
 
-      const now = new Date().getTime();
+      // Filter out trajectories that haven't been seen in the last 15 seconds
+      const now = Date.now();
       return updatedTrajectories.filter((trajectory) => {
-        const lastPointTime = new Date(
-          trajectory.points[trajectory.points.length - 1].timestamp
-        ).getTime();
-        return (
-          drones.find((d) => d.id === trajectory.id) ||
-          now - lastPointTime < 5 * 60 * 1000
-        );
+        // Check if drone is currently in the drones list
+        const droneExists = drones.find((d) => d.id === trajectory.id);
+        
+        if (droneExists) {
+          // Drone is currently active, keep trajectory
+          return true;
+        } else {
+          // Drone is not in current list, check when it was last seen
+          const timeSinceLastSeen = now - trajectory.lastSeenTime;
+          return timeSinceLastSeen < 15000; // 15 seconds
+        }
       });
     });
+  }, [drones]);
+
+  // Clean up old trajectories periodically
+  useEffect(() => {
+    const cleanupInterval = setInterval(() => {
+      const now = Date.now();
+      setTrajectories((prevTrajectories) => {
+        return prevTrajectories.filter((trajectory) => {
+          // Check if drone is currently active
+          const droneExists = drones.find((d) => d.id === trajectory.id);
+          
+          if (droneExists) {
+            return true; // Keep trajectory for active drones
+          }
+          
+          // Check if trajectory is older than 15 seconds
+          const timeSinceLastSeen = now - trajectory.lastSeenTime;
+          return timeSinceLastSeen < 15000; // 15 seconds
+        });
+      });
+    }, 5000); // Check every 5 seconds
+
+    return () => clearInterval(cleanupInterval);
   }, [drones]);
 
   // Threat detection logic
@@ -509,10 +560,13 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   const getTrajectoryPoints = (
     trajectory: DroneTrajectory
   ): [number, number][] => {
-    return trajectory.points.map((point) => [
-      point.position[1],
-      point.position[0],
-    ]);
+    // Filter out any 0.0 coordinates from the trajectory points
+    return trajectory.points
+      .filter(point => !isZeroCoordinate(point.position[1], point.position[0]))
+      .map((point) => [
+        point.position[1],
+        point.position[0],
+      ]);
   };
 
   return (
@@ -573,73 +627,84 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
       <MapContainer
         center={centerPosition}
         zoomControl={false}
-        zoom={12}
+        zoom={11}
         rotate={true}
         rotateControl={false}
         style={{
           height: "100%",
           width: "100%",
           borderRadius: "8px",
-          border: "2px solid #00ff41",
+          border: "2px solid var(--primary-color)",
         }}
       >
         {/* Offline Tile Layer */}
-        <TileLayer url={"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"} />
+        <TileLayer
+          url={
+            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+          }
+        />
         <MapInformationControls activeLayer={activeLayer} />
         <MapRotateTracker onBearingChange={setMapBearing} />
         <MapLayerControls onLayerChange={setActiveLayer} />
         <MapDrawingTools></MapDrawingTools>
-
         {/* Triangle Cone */}
-       {showTriangleCone && (
-        <TriangleCone
-          center={centerPosition}
-          direction={coneangle}
-          jammerActive={jammerActive} // Use the state
-        />
+        {jammerStatus && (
+          <TriangleCone
+            center={centerPosition}
+            direction={coneangle}
+            jammerActive={jammerActive} // Use the state
+          />
         )}
-
         {/* Drone Trajectories */}
         {showTrajectories &&
-          trajectories.map((trajectory) => (
-            <Polyline
-              key={trajectory.id}
-              positions={getTrajectoryPoints(trajectory)}
-              pathOptions={{
-                color: trajectory.color,
-                weight: 3,
-                opacity: 0.7,
-                lineCap: "round",
-                lineJoin: "round",
-                dashArray:
-                  trajectory.threat_level === "CRITICAL" ? "5, 10" : "10, 10",
-                dashOffset: "0",
-              }}
-            />
-          ))}
-
+          trajectories.map((trajectory) => {
+            const points = getTrajectoryPoints(trajectory);
+            // Only render trajectory if we have at least 2 valid points
+            if (points.length < 2) return null;
+            
+            return (
+              <Polyline
+                key={trajectory.id}
+                positions={points}
+                pathOptions={{
+                  color: trajectory.color,
+                  weight: 3,
+                  opacity: 0.7,
+                  lineCap: "round",
+                  lineJoin: "round",
+                  dashArray:
+                    trajectory.threat_level === "CRITICAL" ? "5, 10" : "10, 10",
+                  dashOffset: "0",
+                }}
+              />
+            );
+          })}
         {/* GEOGRAPHICALLY FIXED 10km Coverage Circle */}
+
         <Circle
           center={centerPosition}
           radius={radius10km}
           pathOptions={{
-            color: "#00E676",
+            color: "var(--primary-color)",
             fillColor: "#000000ff",
             fillOpacity: 0.1,
             weight: 2,
             dashArray: "5, 8",
           }}
         />
-
         <RadarComponent
           center={centerPosition}
           radius={radius10km}
           radarActive={radarActive}
           systemActive={systemActive}
         />
-
         {/* Drone Markers */}
         {drones.map((drone) => {
+          // Skip rendering marker if coordinates are 0.0
+          if (isZeroCoordinate(drone.position[1], drone.position[0])) {
+            return null;
+          }
+          
           const isDetected = detectedThreats.includes(drone.id);
           const actualDistance = calculateDistance(
             centerLat,
@@ -660,8 +725,14 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
               )}
             >
               <Popup>
-                <div style={{ fontFamily: "monospace", fontSize: "11px", color:"white" }}>
-                  <strong style={{ color:"#ff0000" }}>
+                <div
+                  style={{
+                    fontFamily: "monospace",
+                    fontSize: "11px",
+                    color: "white",
+                  }}
+                >
+                  <strong style={{ color: "#ff0000" }}>
                     {isDetected ? "🚨 DETECTED THREAT" : "🎯 DRONE"}
                   </strong>
                   <br />
