@@ -16,7 +16,6 @@ import SystemStatus from "./SystemStatus";
 import SpectrumAnalyzer from "./SpectrumAnalyzer";
 import FloatingSpectrumAnalyzer from "./FloatingSpectrumAnalyzer";
 import "../ADSDashboard.css";
-// import "../index.css";
 import { drone_data, logout, df_connectivity, cone_angle, spectrum_data, hardwareSystemId } from "../api/config";
 
 interface DashboardProps {

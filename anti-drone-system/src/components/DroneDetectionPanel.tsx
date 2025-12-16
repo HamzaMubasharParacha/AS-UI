@@ -19,23 +19,28 @@ import {
   Card,
 } from "@mui/material";
 import MapIcon from "@mui/icons-material/Map";
-import SettingsRemoteIcon from '@mui/icons-material/SettingsRemote';
-import CloseIcon from '@mui/icons-material/Close';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import PauseIcon from '@mui/icons-material/Pause';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import SettingsRemoteIcon from "@mui/icons-material/SettingsRemote";
+import CloseIcon from "@mui/icons-material/Close";
+import { Checkbox } from "@mui/material";
 
 // Import Leaflet CSS and components
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Polyline,
+  useMap,
+} from "react-leaflet";
 
 // Fix for default Leaflet marker icons in React
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+  iconUrl: require("leaflet/dist/images/marker-icon.png"),
+  shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
 });
 
 // Define types based on your API response
@@ -56,7 +61,10 @@ interface Drone {
   isActive: boolean;
   firstSeenAt: string;
   lastSeenAt: string;
-  positions: Position[]; // Array of positions for trajectory
+  // positions: Position[]; // Array of positions for trajectory
+  positions: {
+    content: Position[];
+  };
 }
 
 interface ApiResponse {
@@ -101,7 +109,7 @@ const createDroneIcon = (isActive: boolean) => {
         }
       </style>
     `,
-    className: 'custom-drone-icon',
+    className: "custom-drone-icon",
     iconSize: [40, 40],
     iconAnchor: [20, 20],
     popupAnchor: [0, -20],
@@ -111,11 +119,11 @@ const createDroneIcon = (isActive: boolean) => {
 // Component to handle map view changes
 const MapViewUpdater = ({ lat, lng }: { lat: number; lng: number }) => {
   const map = useMap();
-  
+
   useEffect(() => {
     map.setView([lat, lng], 14);
   }, [lat, lng, map]);
-  
+
   return null;
 };
 
@@ -126,48 +134,56 @@ const isZeroCoordinate = (lat: number, lng: number): boolean => {
 
 // Get trajectory coordinates for Polyline - show trajectory with valid coordinates
 const getTrajectoryCoordinates = (drone: Drone): [number, number][] => {
-  if (!drone.positions || drone.positions.length === 0) return [];
-  
+  const positions = drone.positions?.content;
+  if (!positions || positions.length === 0) return [];
+
   // Get ALL non-zero coordinates for trajectory (don't filter too much)
-  const validPositions = drone.positions.filter(pos => 
-    pos && 
-    !isZeroCoordinate(pos.latitude, pos.longitude)
+  const validPositions = positions.filter(
+    (pos) => pos && !isZeroCoordinate(pos.latitude, pos.longitude)
   );
-  
+
   if (validPositions.length === 0) return [];
-  
+
   // Sort positions chronologically using recordedAt
-  const sortedPositions = [...validPositions].sort((a, b) => 
-    new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime()
+  const sortedPositions = [...validPositions].sort(
+    (a, b) =>
+      new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime()
   );
-  
-  return sortedPositions.map(pos => [pos.latitude, pos.longitude] as [number, number]);
+
+  return sortedPositions.map(
+    (pos) => [pos.latitude, pos.longitude] as [number, number]
+  );
 };
 
 // Get the latest NON-ZERO position for display
 const getLatestValidPosition = (drone: Drone): Position | null => {
-  if (!drone.positions || drone.positions.length === 0) return null;
-  
+  const positions = drone.positions?.content;
+  if (!positions || positions.length === 0) return null;
+
   // Sort positions by timestamp to get the latest (using recordedAt)
-  const sortedPositions = [...drone.positions].sort((a, b) => 
-    new Date(b.recordedAt).getTime() - new Date(a.recordedAt).getTime()
+  const sortedPositions = [...positions].sort(
+    (a, b) =>
+      new Date(b.recordedAt).getTime() - new Date(a.recordedAt).getTime()
   );
-  
+
   // Find the latest non-zero position
   for (const pos of sortedPositions) {
     if (!isZeroCoordinate(pos.latitude, pos.longitude)) {
       return pos;
     }
   }
-  
+
   // If all positions are 0.0, return the latest one
   return sortedPositions.length > 0 ? sortedPositions[0] : null;
 };
 
 // Get all valid positions (non-zero) for info display
 const getValidPositionsCount = (drone: Drone): number => {
-  if (!drone.positions) return 0;
-  return drone.positions.filter(pos => !isZeroCoordinate(pos.latitude, pos.longitude)).length;
+  const positions = drone.positions?.content;
+  if (!positions) return 0;
+  return positions.filter(
+    (pos) => !isZeroCoordinate(pos.latitude, pos.longitude)
+  ).length;
 };
 
 const DroneDetectionPanel = () => {
@@ -175,38 +191,38 @@ const DroneDetectionPanel = () => {
   const [drones, setDrones] = useState<Drone[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // State for filter
   const [filter, setFilter] = useState<FilterStatus>("all");
-  
+
   // State for map modal
   const [openMapModal, setOpenMapModal] = useState(false);
   const [selectedDrone, setSelectedDrone] = useState<Drone | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
-  
+
   const mapRef = useRef(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch drones data on component mount
   useEffect(() => {
     fetchDrones();
-    
+
     // Set up auto-refresh
     startAutoRefresh();
-    
+
     // Cleanup interval on component unmount
     return () => {
       stopAutoRefresh();
     };
-  }, []);
+  }, [drones]);
 
   // Start auto-refresh interval
   const startAutoRefresh = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-    
+
     intervalRef.current = setInterval(() => {
       if (autoRefresh) {
         fetchDrones();
@@ -225,7 +241,7 @@ const DroneDetectionPanel = () => {
 
   // Toggle auto-refresh
   const toggleAutoRefresh = () => {
-    setAutoRefresh(prev => !prev);
+    setAutoRefresh((prev) => !prev);
     if (!autoRefresh) {
       startAutoRefresh();
     } else {
@@ -233,19 +249,70 @@ const DroneDetectionPanel = () => {
     }
   };
 
+  const whitelistDrone = async (
+    droneId: string,
+    whitelistVal: boolean
+  ): Promise<void> => {
+    try {
+      const token = sessionStorage.getItem("token");
+      if (!token) {
+        setError("No authentication token found");
+        return;
+      }
+      const response = await fetch(
+        `http://192.168.100.102:8080/api/df/drones/${droneId}/whitelist?whitelistVal=${whitelistVal}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      setDrones((prev) =>
+        prev.map((d) =>
+          d.droneId === droneId ? { ...d, whitelisted: whitelistVal } : d
+        )
+      );
+    } catch (err: unknown) {
+      console.error("Error updating whitelist:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to update whitelist"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchDrones = async () => {
     try {
       setLoading(true);
       setError(null);
-      
-      const response = await fetch(detectedDrones);
+
+      const token = sessionStorage.getItem("token");
+      if (!token) {
+        setError("No authentication token found");
+        setLoading(false);
+        return;
+      }
+      const response = await fetch(`${detectedDrones}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data: ApiResponse = await response.json();
       
-      if (data.success && data.data) {
+      if (data.success) {
         setDrones(data.data);
         setLastUpdate(new Date());
       } else {
@@ -253,7 +320,9 @@ const DroneDetectionPanel = () => {
       }
     } catch (err) {
       console.error("Error fetching drones:", err);
-      setError(err instanceof Error ? err.message : "Failed to fetch drone data");
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch drone data"
+      );
     } finally {
       setLoading(false);
     }
@@ -268,13 +337,13 @@ const DroneDetectionPanel = () => {
   });
 
   // Count statistics - using isActive
-  const activeCount = drones.filter(d => d.isActive).length;
-  const inactiveCount = drones.filter(d => !d.isActive).length;
+  const activeCount = drones.filter((d) => d.isActive).length;
+  const inactiveCount = drones.filter((d) => !d.isActive).length;
   const totalCount = drones.length;
 
   const handleFilterChange = (
     event: React.MouseEvent<HTMLElement>,
-    newFilter: FilterStatus | null,
+    newFilter: FilterStatus | null
   ) => {
     if (newFilter !== null) {
       setFilter(newFilter);
@@ -297,24 +366,25 @@ const DroneDetectionPanel = () => {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
+
     if (diffMins < 1) return "Just now";
     if (diffMins < 60) return `${diffMins} min ago`;
-    
+
     const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    
+    if (diffHours < 24)
+      return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+
     const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
   };
 
   // Format time for display
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
+    return new Date(dateString).toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
     });
   };
 
@@ -332,17 +402,17 @@ const DroneDetectionPanel = () => {
 
   // Format last update time
   const formatLastUpdate = () => {
-    return lastUpdate.toLocaleTimeString('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
+    return lastUpdate.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
     });
   };
 
   if (loading && drones.length === 0) {
     return (
-      <Paper sx={{ p: 3, textAlign: 'center' }}>
+      <Paper sx={{ p: 3, textAlign: "center" }}>
         <Typography>Loading drone data...</Typography>
       </Paper>
     );
@@ -350,7 +420,7 @@ const DroneDetectionPanel = () => {
 
   if (error && drones.length === 0) {
     return (
-      <Paper sx={{ p: 3, textAlign: 'center' }}>
+      <Paper sx={{ p: 3, textAlign: "center" }}>
         <Typography color="error">Error: {error}</Typography>
         <button onClick={fetchDrones}>Retry</button>
       </Paper>
@@ -368,16 +438,18 @@ const DroneDetectionPanel = () => {
         }}
       >
         {/* Header with filter buttons and refresh controls */}
-        <Box sx={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "center", 
-          mb: 2 
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2,
+          }}
+        >
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
             Detected Drones ({totalCount})
           </Typography>
-          
+
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <ToggleButtonGroup
               value={filter}
@@ -389,29 +461,37 @@ const DroneDetectionPanel = () => {
               <ToggleButton value="all" aria-label="all drones">
                 All ({totalCount})
               </ToggleButton>
-              <ToggleButton value="active" aria-label="active drones" sx={{ 
-                color: filter === 'active' ? 'var(--active-color)' : 'inherit',
-                '&.Mui-selected': { 
-                  backgroundColor: '#5a5a5a',
-                  color: 'white',
-                  '&:hover': { backgroundColor: '#5a5a5a' }
-                }
-              }}>
+              <ToggleButton
+                value="active"
+                aria-label="active drones"
+                sx={{
+                  color:
+                    filter === "active" ? "var(--active-color)" : "inherit",
+                  "&.Mui-selected": {
+                    backgroundColor: "#5a5a5a",
+                    color: "white",
+                    "&:hover": { backgroundColor: "#5a5a5a" },
+                  },
+                }}
+              >
                 Active ({activeCount})
               </ToggleButton>
-              <ToggleButton value="inactive" aria-label="inactive drones" sx={{ 
-                color: filter === 'inactive' ? 'var(--inactive-color)' : 'inherit',
-                '&.Mui-selected': { 
-                  backgroundColor: '#5a5a5a',
-                  color: 'white',
-                  '&:hover': { backgroundColor: '#5a5a5a' }
-                }
-              }}>
+              <ToggleButton
+                value="inactive"
+                aria-label="inactive drones"
+                sx={{
+                  color:
+                    filter === "inactive" ? "var(--inactive-color)" : "inherit",
+                  "&.Mui-selected": {
+                    backgroundColor: "#5a5a5a",
+                    color: "white",
+                    "&:hover": { backgroundColor: "#5a5a5a" },
+                  },
+                }}
+              >
                 Inactive ({inactiveCount})
               </ToggleButton>
             </ToggleButtonGroup>
-            
-           
           </Box>
         </Box>
 
@@ -419,25 +499,80 @@ const DroneDetectionPanel = () => {
           <Table stickyHeader size="medium">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 600, backgroundColor: 'var(--header-color)', borderRadius: '10px 0px 0px 10px', color: 'white' }}>
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                    backgroundColor: "var(--header-color)",
+                    borderRadius: "10px 0px 0px 10px",
+                    color: "white",
+                  }}
+                >
                   Image
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, backgroundColor: 'var(--header-color)', color: 'white' }}>
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                    backgroundColor: "var(--header-color)",
+                    color: "white",
+                  }}
+                >
                   Name
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, backgroundColor: 'var(--header-color)', color: 'white' }}>
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                    backgroundColor: "var(--header-color)",
+                    color: "white",
+                  }}
+                >
                   ID
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, backgroundColor: 'var(--header-color)', color: 'white' }}>
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                    backgroundColor: "var(--header-color)",
+                    color: "white",
+                  }}
+                >
                   Status
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, backgroundColor: 'var(--header-color)', color: 'white' }}>
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                    backgroundColor: "var(--header-color)",
+                    color: "white",
+                  }}
+                >
                   Last Seen
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, backgroundColor: 'var(--header-color)', color: 'white' }}>
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                    backgroundColor: "var(--header-color)",
+                    color: "white",
+                  }}
+                >
                   Last Position
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, backgroundColor: 'var(--header-color)', borderRadius: '0px 10px 10px 0px', color: 'white' }}>
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                    backgroundColor: "var(--header-color)",
+                    color: "white",
+                    textAlign: "center",
+                  }}
+                >
+                  Whitelist
+                </TableCell>
+
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                    backgroundColor: "var(--header-color)",
+                    borderRadius: "0px 10px 10px 0px",
+                    color: "white",
+                  }}
+                >
                   Actions
                 </TableCell>
               </TableRow>
@@ -446,8 +581,9 @@ const DroneDetectionPanel = () => {
               {filteredDrones.map((drone) => {
                 const latestPosition = getLatestValidPosition(drone);
                 const validPositionsCount = getValidPositionsCount(drone);
-                const totalPositionsCount = drone.positions?.length || 0;
-                
+                const totalPositionsCount =
+                  drone.positions?.content.length || 0;
+
                 return (
                   <TableRow
                     key={drone.droneId}
@@ -490,8 +626,8 @@ const DroneDetectionPanel = () => {
                         label={getStatusText(drone)}
                         color={getStatusColor(drone)}
                         size="small"
-                        sx={{ 
-                          fontWeight: 500, 
+                        sx={{
+                          fontWeight: 500,
                           minWidth: 80,
                         }}
                       />
@@ -503,28 +639,55 @@ const DroneDetectionPanel = () => {
                     </TableCell>
                     <TableCell>
                       {latestPosition ? (
-                        isZeroCoordinate(latestPosition.latitude, latestPosition.longitude) ? (
-                          <Typography variant="body2" color="text.secondary" fontStyle="italic">
+                        isZeroCoordinate(
+                          latestPosition.latitude,
+                          latestPosition.longitude
+                        ) ? (
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            fontStyle="italic"
+                          >
                             No coordinates
                           </Typography>
                         ) : (
                           <Typography variant="body2">
-                            {latestPosition.latitude.toFixed(4)}, {latestPosition.longitude.toFixed(4)}
+                            {latestPosition.latitude.toFixed(4)},{" "}
+                            {latestPosition.longitude.toFixed(4)}
                           </Typography>
                         )
                       ) : (
-                        <Typography variant="body2" color="text.secondary" fontStyle="italic">
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          fontStyle="italic"
+                        >
                           No position data
                         </Typography>
                       )}
                     </TableCell>
+                    <TableCell align="center">
+                      <Checkbox
+                        checked={drone.whitelisted}
+                        color="success"
+                        onChange={(e) =>
+                          whitelistDrone(drone.droneId, e.target.checked)
+                        }
+                        inputProps={{
+                          "aria-label": `Whitelist drone ${drone.droneId}`,
+                        }}
+                      />
+                    </TableCell>
+
                     <TableCell>
                       <IconButton
                         onClick={() => handleOpenMap(drone)}
                         sx={{
                           bgcolor: "var(--primary-color, #7bff00)",
                           color: "#000",
-                          "&:hover": { bgcolor: "var(--primary-color, #6ae600)" },
+                          "&:hover": {
+                            bgcolor: "var(--primary-color, #6ae600)",
+                          },
                           borderRadius: 1,
                         }}
                         size="small"
@@ -552,7 +715,8 @@ const DroneDetectionPanel = () => {
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            Showing: <strong>{filteredDrones.length}</strong> of <strong>{totalCount}</strong> drones
+            Showing: <strong>{filteredDrones.length}</strong> of{" "}
+            <strong>{totalCount}</strong> drones
           </Typography>
         </Box>
       </Paper>
@@ -614,7 +778,13 @@ const DroneDetectionPanel = () => {
                 borderBottom: "2px solid var(--primary-color, #7bff00)",
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   <Avatar
                     src={selectedDrone.image}
@@ -633,10 +803,15 @@ const DroneDetectionPanel = () => {
                       {selectedDrone.name}
                     </Typography>
                     <Typography variant="body2">
-                      ID: {selectedDrone.droneId} • Last seen: {formatTime(selectedDrone.lastSeenAt)}
+                      ID: {selectedDrone.droneId} • Last seen:{" "}
+                      {formatTime(selectedDrone.lastSeenAt)}
                     </Typography>
-                    <Typography variant="caption" sx={{ display: "block", color: "#aaa" }}>
-                      Valid positions: {getValidPositionsCount(selectedDrone)} of {selectedDrone.positions?.length || 0}
+                    <Typography
+                      variant="caption"
+                      sx={{ display: "block", color: "#aaa" }}
+                    >
+                      Valid positions: {getValidPositionsCount(selectedDrone)}{" "}
+                      of {selectedDrone.positions?.content.length || 0}
                     </Typography>
                   </Box>
                 </Box>
@@ -666,7 +841,7 @@ const DroneDetectionPanel = () => {
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                
+
                 {/* Drone Trajectory - show only valid coordinates */}
                 {(() => {
                   const trajectory = getTrajectoryCoordinates(selectedDrone);
@@ -680,26 +855,32 @@ const DroneDetectionPanel = () => {
                           opacity: 0.7,
                           lineCap: "round",
                           lineJoin: "round",
-                          dashArray: selectedDrone.state === "danger" ? "5, 10" : "10, 10",
+                          dashArray:
+                            selectedDrone.state === "danger"
+                              ? "5, 10"
+                              : "10, 10",
                         }}
                       />
                     );
                   }
                   return null;
                 })()}
-                
+
                 {/* Drone Marker - show at latest valid position */}
                 {(() => {
                   const latestPosition = getLatestValidPosition(selectedDrone);
                   if (latestPosition) {
-                    const isZeroPos = isZeroCoordinate(latestPosition.latitude, latestPosition.longitude);
-                    
+                    const isZeroPos = isZeroCoordinate(
+                      latestPosition.latitude,
+                      latestPosition.longitude
+                    );
+
                     return (
                       <>
-                        <Marker 
+                        <Marker
                           position={[
-                            isZeroPos ? 33.6464 : latestPosition.latitude, 
-                            isZeroPos ? 72.999 : latestPosition.longitude
+                            isZeroPos ? 33.6464 : latestPosition.latitude,
+                            isZeroPos ? 72.999 : latestPosition.longitude,
                           ]}
                           icon={createDroneIcon(selectedDrone.isActive)}
                         >
@@ -718,37 +899,67 @@ const DroneDetectionPanel = () => {
                                 State: {selectedDrone.state}
                               </Typography>
                               <Typography variant="body2">
-                                Valid positions: {getValidPositionsCount(selectedDrone)} of {selectedDrone.positions?.length || 0}
+                                Valid positions:{" "}
+                                {getValidPositionsCount(selectedDrone)} of{" "}
+                                {selectedDrone.positions?.content.length || 0}
                               </Typography>
                               <Typography variant="body2">
-                                First seen: {formatTime(selectedDrone.firstSeenAt)}
+                                First seen:{" "}
+                                {formatTime(selectedDrone.firstSeenAt)}
                               </Typography>
                               <Typography variant="body2">
-                                Last seen: {formatTime(selectedDrone.lastSeenAt)}
+                                Last seen:{" "}
+                                {formatTime(selectedDrone.lastSeenAt)}
                               </Typography>
                               {isZeroPos ? (
-                                <Typography variant="caption" sx={{ display: "block", mt: 1, color: "#ff4444", fontFamily: "monospace" }}>
-                                  ⚠️ Last position: No valid coordinates (0.0, 0.0)
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    display: "block",
+                                    mt: 1,
+                                    color: "#ff4444",
+                                    fontFamily: "monospace",
+                                  }}
+                                >
+                                  ⚠️ Last position: No valid coordinates (0.0,
+                                  0.0)
                                 </Typography>
                               ) : (
                                 <>
-                                  <Typography variant="caption" sx={{ display: "block", mt: 1, fontFamily: "monospace" }}>
-                                    Latest valid position: {latestPosition.latitude.toFixed(6)}, {latestPosition.longitude.toFixed(6)}
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      display: "block",
+                                      mt: 1,
+                                      fontFamily: "monospace",
+                                    }}
+                                  >
+                                    Latest valid position:{" "}
+                                    {latestPosition.latitude.toFixed(6)},{" "}
+                                    {latestPosition.longitude.toFixed(6)}
                                   </Typography>
-                                  <Typography variant="caption" sx={{ display: "block", mt: 0.5, fontFamily: "monospace" }}>
-                                    Recorded at: {formatTime(latestPosition.recordedAt)}
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      display: "block",
+                                      mt: 0.5,
+                                      fontFamily: "monospace",
+                                    }}
+                                  >
+                                    Recorded at:{" "}
+                                    {formatTime(latestPosition.recordedAt)}
                                   </Typography>
                                 </>
                               )}
                             </Box>
                           </Popup>
                         </Marker>
-                        
+
                         {/* Update map view to the latest valid position */}
                         {!isZeroPos && (
-                          <MapViewUpdater 
-                            lat={latestPosition.latitude} 
-                            lng={latestPosition.longitude} 
+                          <MapViewUpdater
+                            lat={latestPosition.latitude}
+                            lng={latestPosition.longitude}
                           />
                         )}
                       </>
@@ -777,25 +988,40 @@ const DroneDetectionPanel = () => {
             <Typography variant="caption" sx={{ display: "block" }}>
               🖱️ Scroll to zoom • Click and drag to pan
             </Typography>
-            {selectedDrone && (() => {
-              const latestPosition = getLatestValidPosition(selectedDrone);
-              if (latestPosition) {
-                const isZeroPos = isZeroCoordinate(latestPosition.latitude, latestPosition.longitude);
-                if (isZeroPos) {
+            {selectedDrone &&
+              (() => {
+                const latestPosition = getLatestValidPosition(selectedDrone);
+                if (latestPosition) {
+                  const isZeroPos = isZeroCoordinate(
+                    latestPosition.latitude,
+                    latestPosition.longitude
+                  );
+                  if (isZeroPos) {
+                    return (
+                      <Typography
+                        variant="caption"
+                        sx={{ display: "block", mt: 0.5, color: "#ff4444" }}
+                      >
+                        ⚠️ Showing default location (no valid coordinates)
+                      </Typography>
+                    );
+                  }
                   return (
-                    <Typography variant="caption" sx={{ display: "block", mt: 0.5, color: "#ff4444" }}>
-                      ⚠️ Showing default location (no valid coordinates)
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: "block",
+                        mt: 0.5,
+                        fontFamily: "monospace",
+                      }}
+                    >
+                      📍 {latestPosition.latitude.toFixed(4)},{" "}
+                      {latestPosition.longitude.toFixed(4)}
                     </Typography>
                   );
                 }
-                return (
-                  <Typography variant="caption" sx={{ display: "block", mt: 0.5, fontFamily: "monospace" }}>
-                    📍 {latestPosition.latitude.toFixed(4)}, {latestPosition.longitude.toFixed(4)}
-                  </Typography>
-                );
-              }
-              return null;
-            })()}
+                return null;
+              })()}
           </Box>
         </Card>
       </Modal>

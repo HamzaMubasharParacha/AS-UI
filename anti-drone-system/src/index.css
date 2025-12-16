@@ -1,21 +1,26 @@
-
+/* Dark theme (default) */
 :root {
   --primary-color: #7bff00;
   --active-color: #70eb0c;
   --inactive-color: #d81e1e;
   --sidebar-width: 280px;
   --radius: 12px;
-  --header-color:#223c39;
+  --header-color: #223c39;
+  --bg-color: #ffffff00;
+  --text-color: #e6e9ee;
+  --card-bg: #f9fafb00;
 }
 
 body {
+  background-color: var(--bg-color);
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #ffffff;
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 code {
@@ -33,7 +38,7 @@ code {
 
 .cesium-viewer-toolbar {
   color: var(--primary-color);
-  background: rgba(42, 42, 42, 0.8) !important;
+  background:  var(--bg-color);
 }
 
 .cesium-viewer-bottom {

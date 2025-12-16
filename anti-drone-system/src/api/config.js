@@ -9,8 +9,9 @@ export const logout = `${BASE_URL}/auth/logout`;
 export const login = `${BASE_URL}/auth/login`;
 export const azimuth = `${BASE_URL}/jammer/1/command`;
 export const df_connectivity = `${BASE_URL}/df/connectivity`;
-export const detectedDrones = `http://192.168.100.102:8084/api/drone-history/drones/1/list`;
- 
+// export const detectedDrones = `http://192.168.100.102:8080/api/df/drones/1/list`;
+export const detectedDrones = `http://192.168.100.102:8080/api/df/drones/1/list/paginated?page=0&size=500`;
+
 export const hardwareSystemId = 1;
 export const sensorId = 1;
 export const freqStart = 30000;
@@ -22,7 +23,3 @@ export const subscribe = `http://192.168.100.102:8084/api/websocket/start-contin
 export const simulate = `${BASE_URL}/df/${hardwareSystemId}/simulate`;
 export const spectrum_data = "http://192.168.100.102:8084/api/decoded/data/all";
  
-
-
-
-
