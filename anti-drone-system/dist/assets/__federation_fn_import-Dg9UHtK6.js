@@ -356,7 +356,7 @@ function satisfy(version, range) {
 const currentImports = {};
 
 // eslint-disable-next-line no-undef
-const moduleMap = {'react':{get:()=>()=>__federation_import(new URL('__federation_shared_react-CW1pSWX7.js', import.meta.url).href),import:true,requiredVersion:'^19.0.0'},'react-dom':{get:()=>()=>__federation_import(new URL('__federation_shared_react-dom-d0cbc030.js', import.meta.url).href),import:true,requiredVersion:'^19.0.0'}};
+const moduleMap = {'react':{get:()=>()=>__federation_import(new URL('__federation_shared_react-CW1pSWX7.js', import.meta.url).href),import:true,requiredVersion:'^19.0.0'},'react-dom':{get:()=>()=>__federation_import(new URL('__federation_shared_react-dom-d0cbc030.js', import.meta.url).href),import:true,requiredVersion:'^19.0.0'},'@reduxjs/toolkit':{get:()=>()=>__federation_import(new URL('__federation_shared_@reduxjs/toolkit-DVq0C5sB.js', import.meta.url).href),import:true},'react-redux':{get:()=>()=>__federation_import(new URL('__federation_shared_react-redux-DbF-zp6Y.js', import.meta.url).href),import:true}};
 const moduleCache = Object.create(null);
 async function importShared(name, shareScope = 'default') {
   return moduleCache[name]

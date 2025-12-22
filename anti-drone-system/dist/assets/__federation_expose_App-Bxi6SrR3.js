@@ -1,4 +1,4 @@
-import { importShared } from './__federation_fn_import-BVg82pE_.js';
+import { importShared } from './__federation_fn_import-Dg9UHtK6.js';
 import { c as commonjsGlobal, g as getDefaultExportFromCjs } from './_commonjsHelpers-BFTU3MAI.js';
 
 var jsxRuntime = {exports: {}};

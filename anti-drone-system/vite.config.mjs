@@ -20,6 +20,12 @@ export default defineConfig({
           singleton: true,
           requiredVersion: "^19.0.0",
         },
+        "@reduxjs/toolkit": {
+          singleton: true,
+        },
+        "react-redux": {
+          singleton: true,
+        },
       },
     }),
   ],
