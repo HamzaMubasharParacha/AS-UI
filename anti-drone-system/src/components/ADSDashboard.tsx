@@ -20,6 +20,7 @@ import { drone_data, logout, df_connectivity, cone_angle, spectrum_data, hardwar
 
 interface DashboardProps {
   setToken: (token: string | null) => void;
+  isRadioDispatcherMicroUI: boolean;
 }
 
 const darkTheme = createTheme({
@@ -87,7 +88,7 @@ interface CardLog {
   icon: React.ReactNode;
 }
 
-const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
+const ADSDashboard: React.FC<DashboardProps> = ({ setToken , isRadioDispatcherMicroUI }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [check, setcheck] = useState("");
@@ -684,15 +685,20 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
         </Alert>
       </Snackbar>
       
-      <div className="App">
+      <div className={`${isRadioDispatcherMicroUI ? '' : 'App'}`}>
         {/* Main Container */}
-        <div className="main-container">
+        <div className={`${isRadioDispatcherMicroUI ? '' : "main-container"} `}>
           {/* Application Header */}
-          <div className="app-header">
+          <div className={`${isRadioDispatcherMicroUI ? "app-header-micro-ui" : "app-header"}`}>
             <div className="header_data"><h2>RAPIDEV</h2></div>
             <div className="header_data">
               <Typography variant="h5" className="app-title">
-                ANTI-DRONE-SYSTEM
+                {
+                  isRadioDispatcherMicroUI
+                    ? "RADIO DISPATCHER"
+                    : "ANTI-DRONE-SYSTEM"
+                }
+               
               </Typography>
             </div>
             <div className="header_data">
@@ -811,7 +817,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
           )}
 
           {/* Full Screen Map */}
-          <div className="map-container">
+          <div className={`${isRadioDispatcherMicroUI ? "map-container-micro-ui" : "map-container"} `}>
             <CesiumMap
               drones={detectedDrones}
               systemActive={check}
@@ -887,12 +893,12 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
             ))}
 
           {/* Left Fixed Column */}
-          <div className="fixed-column">
+          <div className={`${isRadioDispatcherMicroUI ? "fixed-column-micro-ui" : "fixed-column"} `}>
             <div className="column-content">
               {leftCardLogs.map((log) => (
                 <div
                   key={log.id}
-                  className={`column-item ${
+                  className={`${isRadioDispatcherMicroUI ? "column-item-micro-ui" : "column-item"}  ${
                     floatingCards.find((c) => c.id === log.id)?.visible
                       ? "active"
                       : ""

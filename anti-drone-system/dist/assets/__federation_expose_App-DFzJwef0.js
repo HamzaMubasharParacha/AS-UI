@@ -46740,7 +46740,7 @@ const darkTheme = createTheme({
     }
   }
 });
-const ADSDashboard = ({ setToken }) => {
+const ADSDashboard = ({ setToken, isRadioDispatcherMicroUI }) => {
   const [loading, setLoading] = useState$1(false);
   const [error, setError] = useState$1("");
   const [check, setcheck] = useState$1("");
@@ -47206,10 +47206,10 @@ const ADSDashboard = ({ setToken }) => {
         )
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "App", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "main-container", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "app-header", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `${isRadioDispatcherMicroUI ? "" : "App"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `${isRadioDispatcherMicroUI ? "" : "main-container"} `, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `${isRadioDispatcherMicroUI ? "app-header-micro-ui" : "app-header"}`, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "header_data", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { children: "RAPIDEV" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "header_data", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Typography, { variant: "h5", className: "app-title", children: "ANTI-DRONE-SYSTEM" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "header_data", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Typography, { variant: "h5", className: "app-title", children: isRadioDispatcherMicroUI ? "RADIO DISPATCHER" : "ANTI-DRONE-SYSTEM" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "header_data", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
           Button,
           {
@@ -47331,7 +47331,7 @@ const ADSDashboard = ({ setToken }) => {
           ]
         }
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "map-container", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `${isRadioDispatcherMicroUI ? "map-container-micro-ui" : "map-container"} `, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
         CesiumMap,
         {
           drones: detectedDrones,
@@ -47396,10 +47396,10 @@ const ADSDashboard = ({ setToken }) => {
         },
         card.id
       )),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed-column", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "column-content", children: leftCardLogs.map((log) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `${isRadioDispatcherMicroUI ? "fixed-column-micro-ui" : "fixed-column"} `, children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "column-content", children: leftCardLogs.map((log) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "div",
         {
-          className: `column-item ${floatingCards.find((c) => c.id === log.id)?.visible ? "active" : ""}`,
+          className: `${isRadioDispatcherMicroUI ? "column-item-micro-ui" : "column-item"}  ${floatingCards.find((c) => c.id === log.id)?.visible ? "active" : ""}`,
           onClick: () => toggleCard(log.id),
           title: log.description,
           children: [
@@ -47414,7 +47414,9 @@ const ADSDashboard = ({ setToken }) => {
 };
 
 const {useState,useEffect} = await importShared('react');
-const App = () => {
+const App = ({
+  isRadioDispatcherMicroUI
+}) => {
   const [token, setToken] = useState(null);
   useEffect(() => {
     const storedToken = sessionStorage.getItem("token");
@@ -47443,7 +47445,7 @@ const App = () => {
       Route,
       {
         path: "/dashboard",
-        element: /* @__PURE__ */ jsxRuntimeExports.jsx(ProtectedRoute, { token, children: /* @__PURE__ */ jsxRuntimeExports.jsx(ADSDashboard, { setToken }) })
+        element: /* @__PURE__ */ jsxRuntimeExports.jsx(ProtectedRoute, { token, children: /* @__PURE__ */ jsxRuntimeExports.jsx(ADSDashboard, { setToken, isRadioDispatcherMicroUI }) })
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "*", element: /* @__PURE__ */ jsxRuntimeExports.jsx(Navigate, { to: "/login", replace: true }) })

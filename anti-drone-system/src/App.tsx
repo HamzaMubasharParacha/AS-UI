@@ -9,7 +9,9 @@ import LoginPage from "./components/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ADSDashboard from "./components/ADSDashboard";
 
-const App: React.FC = () => {
+const App = ({
+  isRadioDispatcherMicroUI
+} : {isRadioDispatcherMicroUI: boolean}) => {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
@@ -17,6 +19,7 @@ const App: React.FC = () => {
     const storedToken = sessionStorage.getItem("token");
     if (storedToken) setToken(storedToken);
   }, []);
+
 
   return (
     <Router>
@@ -44,7 +47,7 @@ const App: React.FC = () => {
           path="/dashboard"
           element={
             <ProtectedRoute token={token}>
-              <ADSDashboard setToken={setToken} />
+              <ADSDashboard setToken={setToken}  isRadioDispatcherMicroUI={isRadioDispatcherMicroUI} />
             </ProtectedRoute>
           }
         />
