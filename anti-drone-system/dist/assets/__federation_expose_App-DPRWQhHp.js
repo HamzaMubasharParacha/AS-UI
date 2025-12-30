@@ -641,41 +641,41 @@ var validRequestMethodsArr = [
   ...validMutationMethodsArr
 ];
 new Set(validRequestMethodsArr);
-const React$1A = await importShared('react');
+const React$1z = await importShared('react');
 
-var DataRouterContext = React$1A.createContext(null);
+var DataRouterContext = React$1z.createContext(null);
 DataRouterContext.displayName = "DataRouter";
-var DataRouterStateContext = React$1A.createContext(null);
+var DataRouterStateContext = React$1z.createContext(null);
 DataRouterStateContext.displayName = "DataRouterState";
-var RSCRouterContext = React$1A.createContext(false);
+var RSCRouterContext = React$1z.createContext(false);
 function useIsRSCRouterContext() {
-  return React$1A.useContext(RSCRouterContext);
+  return React$1z.useContext(RSCRouterContext);
 }
-var ViewTransitionContext = React$1A.createContext({
+var ViewTransitionContext = React$1z.createContext({
   isTransitioning: false
 });
 ViewTransitionContext.displayName = "ViewTransition";
-var FetchersContext = React$1A.createContext(
+var FetchersContext = React$1z.createContext(
   /* @__PURE__ */ new Map()
 );
 FetchersContext.displayName = "Fetchers";
-var AwaitContext = React$1A.createContext(null);
+var AwaitContext = React$1z.createContext(null);
 AwaitContext.displayName = "Await";
-var NavigationContext = React$1A.createContext(
+var NavigationContext = React$1z.createContext(
   null
 );
 NavigationContext.displayName = "Navigation";
-var LocationContext = React$1A.createContext(
+var LocationContext = React$1z.createContext(
   null
 );
 LocationContext.displayName = "Location";
-var RouteContext = React$1A.createContext({
+var RouteContext = React$1z.createContext({
   outlet: null,
   matches: [],
   isDataRoute: false
 });
 RouteContext.displayName = "Route";
-var RouteErrorContext = React$1A.createContext(null);
+var RouteErrorContext = React$1z.createContext(null);
 RouteErrorContext.displayName = "RouteError";
 const React2$1 = await importShared('react');
 
@@ -2565,10 +2565,8 @@ await importShared('react');
 const BASE_URL = "http://192.168.100.102:8080/api";
 const command_center = `${BASE_URL}/df/sensors`;
 const cone_angle = `${BASE_URL}/jammer/1/status`;
-const drone_data = `${BASE_URL}/df/drones`;
 const logout = `${BASE_URL}/auth/logout`;
 const login = `${BASE_URL}/auth/login`;
-const df_connectivity = `${BASE_URL}/df/connectivity`;
 // export const detectedDrones = `http://192.168.100.102:8080/api/df/drones/1/list`;
 const detectedDrones = `http://192.168.100.102:8080/api/df/drones/1/list/paginated?page=0&size=500`;
 
@@ -4269,22 +4267,22 @@ function serializeStyles(args, registered, mergedProps) {
   };
 }
 
-const React$1z = await importShared('react');
+const React$1y = await importShared('react');
 
 
 var syncFallback = function syncFallback(create) {
   return create();
 };
 
-var useInsertionEffect = React$1z['useInsertion' + 'Effect'] ? React$1z['useInsertion' + 'Effect'] : false;
+var useInsertionEffect = React$1y['useInsertion' + 'Effect'] ? React$1y['useInsertion' + 'Effect'] : false;
 var useInsertionEffectAlwaysWithSyncFallback = useInsertionEffect || syncFallback;
-var useInsertionEffectWithLayoutFallback = useInsertionEffect || React$1z.useLayoutEffect;
+var useInsertionEffectWithLayoutFallback = useInsertionEffect || React$1y.useLayoutEffect;
 
-const React$1y = await importShared('react');
+const React$1x = await importShared('react');
 
 const {useContext,forwardRef: forwardRef$3} = await importShared('react');
 
-var EmotionCacheContext = /* #__PURE__ */React$1y.createContext( // we're doing this to avoid preconstruct's dead code elimination in this one case
+var EmotionCacheContext = /* #__PURE__ */React$1x.createContext( // we're doing this to avoid preconstruct's dead code elimination in this one case
 // because this module is primarily intended for the browser and node
 // but it's also required in react native and similar environments sometimes
 // and we could have a special build just for that
@@ -4304,7 +4302,7 @@ var withEmotionCache = function withEmotionCache(func) {
   });
 };
 
-var ThemeContext$1 = /* #__PURE__ */React$1y.createContext({});
+var ThemeContext$1 = /* #__PURE__ */React$1x.createContext({});
 
 var hasOwn = {}.hasOwnProperty;
 
@@ -4355,7 +4353,7 @@ var Emotion = /* #__PURE__ */withEmotionCache(function (props, cache, ref) {
     className = props.className + " ";
   }
 
-  var serialized = serializeStyles(registeredStyles, undefined, React$1y.useContext(ThemeContext$1));
+  var serialized = serializeStyles(registeredStyles, undefined, React$1x.useContext(ThemeContext$1));
 
   className += cache.key + "-" + serialized.name;
   var newProps = {};
@@ -4372,23 +4370,23 @@ var Emotion = /* #__PURE__ */withEmotionCache(function (props, cache, ref) {
     newProps.ref = ref;
   }
 
-  return /*#__PURE__*/React$1y.createElement(React$1y.Fragment, null, /*#__PURE__*/React$1y.createElement(Insertion$1, {
+  return /*#__PURE__*/React$1x.createElement(React$1x.Fragment, null, /*#__PURE__*/React$1x.createElement(Insertion$1, {
     cache: cache,
     serialized: serialized,
     isStringTag: typeof WrappedComponent === 'string'
-  }), /*#__PURE__*/React$1y.createElement(WrappedComponent, newProps));
+  }), /*#__PURE__*/React$1x.createElement(WrappedComponent, newProps));
 });
 
 var Emotion$1 = Emotion;
 
-const React$1x = await importShared('react');
+const React$1w = await importShared('react');
 
 var jsx = function jsx(type, props) {
   // eslint-disable-next-line prefer-rest-params
   var args = arguments;
 
   if (props == null || !hasOwn.call(props, 'css')) {
-    return React$1x.createElement.apply(undefined, args);
+    return React$1w.createElement.apply(undefined, args);
   }
 
   var argsLength = args.length;
@@ -4400,7 +4398,7 @@ var jsx = function jsx(type, props) {
     createElementArgArray[i] = args[i];
   }
 
-  return React$1x.createElement.apply(null, createElementArgArray);
+  return React$1w.createElement.apply(null, createElementArgArray);
 };
 
 (function (_jsx) {
@@ -4415,13 +4413,13 @@ var jsx = function jsx(type, props) {
 var Global = /* #__PURE__ */withEmotionCache(function (props, cache) {
 
   var styles = props.styles;
-  var serialized = serializeStyles([styles], undefined, React$1x.useContext(ThemeContext$1));
+  var serialized = serializeStyles([styles], undefined, React$1w.useContext(ThemeContext$1));
   // but it is based on a constant that will never change at runtime
   // it's effectively like having two implementations and switching them out
   // so it's not actually breaking anything
 
 
-  var sheetRef = React$1x.useRef();
+  var sheetRef = React$1w.useRef();
   useInsertionEffectWithLayoutFallback(function () {
     var key = cache.key + "-global"; // use case of https://github.com/emotion-js/emotion/issues/2675
 
@@ -4511,7 +4509,7 @@ var isPropValid = /* #__PURE__ */memoize$1(function (prop) {
 /* Z+1 */
 );
 
-const React$1w = await importShared('react');
+const React$1v = await importShared('react');
 
 var testOmitPropsOnStringTag = isPropValid;
 
@@ -4607,7 +4605,7 @@ var createStyled$1 = function createStyled(tag, options) {
           mergedProps[key] = props[key];
         }
 
-        mergedProps.theme = React$1w.useContext(ThemeContext$1);
+        mergedProps.theme = React$1v.useContext(ThemeContext$1);
       }
 
       if (typeof props.className === 'string') {
@@ -4640,11 +4638,11 @@ var createStyled$1 = function createStyled(tag, options) {
         newProps.ref = ref;
       }
 
-      return /*#__PURE__*/React$1w.createElement(React$1w.Fragment, null, /*#__PURE__*/React$1w.createElement(Insertion, {
+      return /*#__PURE__*/React$1v.createElement(React$1v.Fragment, null, /*#__PURE__*/React$1v.createElement(Insertion, {
         cache: cache,
         serialized: serialized,
         isStringTag: typeof FinalTag === 'string'
-      }), /*#__PURE__*/React$1w.createElement(FinalTag, newProps));
+      }), /*#__PURE__*/React$1v.createElement(FinalTag, newProps));
     });
     Styled.displayName = identifierName !== undefined ? identifierName : "Styled(" + (typeof baseTag === 'string' ? baseTag : baseTag.displayName || baseTag.name || 'Component') + ")";
     Styled.defaultProps = tag.defaultProps;
@@ -4847,7 +4845,7 @@ reactIs_production.typeOf = typeOf;
 
 var reactIsExports = reactIs.exports;
 
-const React$1v = await importShared('react');
+const React$1u = await importShared('react');
 
 // https://github.com/sindresorhus/is-plain-obj/blob/main/index.js
 function isPlainObject(item) {
@@ -4858,7 +4856,7 @@ function isPlainObject(item) {
   return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in item) && !(Symbol.iterator in item);
 }
 function deepClone(source) {
-  if (/*#__PURE__*/React$1v.isValidElement(source) || reactIsExports.isValidElementType(source) || !isPlainObject(source)) {
+  if (/*#__PURE__*/React$1u.isValidElement(source) || reactIsExports.isValidElementType(source) || !isPlainObject(source)) {
     return source;
   }
   const output = {};
@@ -4894,7 +4892,7 @@ function deepmerge(target, source, options = {
   } : target;
   if (isPlainObject(target) && isPlainObject(source)) {
     Object.keys(source).forEach(key => {
-      if (/*#__PURE__*/React$1v.isValidElement(source[key]) || reactIsExports.isValidElementType(source[key])) {
+      if (/*#__PURE__*/React$1u.isValidElement(source[key]) || reactIsExports.isValidElementType(source[key])) {
         output[key] = source[key];
       } else if (isPlainObject(source[key]) &&
       // Avoid prototype pollution
@@ -6111,12 +6109,12 @@ function createTheme$1(options = {}, ...args) {
   return muiTheme;
 }
 
-const React$1u = await importShared('react');
+const React$1t = await importShared('react');
 function isObjectEmpty$2(obj) {
   return Object.keys(obj).length === 0;
 }
 function useTheme$3(defaultTheme = null) {
-  const contextTheme = React$1u.useContext(ThemeContext$1);
+  const contextTheme = React$1t.useContext(ThemeContext$1);
   return !contextTheme || isObjectEmpty$2(contextTheme) ? defaultTheme : contextTheme;
 }
 
@@ -6230,7 +6228,7 @@ const ClassNameGenerator = createClassNameGenerator();
 
 function r(e){var t,f,n="";if("string"==typeof e||"number"==typeof e)n+=e;else if("object"==typeof e)if(Array.isArray(e)){var o=e.length;for(t=0;t<o;t++)e[t]&&(f=r(e[t]))&&(n&&(n+=" "),n+=f);}else for(f in e)e[f]&&(n&&(n+=" "),n+=f);return n}function clsx(){for(var e,t,f=0,n="",o=arguments.length;f<o;f++)(e=arguments[f])&&(t=r(e))&&(n&&(n+=" "),n+=t);return n}
 
-const React$1t = await importShared('react');
+const React$1s = await importShared('react');
 function createBox(options = {}) {
   const {
     themeId,
@@ -6241,7 +6239,7 @@ function createBox(options = {}) {
   const BoxRoot = styled$1('div', {
     shouldForwardProp: prop => prop !== 'theme' && prop !== 'sx' && prop !== 'as'
   })(styleFunctionSx);
-  const Box = /*#__PURE__*/React$1t.forwardRef(function Box(inProps, ref) {
+  const Box = /*#__PURE__*/React$1s.forwardRef(function Box(inProps, ref) {
     const theme = useTheme$2(defaultTheme);
     const {
       className,
@@ -6582,7 +6580,7 @@ function resolveProps(defaultProps, props, mergeClassNameAndStyle = false) {
   return output;
 }
 
-const React$1s = await importShared('react');
+const React$1r = await importShared('react');
 
 
 /**
@@ -6592,7 +6590,7 @@ const React$1s = await importShared('react');
  * Before you use this hook, make sure to read https://gist.github.com/gaearon/e7d97cdf38a2907924ea12e4ebdf3c85
  * and confirm it doesn't apply to your use-case.
  */
-const useEnhancedEffect = typeof window !== 'undefined' ? React$1s.useLayoutEffect : React$1s.useEffect;
+const useEnhancedEffect = typeof window !== 'undefined' ? React$1r.useLayoutEffect : React$1r.useEffect;
 
 function clamp(val, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) {
   return Math.max(min, Math.min(val, max));
@@ -6787,20 +6785,20 @@ function private_safeEmphasize(color, coefficient, warning) {
   }
 }
 
-const React$1r = await importShared('react');
-
-const ThemeContext = /* @__PURE__ */ React$1r.createContext(null);
-
 const React$1q = await importShared('react');
+
+const ThemeContext = /* @__PURE__ */ React$1q.createContext(null);
+
+const React$1p = await importShared('react');
 function useTheme$1() {
-  const theme = React$1q.useContext(ThemeContext);
+  const theme = React$1p.useContext(ThemeContext);
   return theme;
 }
 
 const hasSymbol = typeof Symbol === 'function' && Symbol.for;
 const nested = hasSymbol ? Symbol.for('mui.nested') : '__THEME_NESTED__';
 
-const React$1p = await importShared('react');
+const React$1o = await importShared('react');
 function mergeOuterLocalTheme(outerTheme, localTheme) {
   if (typeof localTheme === "function") {
     const mergedTheme = localTheme(outerTheme);
@@ -6817,7 +6815,7 @@ function ThemeProvider$2(props) {
     theme: localTheme
   } = props;
   const outerTheme = useTheme$1();
-  const theme = React$1p.useMemo(() => {
+  const theme = React$1o.useMemo(() => {
     const output = outerTheme === null ? {
       ...localTheme
     } : mergeOuterLocalTheme(outerTheme, localTheme);
@@ -6832,8 +6830,8 @@ function ThemeProvider$2(props) {
   });
 }
 
-const React$1o = await importShared('react');
-const RtlContext = /* @__PURE__ */ React$1o.createContext();
+const React$1n = await importShared('react');
+const RtlContext = /* @__PURE__ */ React$1n.createContext();
 function RtlProvider({
   value,
   ...props
@@ -6844,12 +6842,12 @@ function RtlProvider({
   });
 }
 const useRtl = () => {
-  const value = React$1o.useContext(RtlContext);
+  const value = React$1n.useContext(RtlContext);
   return value ?? false;
 };
 
-const React$1n = await importShared('react');
-const PropsContext = /* @__PURE__ */ React$1n.createContext(void 0);
+const React$1m = await importShared('react');
+const PropsContext = /* @__PURE__ */ React$1m.createContext(void 0);
 function DefaultPropsProvider({
   value,
   children
@@ -6881,7 +6879,7 @@ function useDefaultProps$1({
   props,
   name
 }) {
-  const ctx = React$1n.useContext(PropsContext);
+  const ctx = React$1m.useContext(PropsContext);
   return getThemeProps({
     props,
     name,
@@ -6891,15 +6889,15 @@ function useDefaultProps$1({
   });
 }
 
-const React$1m = await importShared('react');
+const React$1l = await importShared('react');
 
 let globalId = 0;
 
 // TODO React 17: Remove `useGlobalId` once React 17 support is removed
 function useGlobalId(idOverride) {
-  const [defaultId, setDefaultId] = React$1m.useState(idOverride);
+  const [defaultId, setDefaultId] = React$1l.useState(idOverride);
   const id = idOverride || defaultId;
-  React$1m.useEffect(() => {
+  React$1l.useEffect(() => {
     if (defaultId == null) {
       // Fallback to this default id when possible.
       // Use the incrementing value for client-side rendering only.
@@ -6914,7 +6912,7 @@ function useGlobalId(idOverride) {
 
 // See https://github.com/mui/material-ui/issues/41190#issuecomment-2040873379 for why
 const safeReact = {
-  ...React$1m
+  ...React$1l
 };
 const maybeReactUseId = safeReact.useId;
 
@@ -6979,10 +6977,10 @@ function useLayerOrder(theme) {
   });
 }
 
-const React$1l = await importShared('react');
+const React$1k = await importShared('react');
 const EMPTY_THEME = {};
 function useThemeScoping(themeId, upperTheme, localTheme, isPrivate = false) {
-  return React$1l.useMemo(() => {
+  return React$1k.useMemo(() => {
     const resolvedTheme = themeId ? upperTheme[themeId] || upperTheme : upperTheme;
     if (typeof localTheme === "function") {
       const mergedTheme = localTheme(resolvedTheme);
@@ -7187,7 +7185,7 @@ const localStorageManager = ({
   };
 };
 
-const React$1k = await importShared('react');
+const React$1j = await importShared('react');
 function noop$2() {}
 function getSystemMode(mode) {
   if (typeof window !== 'undefined' && typeof window.matchMedia === 'function' && mode === 'system') {
@@ -7233,19 +7231,19 @@ function useCurrentColorScheme(options) {
   } = options;
   const joinedColorSchemes = supportedColorSchemes.join(',');
   const isMultiSchemes = supportedColorSchemes.length > 1;
-  const modeStorage = React$1k.useMemo(() => storageManager?.({
+  const modeStorage = React$1j.useMemo(() => storageManager?.({
     key: modeStorageKey,
     storageWindow
   }), [storageManager, modeStorageKey, storageWindow]);
-  const lightStorage = React$1k.useMemo(() => storageManager?.({
+  const lightStorage = React$1j.useMemo(() => storageManager?.({
     key: `${colorSchemeStorageKey}-light`,
     storageWindow
   }), [storageManager, colorSchemeStorageKey, storageWindow]);
-  const darkStorage = React$1k.useMemo(() => storageManager?.({
+  const darkStorage = React$1j.useMemo(() => storageManager?.({
     key: `${colorSchemeStorageKey}-dark`,
     storageWindow
   }), [storageManager, colorSchemeStorageKey, storageWindow]);
-  const [state, setState] = React$1k.useState(() => {
+  const [state, setState] = React$1j.useState(() => {
     const initialMode = modeStorage?.get(defaultMode) || defaultMode;
     const lightColorScheme = lightStorage?.get(defaultLightColorScheme) || defaultLightColorScheme;
     const darkColorScheme = darkStorage?.get(defaultDarkColorScheme) || defaultDarkColorScheme;
@@ -7256,12 +7254,12 @@ function useCurrentColorScheme(options) {
       darkColorScheme
     };
   });
-  const [isClient, setIsClient] = React$1k.useState(noSsr || !isMultiSchemes);
-  React$1k.useEffect(() => {
+  const [isClient, setIsClient] = React$1j.useState(noSsr || !isMultiSchemes);
+  React$1j.useEffect(() => {
     setIsClient(true); // to rerender the component after hydration
   }, []);
   const colorScheme = getColorScheme(state);
-  const setMode = React$1k.useCallback(mode => {
+  const setMode = React$1j.useCallback(mode => {
     setState(currentState => {
       if (mode === currentState.mode) {
         // do nothing if mode does not change
@@ -7276,7 +7274,7 @@ function useCurrentColorScheme(options) {
       };
     });
   }, [modeStorage, defaultMode]);
-  const setColorScheme = React$1k.useCallback(value => {
+  const setColorScheme = React$1j.useCallback(value => {
     if (!value) {
       setState(currentState => {
         lightStorage?.set(defaultLightColorScheme);
@@ -7335,7 +7333,7 @@ function useCurrentColorScheme(options) {
       });
     }
   }, [joinedColorSchemes, lightStorage, darkStorage, defaultLightColorScheme, defaultDarkColorScheme]);
-  const handleMediaQuery = React$1k.useCallback(event => {
+  const handleMediaQuery = React$1j.useCallback(event => {
     if (state.mode === 'system') {
       setState(currentState => {
         const systemMode = event?.matches ? 'dark' : 'light';
@@ -7353,9 +7351,9 @@ function useCurrentColorScheme(options) {
   }, [state.mode]);
 
   // Ref hack to avoid adding handleMediaQuery as a dep
-  const mediaListener = React$1k.useRef(handleMediaQuery);
+  const mediaListener = React$1j.useRef(handleMediaQuery);
   mediaListener.current = handleMediaQuery;
-  React$1k.useEffect(() => {
+  React$1j.useEffect(() => {
     if (typeof window.matchMedia !== 'function' || !isMultiSchemes) {
       return undefined;
     }
@@ -7373,7 +7371,7 @@ function useCurrentColorScheme(options) {
   }, [isMultiSchemes]);
 
   // Handle when localStorage has changed
-  React$1k.useEffect(() => {
+  React$1j.useEffect(() => {
     if (isMultiSchemes) {
       const unsubscribeMode = modeStorage?.subscribe(value => {
         if (!value || ['light', 'dark', 'system'].includes(value)) {
@@ -7412,7 +7410,7 @@ function useCurrentColorScheme(options) {
   };
 }
 
-const React$1j = await importShared('react');
+const React$1i = await importShared('react');
 const DISABLE_CSS_TRANSITION = "*{-webkit-transition:none!important;-moz-transition:none!important;-o-transition:none!important;-ms-transition:none!important;transition:none!important}";
 function createCssVarsProvider(options) {
   const {
@@ -7442,8 +7440,8 @@ function createCssVarsProvider(options) {
     },
     systemMode: void 0
   };
-  const ColorSchemeContext = /* @__PURE__ */ React$1j.createContext(void 0);
-  const useColorScheme = () => React$1j.useContext(ColorSchemeContext) || defaultContext;
+  const ColorSchemeContext = /* @__PURE__ */ React$1i.createContext(void 0);
+  const useColorScheme = () => React$1i.useContext(ColorSchemeContext) || defaultContext;
   const defaultColorSchemes = {};
   const defaultComponents = {};
   function CssVarsProvider(props) {
@@ -7463,11 +7461,11 @@ function createCssVarsProvider(options) {
       forceThemeRerender = false,
       noSsr
     } = props;
-    const hasMounted = React$1j.useRef(false);
+    const hasMounted = React$1i.useRef(false);
     const upperTheme = useTheme$1();
-    const ctx = React$1j.useContext(ColorSchemeContext);
+    const ctx = React$1i.useContext(ColorSchemeContext);
     const nested = !!ctx && !disableNestedContext;
-    const initialTheme = React$1j.useMemo(() => {
+    const initialTheme = React$1i.useMemo(() => {
       if (themeProp) {
         return themeProp;
       }
@@ -7481,7 +7479,7 @@ function createCssVarsProvider(options) {
       cssVarPrefix
     } = restThemeProp;
     const joinedColorSchemes = Object.keys(colorSchemes).filter((k) => !!colorSchemes[k]).join(",");
-    const allColorSchemes = React$1j.useMemo(() => joinedColorSchemes.split(","), [joinedColorSchemes]);
+    const allColorSchemes = React$1i.useMemo(() => joinedColorSchemes.split(","), [joinedColorSchemes]);
     const defaultLightColorScheme2 = typeof defaultColorScheme === "string" ? defaultColorScheme : defaultColorScheme.light;
     const defaultDarkColorScheme2 = typeof defaultColorScheme === "string" ? defaultColorScheme : defaultColorScheme.dark;
     const defaultMode = colorSchemes[defaultLightColorScheme2] && colorSchemes[defaultDarkColorScheme2] ? initialMode : colorSchemes[restThemeProp.defaultColorScheme]?.palette?.mode || restThemeProp.palette?.mode;
@@ -7514,7 +7512,7 @@ function createCssVarsProvider(options) {
     if (restThemeProp.vars && !forceThemeRerender) {
       calculatedColorScheme = restThemeProp.defaultColorScheme;
     }
-    const memoTheme = React$1j.useMemo(() => {
+    const memoTheme = React$1i.useMemo(() => {
       const themeVars = restThemeProp.generateThemeVars?.() || restThemeProp.vars;
       const theme = {
         ...restThemeProp,
@@ -7576,7 +7574,7 @@ function createCssVarsProvider(options) {
         }
       }
     }, [colorScheme, colorSchemeSelector, colorSchemeNode, allColorSchemes]);
-    React$1j.useEffect(() => {
+    React$1i.useEffect(() => {
       let timer;
       if (disableTransitionOnChange && hasMounted.current && documentNode) {
         const css = documentNode.createElement("style");
@@ -7591,13 +7589,13 @@ function createCssVarsProvider(options) {
         clearTimeout(timer);
       };
     }, [colorScheme, disableTransitionOnChange, documentNode]);
-    React$1j.useEffect(() => {
+    React$1i.useEffect(() => {
       hasMounted.current = true;
       return () => {
         hasMounted.current = false;
       };
     }, []);
-    const contextValue = React$1j.useMemo(() => ({
+    const contextValue = React$1i.useMemo(() => ({
       allColorSchemes,
       colorScheme,
       darkColorScheme,
@@ -7611,7 +7609,7 @@ function createCssVarsProvider(options) {
     if (disableStyleSheetGeneration || restThemeProp.cssVariables === false || nested && upperTheme?.cssVarPrefix === cssVarPrefix) {
       shouldGenerateStyleSheet = false;
     }
-    const element = /* @__PURE__ */ jsxRuntimeExports.jsxs(React$1j.Fragment, {
+    const element = /* @__PURE__ */ jsxRuntimeExports.jsxs(React$1i.Fragment, {
       children: [/* @__PURE__ */ jsxRuntimeExports.jsx(ThemeProvider$1, {
         themeId: scopedTheme ? themeId : void 0,
         theme: memoTheme,
@@ -8034,10 +8032,10 @@ function composeClasses(slots, getUtilityClass, classes = undefined) {
   return output;
 }
 
-const React$1i = await importShared('react');
+const React$1h = await importShared('react');
 
 function isMuiElement(element, muiNames) {
-  return /*#__PURE__*/React$1i.isValidElement(element) && muiNames.indexOf(
+  return /*#__PURE__*/React$1h.isValidElement(element) && muiNames.indexOf(
   // For server components `muiName` is available in element.type._payload.value.muiName
   // relevant info - https://github.com/facebook/react/blob/2807d781a08db8e9873687fccc25c0f12b4fb3d4/packages/react/src/ReactLazy.js#L45
   // eslint-disable-next-line no-underscore-dangle
@@ -9354,12 +9352,12 @@ const {
 });
 const CssVarsProvider = InternalCssVarsProvider;
 
-const React$1h = await importShared('react');
+const React$1g = await importShared('react');
 function ThemeProvider({
   theme,
   ...props
 }) {
-  const noVarsTheme = React$1h.useMemo(() => {
+  const noVarsTheme = React$1g.useMemo(() => {
     if (typeof theme === 'function') {
       return theme;
     }
@@ -9449,7 +9447,7 @@ function getSvgIconUtilityClass(slot) {
 }
 generateUtilityClasses('MuiSvgIcon', ['root', 'colorPrimary', 'colorSecondary', 'colorAction', 'colorError', 'colorDisabled', 'fontSizeInherit', 'fontSizeSmall', 'fontSizeMedium', 'fontSizeLarge']);
 
-const React$1g = await importShared('react');
+const React$1f = await importShared('react');
 const useUtilityClasses$F = (ownerState) => {
   const {
     color,
@@ -9557,7 +9555,7 @@ const SvgIconRoot = styled("svg", {
     }
   ]
 })));
-const SvgIcon = /* @__PURE__ */ React$1g.forwardRef(function SvgIcon2(inProps, ref) {
+const SvgIcon = /* @__PURE__ */ React$1f.forwardRef(function SvgIcon2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiSvgIcon"
@@ -9574,7 +9572,7 @@ const SvgIcon = /* @__PURE__ */ React$1g.forwardRef(function SvgIcon2(inProps, r
     viewBox = "0 0 24 24",
     ...other
   } = props;
-  const hasSvgAsChild = /* @__PURE__ */ React$1g.isValidElement(children) && children.type === "svg";
+  const hasSvgAsChild = /* @__PURE__ */ React$1f.isValidElement(children) && children.type === "svg";
   const ownerState = {
     ...props,
     color,
@@ -9609,7 +9607,7 @@ const SvgIcon = /* @__PURE__ */ React$1g.forwardRef(function SvgIcon2(inProps, r
 });
 SvgIcon.muiName = "SvgIcon";
 
-const React$1f = await importShared('react');
+const React$1e = await importShared('react');
 function createSvgIcon(path, displayName) {
   function Component(props, ref) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx(SvgIcon, {
@@ -9620,7 +9618,7 @@ function createSvgIcon(path, displayName) {
     });
   }
   Component.muiName = SvgIcon.muiName;
-  return /* @__PURE__ */ React$1f.memo(/* @__PURE__ */ React$1f.forwardRef(Component));
+  return /* @__PURE__ */ React$1e.memo(/* @__PURE__ */ React$1e.forwardRef(Component));
 }
 
 // Corresponds to 10 frames at 60 Hz.
@@ -9671,7 +9669,7 @@ function setRef(ref, value) {
   }
 }
 
-const React$1e = await importShared('react');
+const React$1d = await importShared('react');
 
 function useControlled(props) {
   const {
@@ -9682,10 +9680,10 @@ function useControlled(props) {
   } = props;
   const {
     current: isControlled
-  } = React$1e.useRef(controlled !== void 0);
-  const [valueState, setValue] = React$1e.useState(defaultProp);
+  } = React$1d.useRef(controlled !== void 0);
+  const [valueState, setValue] = React$1d.useState(defaultProp);
   const value = isControlled ? controlled : valueState;
-  const setValueIfUncontrolled = React$1e.useCallback((newValue) => {
+  const setValueIfUncontrolled = React$1d.useCallback((newValue) => {
     if (!isControlled) {
       setValue(newValue);
     }
@@ -9693,7 +9691,7 @@ function useControlled(props) {
   return [value, setValueIfUncontrolled];
 }
 
-const React$1d = await importShared('react');
+const React$1c = await importShared('react');
 
 /**
  * Inspired by https://github.com/facebook/react/issues/14099#issuecomment-440013892
@@ -9701,16 +9699,16 @@ const React$1d = await importShared('react');
  */
 
 function useEventCallback(fn) {
-  const ref = React$1d.useRef(fn);
+  const ref = React$1c.useRef(fn);
   useEnhancedEffect(() => {
     ref.current = fn;
   });
-  return React$1d.useRef((...args) =>
+  return React$1c.useRef((...args) =>
   // @ts-expect-error hide `this`
   (0, ref.current)(...args)).current;
 }
 
-const React$1c = await importShared('react');
+const React$1b = await importShared('react');
 
 
 /**
@@ -9729,8 +9727,8 @@ const React$1c = await importShared('react');
  * @returns {React.RefCallback<Instance> | null} The new ref callback.
  */
 function useForkRef(...refs) {
-  const cleanupRef = React$1c.useRef(undefined);
-  const refEffect = React$1c.useCallback(instance => {
+  const cleanupRef = React$1b.useRef(undefined);
+  const refEffect = React$1b.useCallback(instance => {
     const cleanups = refs.map(ref => {
       if (ref == null) {
         return null;
@@ -9752,7 +9750,7 @@ function useForkRef(...refs) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, refs);
-  return React$1c.useMemo(() => {
+  return React$1b.useMemo(() => {
     if (refs.every(ref => ref == null)) {
       return null;
     }
@@ -9868,15 +9866,15 @@ const config = {
   disabled: false
 };
 
-const React$1b = await importShared('react');
+const React$1a = await importShared('react');
 
-const TransitionGroupContext = React$1b.createContext(null);
+const TransitionGroupContext = React$1a.createContext(null);
 
 var forceReflow = function forceReflow(node) {
   return node.scrollTop;
 };
 
-const React$1a = await importShared('react');
+const React$19 = await importShared('react');
 
 const ReactDOM$1 = await importShared('react-dom');
 var UNMOUNTED = "unmounted";
@@ -10086,13 +10084,13 @@ var Transition = /* @__PURE__ */ function(_React$Component) {
     var _this$props = this.props, children = _this$props.children; _this$props.in; _this$props.mountOnEnter; _this$props.unmountOnExit; _this$props.appear; _this$props.enter; _this$props.exit; _this$props.timeout; _this$props.addEndListener; _this$props.onEnter; _this$props.onEntering; _this$props.onEntered; _this$props.onExit; _this$props.onExiting; _this$props.onExited; _this$props.nodeRef; var childProps = _objectWithoutPropertiesLoose(_this$props, ["children", "in", "mountOnEnter", "unmountOnExit", "appear", "enter", "exit", "timeout", "addEndListener", "onEnter", "onEntering", "onEntered", "onExit", "onExiting", "onExited", "nodeRef"]);
     return (
       // allows for nested Transitions
-      /* @__PURE__ */ React$1a.createElement(TransitionGroupContext.Provider, {
+      /* @__PURE__ */ React$19.createElement(TransitionGroupContext.Provider, {
         value: null
-      }, typeof children === "function" ? children(status, childProps) : React$1a.cloneElement(React$1a.Children.only(children), childProps))
+      }, typeof children === "function" ? children(status, childProps) : React$19.cloneElement(React$19.Children.only(children), childProps))
     );
   };
   return Transition2;
-}(React$1a.Component);
+}(React$19.Component);
 Transition.contextType = TransitionGroupContext;
 Transition.propTypes = {};
 function noop$1() {
@@ -10264,7 +10262,7 @@ function getNextChildMapping(nextProps, prevChildMapping, onExited) {
   return children;
 }
 
-const React$19 = await importShared('react');
+const React$18 = await importShared('react');
 var values = Object.values || function(obj) {
   return Object.keys(obj).map(function(k) {
     return obj[k];
@@ -10334,20 +10332,20 @@ var TransitionGroup = /* @__PURE__ */ function(_React$Component) {
     delete props.enter;
     delete props.exit;
     if (Component === null) {
-      return /* @__PURE__ */ React$19.createElement(TransitionGroupContext.Provider, {
+      return /* @__PURE__ */ React$18.createElement(TransitionGroupContext.Provider, {
         value: contextValue
       }, children);
     }
-    return /* @__PURE__ */ React$19.createElement(TransitionGroupContext.Provider, {
+    return /* @__PURE__ */ React$18.createElement(TransitionGroupContext.Provider, {
       value: contextValue
-    }, /* @__PURE__ */ React$19.createElement(Component, props, children));
+    }, /* @__PURE__ */ React$18.createElement(Component, props, children));
   };
   return TransitionGroup2;
-}(React$19.Component);
+}(React$18.Component);
 TransitionGroup.propTypes = {};
 TransitionGroup.defaultProps = defaultProps;
 
-const React$18 = await importShared('react');
+const React$17 = await importShared('react');
 
 const UNINITIALIZED = {};
 
@@ -10359,14 +10357,14 @@ const UNINITIALIZED = {};
  *   const ref = useLazyRef(sortColumns, columns)
  */
 function useLazyRef(init, initArg) {
-  const ref = React$18.useRef(UNINITIALIZED);
+  const ref = React$17.useRef(UNINITIALIZED);
   if (ref.current === UNINITIALIZED) {
     ref.current = init(initArg);
   }
   return ref;
 }
 
-const React$17 = await importShared('react');
+const React$16 = await importShared('react');
 
 const EMPTY = [];
 
@@ -10376,7 +10374,7 @@ const EMPTY = [];
 function useOnMount(fn) {
   // TODO: uncomment once we enable eslint-plugin-react-compiler // eslint-disable-next-line react-compiler/react-compiler -- no need to put `fn` in the dependency array
   /* eslint-disable react-hooks/exhaustive-deps */
-  React$17.useEffect(fn, EMPTY);
+  React$16.useEffect(fn, EMPTY);
   /* eslint-enable react-hooks/exhaustive-deps */
 }
 
@@ -10431,7 +10429,7 @@ function getPaperUtilityClass(slot) {
 }
 generateUtilityClasses('MuiPaper', ['root', 'rounded', 'outlined', 'elevation', 'elevation0', 'elevation1', 'elevation2', 'elevation3', 'elevation4', 'elevation5', 'elevation6', 'elevation7', 'elevation8', 'elevation9', 'elevation10', 'elevation11', 'elevation12', 'elevation13', 'elevation14', 'elevation15', 'elevation16', 'elevation17', 'elevation18', 'elevation19', 'elevation20', 'elevation21', 'elevation22', 'elevation23', 'elevation24']);
 
-const React$16 = await importShared('react');
+const React$15 = await importShared('react');
 const useUtilityClasses$E = (ownerState) => {
   const {
     square,
@@ -10483,7 +10481,7 @@ const PaperRoot = styled("div", {
     }
   }]
 })));
-const Paper = /* @__PURE__ */ React$16.forwardRef(function Paper2(inProps, ref) {
+const Paper = /* @__PURE__ */ React$15.forwardRef(function Paper2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiPaper"
@@ -10776,7 +10774,7 @@ function isFocusVisible(element) {
   return false;
 }
 
-const React$15 = await importShared('react');
+const React$14 = await importShared('react');
 /**
  * Lazy initialization container for the Ripple instance. This improves
  * performance by delaying mounting the ripple until it's needed.
@@ -10798,10 +10796,10 @@ class LazyRipple {
   static use() {
     /* eslint-disable */
     const ripple = useLazyRef(LazyRipple.create).current;
-    const [shouldMount, setShouldMount] = React$15.useState(false);
+    const [shouldMount, setShouldMount] = React$14.useState(false);
     ripple.shouldMount = shouldMount;
     ripple.setShouldMount = setShouldMount;
-    React$15.useEffect(ripple.mountEffect, [shouldMount]);
+    React$14.useEffect(ripple.mountEffect, [shouldMount]);
     /* eslint-enable */
 
     return ripple;
@@ -10859,7 +10857,7 @@ function createControlledPromise() {
   return p;
 }
 
-const React$14 = await importShared('react');
+const React$13 = await importShared('react');
 function Ripple(props) {
   const {
     className,
@@ -10872,7 +10870,7 @@ function Ripple(props) {
     onExited,
     timeout
   } = props;
-  const [leaving, setLeaving] = React$14.useState(false);
+  const [leaving, setLeaving] = React$13.useState(false);
   const rippleClassName = clsx(className, classes.ripple, classes.rippleVisible, pulsate && classes.ripplePulsate);
   const rippleStyles = {
     width: rippleSize,
@@ -10884,7 +10882,7 @@ function Ripple(props) {
   if (!inProp && !leaving) {
     setLeaving(true);
   }
-  React$14.useEffect(() => {
+  React$13.useEffect(() => {
     if (!inProp && onExited != null) {
       const timeoutId = setTimeout(onExited, timeout);
       return () => {
@@ -10904,7 +10902,7 @@ function Ripple(props) {
 
 const touchRippleClasses = generateUtilityClasses('MuiTouchRipple', ['root', 'ripple', 'rippleVisible', 'ripplePulsate', 'child', 'childLeaving', 'childPulsate']);
 
-const React$13 = await importShared('react');
+const React$12 = await importShared('react');
 const DURATION = 550;
 const DELAY_RIPPLE = 80;
 const enterKeyframe = keyframes`
@@ -11009,7 +11007,7 @@ const TouchRippleRipple = styled(Ripple, {
     animation-delay: 200ms;
   }
 `;
-const TouchRipple = /* @__PURE__ */ React$13.forwardRef(function TouchRipple2(inProps, ref) {
+const TouchRipple = /* @__PURE__ */ React$12.forwardRef(function TouchRipple2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiTouchRipple"
@@ -11020,20 +11018,20 @@ const TouchRipple = /* @__PURE__ */ React$13.forwardRef(function TouchRipple2(in
     className,
     ...other
   } = props;
-  const [ripples, setRipples] = React$13.useState([]);
-  const nextKey = React$13.useRef(0);
-  const rippleCallback = React$13.useRef(null);
-  React$13.useEffect(() => {
+  const [ripples, setRipples] = React$12.useState([]);
+  const nextKey = React$12.useRef(0);
+  const rippleCallback = React$12.useRef(null);
+  React$12.useEffect(() => {
     if (rippleCallback.current) {
       rippleCallback.current();
       rippleCallback.current = null;
     }
   }, [ripples]);
-  const ignoringMouseDown = React$13.useRef(false);
+  const ignoringMouseDown = React$12.useRef(false);
   const startTimer = useTimeout();
-  const startTimerCommit = React$13.useRef(null);
-  const container = React$13.useRef(null);
-  const startCommit = React$13.useCallback((params) => {
+  const startTimerCommit = React$12.useRef(null);
+  const container = React$12.useRef(null);
+  const startCommit = React$12.useCallback((params) => {
     const {
       pulsate: pulsate2,
       rippleX,
@@ -11059,7 +11057,7 @@ const TouchRipple = /* @__PURE__ */ React$13.forwardRef(function TouchRipple2(in
     nextKey.current += 1;
     rippleCallback.current = cb;
   }, [classes]);
-  const start = React$13.useCallback((event = {}, options = {}, cb = () => {
+  const start = React$12.useCallback((event = {}, options = {}, cb = () => {
   }) => {
     const {
       pulsate: pulsate2 = false,
@@ -11133,12 +11131,12 @@ const TouchRipple = /* @__PURE__ */ React$13.forwardRef(function TouchRipple2(in
       });
     }
   }, [centerProp, startCommit, startTimer]);
-  const pulsate = React$13.useCallback(() => {
+  const pulsate = React$12.useCallback(() => {
     start({}, {
       pulsate: true
     });
   }, [start]);
-  const stop = React$13.useCallback((event, cb) => {
+  const stop = React$12.useCallback((event, cb) => {
     startTimer.clear();
     if (event?.type === "touchend" && startTimerCommit.current) {
       startTimerCommit.current();
@@ -11157,7 +11155,7 @@ const TouchRipple = /* @__PURE__ */ React$13.forwardRef(function TouchRipple2(in
     });
     rippleCallback.current = cb;
   }, [startTimer]);
-  React$13.useImperativeHandle(ref, () => ({
+  React$12.useImperativeHandle(ref, () => ({
     pulsate,
     start,
     stop
@@ -11179,7 +11177,7 @@ function getButtonBaseUtilityClass(slot) {
 }
 const buttonBaseClasses = generateUtilityClasses('MuiButtonBase', ['root', 'disabled', 'focusVisible']);
 
-const React$12 = await importShared('react');
+const React$11 = await importShared('react');
 const useUtilityClasses$D = (ownerState) => {
   const {
     disabled,
@@ -11239,7 +11237,7 @@ const ButtonBaseRoot = styled("button", {
     colorAdjust: "exact"
   }
 });
-const ButtonBase = /* @__PURE__ */ React$12.forwardRef(function ButtonBase2(inProps, ref) {
+const ButtonBase = /* @__PURE__ */ React$11.forwardRef(function ButtonBase2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiButtonBase"
@@ -11276,21 +11274,21 @@ const ButtonBase = /* @__PURE__ */ React$12.forwardRef(function ButtonBase2(inPr
     type,
     ...other
   } = props;
-  const buttonRef = React$12.useRef(null);
+  const buttonRef = React$11.useRef(null);
   const ripple = useLazyRipple();
   const handleRippleRef = useForkRef(ripple.ref, touchRippleRef);
-  const [focusVisible, setFocusVisible] = React$12.useState(false);
+  const [focusVisible, setFocusVisible] = React$11.useState(false);
   if (disabled && focusVisible) {
     setFocusVisible(false);
   }
-  React$12.useImperativeHandle(action, () => ({
+  React$11.useImperativeHandle(action, () => ({
     focusVisible: () => {
       setFocusVisible(true);
       buttonRef.current.focus();
     }
   }), []);
   const enableTouchRipple = ripple.shouldMount && !disableRipple && !disabled;
-  React$12.useEffect(() => {
+  React$11.useEffect(() => {
     if (focusVisible && focusRipple && !disableRipple) {
       ripple.pulsate();
     }
@@ -11490,7 +11488,7 @@ function getCircularProgressUtilityClass(slot) {
 }
 generateUtilityClasses('MuiCircularProgress', ['root', 'determinate', 'indeterminate', 'colorPrimary', 'colorSecondary', 'svg', 'track', 'circle', 'circleDeterminate', 'circleIndeterminate', 'circleDisableShrink']);
 
-const React$11 = await importShared('react');
+const React$10 = await importShared('react');
 const SIZE = 44;
 const circularRotateKeyframe = keyframes`
   0% {
@@ -11630,7 +11628,7 @@ const CircularProgressTrack = styled("circle", {
   stroke: "currentColor",
   opacity: (theme.vars || theme).palette.action.activatedOpacity
 })));
-const CircularProgress = /* @__PURE__ */ React$11.forwardRef(function CircularProgress2(inProps, ref) {
+const CircularProgress = /* @__PURE__ */ React$10.forwardRef(function CircularProgress2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiCircularProgress"
@@ -11713,7 +11711,7 @@ function getIconButtonUtilityClass(slot) {
 }
 const iconButtonClasses = generateUtilityClasses('MuiIconButton', ['root', 'disabled', 'colorInherit', 'colorPrimary', 'colorSecondary', 'colorError', 'colorInfo', 'colorSuccess', 'colorWarning', 'edgeStart', 'edgeEnd', 'sizeSmall', 'sizeMedium', 'sizeLarge', 'loading', 'loadingIndicator', 'loadingWrapper']);
 
-const React$10 = await importShared('react');
+const React$$ = await importShared('react');
 const useUtilityClasses$B = (ownerState) => {
   const {
     classes,
@@ -11865,7 +11863,7 @@ const IconButtonLoadingIndicator = styled("span", {
     }
   }]
 }));
-const IconButton = /* @__PURE__ */ React$10.forwardRef(function IconButton2(inProps, ref) {
+const IconButton = /* @__PURE__ */ React$$.forwardRef(function IconButton2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiIconButton"
@@ -11949,7 +11947,7 @@ const ClearIcon = createSvgIcon(/*#__PURE__*/jsxRuntimeExports.jsx("path", {
   d: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
 }));
 
-const React$$ = await importShared('react');
+const React$_ = await importShared('react');
 const useUtilityClasses$A = (ownerState) => {
   const {
     variant,
@@ -12072,7 +12070,7 @@ const defaultIconMapping = {
     fontSize: "inherit"
   })
 };
-const Alert = /* @__PURE__ */ React$$.forwardRef(function Alert2(inProps, ref) {
+const Alert = /* @__PURE__ */ React$_.forwardRef(function Alert2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiAlert"
@@ -12191,7 +12189,7 @@ function getTypographyUtilityClass(slot) {
 }
 generateUtilityClasses('MuiTypography', ['root', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'subtitle1', 'subtitle2', 'body1', 'body2', 'inherit', 'button', 'caption', 'overline', 'alignLeft', 'alignRight', 'alignCenter', 'alignJustify', 'noWrap', 'gutterBottom', 'paragraph']);
 
-const React$_ = await importShared('react');
+const React$Z = await importShared('react');
 const v6Colors = {
   primary: true,
   secondary: true,
@@ -12305,7 +12303,7 @@ const defaultVariantMapping = {
   body2: "p",
   inherit: "p"
 };
-const Typography = /* @__PURE__ */ React$_.forwardRef(function Typography2(inProps, ref) {
+const Typography = /* @__PURE__ */ React$Z.forwardRef(function Typography2(inProps, ref) {
   const {
     color,
     ...themeProps
@@ -12392,7 +12390,7 @@ function useSlotProps(parameters) {
   return props;
 }
 
-const React$Z = await importShared('react');
+const React$Y = await importShared('react');
 
 
 /**
@@ -12404,7 +12402,7 @@ const React$Z = await importShared('react');
  */
 function getReactElementRef(element) {
   // 'ref' is passed as prop in React 19, whereas 'ref' is directly attached to children in older versions
-  if (parseInt(React$Z.version, 10) >= 19) {
+  if (parseInt(React$Y.version, 10) >= 19) {
     return element?.props?.ref || null;
   }
   // @ts-expect-error element.ref is not included in the ReactElement type
@@ -12412,20 +12410,20 @@ function getReactElementRef(element) {
   return element?.ref || null;
 }
 
-const React$Y = await importShared('react');
+const React$X = await importShared('react');
 
 const ReactDOM = await importShared('react-dom');
 function getContainer$1(container) {
   return typeof container === "function" ? container() : container;
 }
-const Portal = /* @__PURE__ */ React$Y.forwardRef(function Portal2(props, forwardedRef) {
+const Portal = /* @__PURE__ */ React$X.forwardRef(function Portal2(props, forwardedRef) {
   const {
     children,
     container,
     disablePortal = false
   } = props;
-  const [mountNode, setMountNode] = React$Y.useState(null);
-  const handleRef = useForkRef(/* @__PURE__ */ React$Y.isValidElement(children) ? getReactElementRef(children) : null, forwardedRef);
+  const [mountNode, setMountNode] = React$X.useState(null);
+  const handleRef = useForkRef(/* @__PURE__ */ React$X.isValidElement(children) ? getReactElementRef(children) : null, forwardedRef);
   useEnhancedEffect(() => {
     if (!disablePortal) {
       setMountNode(getContainer$1(container) || document.body);
@@ -12441,11 +12439,11 @@ const Portal = /* @__PURE__ */ React$Y.forwardRef(function Portal2(props, forwar
     return void 0;
   }, [forwardedRef, mountNode, disablePortal]);
   if (disablePortal) {
-    if (/* @__PURE__ */ React$Y.isValidElement(children)) {
+    if (/* @__PURE__ */ React$X.isValidElement(children)) {
       const newProps = {
         ref: handleRef
       };
-      return /* @__PURE__ */ React$Y.cloneElement(children, newProps);
+      return /* @__PURE__ */ React$X.cloneElement(children, newProps);
     }
     return children;
   }
@@ -12462,7 +12460,7 @@ function getChipUtilityClass(slot) {
 }
 const chipClasses = generateUtilityClasses('MuiChip', ['root', 'sizeSmall', 'sizeMedium', 'colorDefault', 'colorError', 'colorInfo', 'colorPrimary', 'colorSecondary', 'colorSuccess', 'colorWarning', 'disabled', 'clickable', 'clickableColorPrimary', 'clickableColorSecondary', 'deletable', 'deletableColorPrimary', 'deletableColorSecondary', 'outlined', 'filled', 'outlinedPrimary', 'outlinedSecondary', 'filledPrimary', 'filledSecondary', 'avatar', 'avatarSmall', 'avatarMedium', 'avatarColorPrimary', 'avatarColorSecondary', 'icon', 'iconSmall', 'iconMedium', 'iconColorPrimary', 'iconColorSecondary', 'label', 'labelSmall', 'labelMedium', 'deleteIcon', 'deleteIconSmall', 'deleteIconMedium', 'deleteIconColorPrimary', 'deleteIconColorSecondary', 'deleteIconOutlinedColorPrimary', 'deleteIconOutlinedColorSecondary', 'deleteIconFilledColorPrimary', 'deleteIconFilledColorSecondary', 'focusVisible']);
 
-const React$X = await importShared('react');
+const React$W = await importShared('react');
 const useUtilityClasses$y = (ownerState) => {
   const {
     classes,
@@ -12790,7 +12788,7 @@ const ChipLabel = styled("span", {
 function isDeleteKeyboardEvent(keyboardEvent) {
   return keyboardEvent.key === "Backspace" || keyboardEvent.key === "Delete";
 }
-const Chip = /* @__PURE__ */ React$X.forwardRef(function Chip2(inProps, ref) {
+const Chip = /* @__PURE__ */ React$W.forwardRef(function Chip2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiChip"
@@ -12818,7 +12816,7 @@ const Chip = /* @__PURE__ */ React$X.forwardRef(function Chip2(inProps, ref) {
     slotProps = {},
     ...other
   } = props;
-  const chipRef = React$X.useRef(null);
+  const chipRef = React$W.useRef(null);
   const handleRef = useForkRef(chipRef, ref);
   const handleDeleteIconClick = (event) => {
     event.stopPropagation();
@@ -12852,7 +12850,7 @@ const Chip = /* @__PURE__ */ React$X.forwardRef(function Chip2(inProps, ref) {
     disabled,
     size,
     color,
-    iconColor: /* @__PURE__ */ React$X.isValidElement(iconProp) ? iconProp.props.color || color : color,
+    iconColor: /* @__PURE__ */ React$W.isValidElement(iconProp) ? iconProp.props.color || color : color,
     onDelete: !!onDelete,
     clickable,
     variant
@@ -12867,7 +12865,7 @@ const Chip = /* @__PURE__ */ React$X.forwardRef(function Chip2(inProps, ref) {
   } : {};
   let deleteIcon = null;
   if (onDelete) {
-    deleteIcon = deleteIconProp && /* @__PURE__ */ React$X.isValidElement(deleteIconProp) ? /* @__PURE__ */ React$X.cloneElement(deleteIconProp, {
+    deleteIcon = deleteIconProp && /* @__PURE__ */ React$W.isValidElement(deleteIconProp) ? /* @__PURE__ */ React$W.cloneElement(deleteIconProp, {
       className: clsx(deleteIconProp.props.className, classes.deleteIcon),
       onClick: handleDeleteIconClick
     }) : /* @__PURE__ */ jsxRuntimeExports.jsx(CancelIcon, {
@@ -12876,14 +12874,14 @@ const Chip = /* @__PURE__ */ React$X.forwardRef(function Chip2(inProps, ref) {
     });
   }
   let avatar = null;
-  if (avatarProp && /* @__PURE__ */ React$X.isValidElement(avatarProp)) {
-    avatar = /* @__PURE__ */ React$X.cloneElement(avatarProp, {
+  if (avatarProp && /* @__PURE__ */ React$W.isValidElement(avatarProp)) {
+    avatar = /* @__PURE__ */ React$W.cloneElement(avatarProp, {
       className: clsx(classes.avatar, avatarProp.props.className)
     });
   }
   let icon = null;
-  if (iconProp && /* @__PURE__ */ React$X.isValidElement(iconProp)) {
-    icon = /* @__PURE__ */ React$X.cloneElement(iconProp, {
+  if (iconProp && /* @__PURE__ */ React$W.isValidElement(iconProp)) {
+    icon = /* @__PURE__ */ React$W.cloneElement(iconProp, {
       className: clsx(classes.icon, iconProp.props.className)
     });
   }
@@ -12939,7 +12937,7 @@ const Chip = /* @__PURE__ */ React$X.forwardRef(function Chip2(inProps, ref) {
   });
 });
 
-const React$W = await importShared('react');
+const React$V = await importShared('react');
 function getStyleValue(value) {
   return parseInt(value, 10) || 0;
 }
@@ -12967,7 +12965,7 @@ function isObjectEmpty(object) {
 function isEmpty$1(obj) {
   return isObjectEmpty(obj) || obj.outerHeightStyle === 0 && !obj.overflowing;
 }
-const TextareaAutosize = /* @__PURE__ */ React$W.forwardRef(function TextareaAutosize2(props, forwardedRef) {
+const TextareaAutosize = /* @__PURE__ */ React$V.forwardRef(function TextareaAutosize2(props, forwardedRef) {
   const {
     onChange,
     maxRows,
@@ -12978,12 +12976,12 @@ const TextareaAutosize = /* @__PURE__ */ React$W.forwardRef(function TextareaAut
   } = props;
   const {
     current: isControlled
-  } = React$W.useRef(value != null);
-  const textareaRef = React$W.useRef(null);
+  } = React$V.useRef(value != null);
+  const textareaRef = React$V.useRef(null);
   const handleRef = useForkRef(forwardedRef, textareaRef);
-  const heightRef = React$W.useRef(null);
-  const hiddenTextareaRef = React$W.useRef(null);
-  const calculateTextareaStyles = React$W.useCallback(() => {
+  const heightRef = React$V.useRef(null);
+  const hiddenTextareaRef = React$V.useRef(null);
+  const calculateTextareaStyles = React$V.useCallback(() => {
     const textarea = textareaRef.current;
     const hiddenTextarea = hiddenTextareaRef.current;
     if (!textarea || !hiddenTextarea) {
@@ -13032,7 +13030,7 @@ const TextareaAutosize = /* @__PURE__ */ React$W.forwardRef(function TextareaAut
     const outerHeightStyle = textareaStyles.outerHeightStyle;
     return heightRef.current != null && heightRef.current !== outerHeightStyle;
   });
-  const syncHeight = React$W.useCallback(() => {
+  const syncHeight = React$V.useCallback(() => {
     const textarea = textareaRef.current;
     const textareaStyles = calculateTextareaStyles();
     if (!textarea || !textareaStyles || isEmpty$1(textareaStyles)) {
@@ -13045,7 +13043,7 @@ const TextareaAutosize = /* @__PURE__ */ React$W.forwardRef(function TextareaAut
     }
     textarea.style.overflow = textareaStyles.overflowing ? "hidden" : "";
   }, [calculateTextareaStyles]);
-  const frameRef = React$W.useRef(-1);
+  const frameRef = React$V.useRef(-1);
   useEnhancedEffect(() => {
     const debouncedHandleResize = debounce(syncHeight);
     const textarea = textareaRef?.current;
@@ -13095,7 +13093,7 @@ const TextareaAutosize = /* @__PURE__ */ React$W.forwardRef(function TextareaAut
       onChange(event);
     }
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(React$W.Fragment, {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(React$V.Fragment, {
     children: [/* @__PURE__ */ jsxRuntimeExports.jsx("textarea", {
       value,
       onChange: handleChange,
@@ -13135,13 +13133,13 @@ function formControlState({
   }, {});
 }
 
-const React$V = await importShared('react');
-
-const FormControlContext = /* @__PURE__ */ React$V.createContext(void 0);
-
 const React$U = await importShared('react');
+
+const FormControlContext = /* @__PURE__ */ React$U.createContext(void 0);
+
+const React$T = await importShared('react');
 function useFormControl() {
-  return React$U.useContext(FormControlContext);
+  return React$T.useContext(FormControlContext);
 }
 
 // Supports determination of isControlled().
@@ -13181,7 +13179,7 @@ function getInputBaseUtilityClass(slot) {
 const inputBaseClasses = generateUtilityClasses('MuiInputBase', ['root', 'formControl', 'focused', 'disabled', 'adornedStart', 'adornedEnd', 'error', 'sizeSmall', 'multiline', 'colorSecondary', 'fullWidth', 'hiddenLabel', 'readOnly', 'input', 'inputSizeSmall', 'inputMultiline', 'inputTypeSearch', 'inputAdornedStart', 'inputAdornedEnd', 'inputHiddenLabel']);
 
 var _InputGlobalStyles;
-const React$T = await importShared('react');
+const React$S = await importShared('react');
 const rootOverridesResolver = (props, styles) => {
   const {
     ownerState
@@ -13393,7 +13391,7 @@ const InputGlobalStyles = globalCss({
     }
   }
 });
-const InputBase = /* @__PURE__ */ React$T.forwardRef(function InputBase2(inProps, ref) {
+const InputBase = /* @__PURE__ */ React$S.forwardRef(function InputBase2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiInputBase"
@@ -13442,12 +13440,12 @@ const InputBase = /* @__PURE__ */ React$T.forwardRef(function InputBase2(inProps
   const value = inputPropsProp.value != null ? inputPropsProp.value : valueProp;
   const {
     current: isControlled
-  } = React$T.useRef(value != null);
-  const inputRef = React$T.useRef();
-  const handleInputRefWarning = React$T.useCallback((instance) => {
+  } = React$S.useRef(value != null);
+  const inputRef = React$S.useRef();
+  const handleInputRefWarning = React$S.useCallback((instance) => {
   }, []);
   const handleInputRef = useForkRef(inputRef, inputRefProp, inputPropsProp.ref, handleInputRefWarning);
-  const [focused, setFocused] = React$T.useState(false);
+  const [focused, setFocused] = React$S.useState(false);
   const muiFormControl = useFormControl();
   const fcs = formControlState({
     props,
@@ -13455,7 +13453,7 @@ const InputBase = /* @__PURE__ */ React$T.forwardRef(function InputBase2(inProps
     states: ["color", "disabled", "error", "hiddenLabel", "size", "required", "filled"]
   });
   fcs.focused = muiFormControl ? muiFormControl.focused : focused;
-  React$T.useEffect(() => {
+  React$S.useEffect(() => {
     if (!muiFormControl && disabled && focused) {
       setFocused(false);
       if (onBlur) {
@@ -13465,7 +13463,7 @@ const InputBase = /* @__PURE__ */ React$T.forwardRef(function InputBase2(inProps
   }, [muiFormControl, disabled, focused, onBlur]);
   const onFilled = muiFormControl && muiFormControl.onFilled;
   const onEmpty = muiFormControl && muiFormControl.onEmpty;
-  const checkDirty = React$T.useCallback((obj) => {
+  const checkDirty = React$S.useCallback((obj) => {
     if (isFilled(obj)) {
       if (onFilled) {
         onFilled();
@@ -13524,7 +13522,7 @@ const InputBase = /* @__PURE__ */ React$T.forwardRef(function InputBase2(inProps
       onChange(event, ...args);
     }
   };
-  React$T.useEffect(() => {
+  React$S.useEffect(() => {
     checkDirty(inputRef.current);
   }, []);
   const handleClick = (event) => {
@@ -13560,7 +13558,7 @@ const InputBase = /* @__PURE__ */ React$T.forwardRef(function InputBase2(inProps
       value: "x"
     });
   };
-  React$T.useEffect(() => {
+  React$S.useEffect(() => {
     if (muiFormControl) {
       muiFormControl.setAdornedStart(Boolean(startAdornment));
     }
@@ -13588,7 +13586,7 @@ const InputBase = /* @__PURE__ */ React$T.forwardRef(function InputBase2(inProps
     ...inputProps,
     ...slotProps.input ?? componentsProps.input
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(React$T.Fragment, {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(React$S.Fragment, {
     children: [!disableInjectingGlobalStyles && typeof InputGlobalStyles === "function" && // For Emotion/Styled-components, InputGlobalStyles will be a function
     // For Pigment CSS, this has no effect because the InputGlobalStyles will be null.
     (_InputGlobalStyles || (_InputGlobalStyles = /* @__PURE__ */ jsxRuntimeExports.jsx(InputGlobalStyles, {}))), /* @__PURE__ */ jsxRuntimeExports.jsxs(Root, {
@@ -13684,7 +13682,7 @@ function getAvatarUtilityClass(slot) {
 }
 generateUtilityClasses('MuiAvatar', ['root', 'colorDefault', 'circular', 'rounded', 'square', 'img', 'fallback']);
 
-const React$S = await importShared('react');
+const React$R = await importShared('react');
 const useUtilityClasses$w = (ownerState) => {
   const {
     classes,
@@ -13781,8 +13779,8 @@ function useLoaded({
   src,
   srcSet
 }) {
-  const [loaded, setLoaded] = React$S.useState(false);
-  React$S.useEffect(() => {
+  const [loaded, setLoaded] = React$R.useState(false);
+  React$R.useEffect(() => {
     if (!src && !srcSet) {
       return void 0;
     }
@@ -13813,7 +13811,7 @@ function useLoaded({
   }, [crossOrigin, referrerPolicy, src, srcSet]);
   return loaded;
 }
-const Avatar = /* @__PURE__ */ React$S.forwardRef(function Avatar2(inProps, ref) {
+const Avatar = /* @__PURE__ */ React$R.forwardRef(function Avatar2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiAvatar"
@@ -13910,7 +13908,7 @@ const Avatar = /* @__PURE__ */ React$S.forwardRef(function Avatar2(inProps, ref)
   });
 });
 
-const React$R = await importShared('react');
+const React$Q = await importShared('react');
 const styles$2 = {
   entering: {
     opacity: 1
@@ -13919,7 +13917,7 @@ const styles$2 = {
     opacity: 1
   }
 };
-const Fade = /* @__PURE__ */ React$R.forwardRef(function Fade2(props, ref) {
+const Fade = /* @__PURE__ */ React$Q.forwardRef(function Fade2(props, ref) {
   const theme = useTheme();
   const defaultTimeout = {
     enter: theme.transitions.duration.enteringScreen,
@@ -13943,7 +13941,7 @@ const Fade = /* @__PURE__ */ React$R.forwardRef(function Fade2(props, ref) {
     TransitionComponent = Transition,
     ...other
   } = props;
-  const nodeRef = React$R.useRef(null);
+  const nodeRef = React$Q.useRef(null);
   const handleRef = useForkRef(nodeRef, getReactElementRef(children), ref);
   const normalizedTransitionCallback = (callback) => (maybeIsAppearing) => {
     if (callback) {
@@ -14010,7 +14008,7 @@ const Fade = /* @__PURE__ */ React$R.forwardRef(function Fade2(props, ref) {
       ownerState,
       ...restChildProps
     }) => {
-      return /* @__PURE__ */ React$R.cloneElement(children, {
+      return /* @__PURE__ */ React$Q.cloneElement(children, {
         style: {
           opacity: 0,
           visibility: state === "exited" && !inProp ? "hidden" : void 0,
@@ -14030,7 +14028,7 @@ function getBackdropUtilityClass(slot) {
 }
 generateUtilityClasses('MuiBackdrop', ['root', 'invisible']);
 
-const React$Q = await importShared('react');
+const React$P = await importShared('react');
 const useUtilityClasses$v = (ownerState) => {
   const {
     classes,
@@ -14070,7 +14068,7 @@ const BackdropRoot = styled("div", {
     }
   }]
 });
-const Backdrop = /* @__PURE__ */ React$Q.forwardRef(function Backdrop2(inProps, ref) {
+const Backdrop = /* @__PURE__ */ React$P.forwardRef(function Backdrop2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiBackdrop"
@@ -14150,15 +14148,15 @@ function getButtonUtilityClass(slot) {
 }
 const buttonClasses = generateUtilityClasses('MuiButton', ['root', 'text', 'textInherit', 'textPrimary', 'textSecondary', 'textSuccess', 'textError', 'textInfo', 'textWarning', 'outlined', 'outlinedInherit', 'outlinedPrimary', 'outlinedSecondary', 'outlinedSuccess', 'outlinedError', 'outlinedInfo', 'outlinedWarning', 'contained', 'containedInherit', 'containedPrimary', 'containedSecondary', 'containedSuccess', 'containedError', 'containedInfo', 'containedWarning', 'disableElevation', 'focusVisible', 'disabled', 'colorInherit', 'colorPrimary', 'colorSecondary', 'colorSuccess', 'colorError', 'colorInfo', 'colorWarning', 'textSizeSmall', 'textSizeMedium', 'textSizeLarge', 'outlinedSizeSmall', 'outlinedSizeMedium', 'outlinedSizeLarge', 'containedSizeSmall', 'containedSizeMedium', 'containedSizeLarge', 'sizeMedium', 'sizeSmall', 'sizeLarge', 'fullWidth', 'startIcon', 'endIcon', 'icon', 'iconSizeSmall', 'iconSizeMedium', 'iconSizeLarge', 'loading', 'loadingWrapper', 'loadingIconPlaceholder', 'loadingIndicator', 'loadingPositionCenter', 'loadingPositionStart', 'loadingPositionEnd']);
 
-const React$P = await importShared('react');
-
-const ButtonGroupContext = /* @__PURE__ */ React$P.createContext({});
-
 const React$O = await importShared('react');
 
-const ButtonGroupButtonContext = /* @__PURE__ */ React$O.createContext(void 0);
+const ButtonGroupContext = /* @__PURE__ */ React$O.createContext({});
 
 const React$N = await importShared('react');
+
+const ButtonGroupButtonContext = /* @__PURE__ */ React$N.createContext(void 0);
+
+const React$M = await importShared('react');
 const useUtilityClasses$u = (ownerState) => {
   const {
     color,
@@ -14609,9 +14607,9 @@ const ButtonLoadingIconPlaceholder = styled("span", {
   width: "1em",
   height: "1em"
 });
-const Button = /* @__PURE__ */ React$N.forwardRef(function Button2(inProps, ref) {
-  const contextProps = React$N.useContext(ButtonGroupContext);
-  const buttonGroupButtonContextPositionClassName = React$N.useContext(ButtonGroupButtonContext);
+const Button = /* @__PURE__ */ React$M.forwardRef(function Button2(inProps, ref) {
+  const contextProps = React$M.useContext(ButtonGroupContext);
+  const buttonGroupButtonContextPositionClassName = React$M.useContext(ButtonGroupButtonContext);
   const resolvedProps = resolveProps(contextProps, inProps);
   const props = useDefaultProps({
     props: resolvedProps,
@@ -14707,7 +14705,7 @@ const Button = /* @__PURE__ */ React$N.forwardRef(function Button2(inProps, ref)
   });
 });
 
-const React$M = await importShared('react');
+const React$L = await importShared('react');
 
 
 /**
@@ -14717,7 +14715,7 @@ const React$M = await importShared('react');
  * @param children the children
  */
 function getValidReactChildren(children) {
-  return React$M.Children.toArray(children).filter(child => /*#__PURE__*/React$M.isValidElement(child));
+  return React$L.Children.toArray(children).filter(child => /*#__PURE__*/React$L.isValidElement(child));
 }
 
 function getCardUtilityClass(slot) {
@@ -14725,7 +14723,7 @@ function getCardUtilityClass(slot) {
 }
 generateUtilityClasses('MuiCard', ['root']);
 
-const React$L = await importShared('react');
+const React$K = await importShared('react');
 const useUtilityClasses$t = (ownerState) => {
   const {
     classes
@@ -14741,7 +14739,7 @@ const CardRoot = styled(Paper, {
 })({
   overflow: "hidden"
 });
-const Card = /* @__PURE__ */ React$L.forwardRef(function Card2(inProps, ref) {
+const Card = /* @__PURE__ */ React$K.forwardRef(function Card2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiCard"
@@ -14770,7 +14768,7 @@ function getSwitchBaseUtilityClass(slot) {
 }
 generateUtilityClasses('PrivateSwitchBase', ['root', 'checked', 'disabled', 'input', 'edgeStart', 'edgeEnd']);
 
-const React$K = await importShared('react');
+const React$J = await importShared('react');
 const useUtilityClasses$s = (ownerState) => {
   const {
     classes,
@@ -14838,7 +14836,7 @@ const SwitchBaseInput = styled("input", {
   padding: 0,
   zIndex: 1
 });
-const SwitchBase = /* @__PURE__ */ React$K.forwardRef(function SwitchBase2(props, ref) {
+const SwitchBase = /* @__PURE__ */ React$J.forwardRef(function SwitchBase2(props, ref) {
   const {
     autoFocus,
     checked: checkedProp,
@@ -15006,7 +15004,7 @@ function getCheckboxUtilityClass(slot) {
 }
 const checkboxClasses = generateUtilityClasses('MuiCheckbox', ['root', 'checked', 'disabled', 'indeterminate', 'colorPrimary', 'colorSecondary', 'sizeSmall', 'sizeMedium']);
 
-const React$J = await importShared('react');
+const React$I = await importShared('react');
 const useUtilityClasses$r = (ownerState) => {
   const {
     classes,
@@ -15088,7 +15086,7 @@ const CheckboxRoot = styled(SwitchBase, {
 const defaultCheckedIcon = /* @__PURE__ */ jsxRuntimeExports.jsx(CheckBoxIcon, {});
 const defaultIcon = /* @__PURE__ */ jsxRuntimeExports.jsx(CheckBoxOutlineBlankIcon, {});
 const defaultIndeterminateIcon = /* @__PURE__ */ jsxRuntimeExports.jsx(IndeterminateCheckBoxIcon, {});
-const Checkbox = /* @__PURE__ */ React$J.forwardRef(function Checkbox2(inProps, ref) {
+const Checkbox = /* @__PURE__ */ React$I.forwardRef(function Checkbox2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiCheckbox"
@@ -15131,10 +15129,10 @@ const Checkbox = /* @__PURE__ */ React$J.forwardRef(function Checkbox2(inProps, 
     ownerState,
     additionalProps: {
       type: "checkbox",
-      icon: /* @__PURE__ */ React$J.cloneElement(icon, {
+      icon: /* @__PURE__ */ React$I.cloneElement(icon, {
         fontSize: icon.props.fontSize ?? size
       }),
-      checkedIcon: /* @__PURE__ */ React$J.cloneElement(indeterminateIcon, {
+      checkedIcon: /* @__PURE__ */ React$I.cloneElement(indeterminateIcon, {
         fontSize: indeterminateIcon.props.fontSize ?? size
       }),
       disableRipple,
@@ -15152,7 +15150,7 @@ const Checkbox = /* @__PURE__ */ React$J.forwardRef(function Checkbox2(inProps, 
   });
 });
 
-const React$I = await importShared('react');
+const React$H = await importShared('react');
 function mapEventPropToEvent(eventProp) {
   return eventProp.substring(2).toLowerCase();
 }
@@ -15167,11 +15165,11 @@ function ClickAwayListener(props) {
     onClickAway,
     touchEvent = "onTouchEnd"
   } = props;
-  const movedRef = React$I.useRef(false);
-  const nodeRef = React$I.useRef(null);
-  const activatedRef = React$I.useRef(false);
-  const syntheticEventRef = React$I.useRef(false);
-  React$I.useEffect(() => {
+  const movedRef = React$H.useRef(false);
+  const nodeRef = React$H.useRef(null);
+  const activatedRef = React$H.useRef(false);
+  const syntheticEventRef = React$H.useRef(false);
+  React$H.useEffect(() => {
     setTimeout(() => {
       activatedRef.current = true;
     }, 0);
@@ -15220,7 +15218,7 @@ function ClickAwayListener(props) {
   if (touchEvent !== false) {
     childrenProps[touchEvent] = createHandleSynthetic(touchEvent);
   }
-  React$I.useEffect(() => {
+  React$H.useEffect(() => {
     if (touchEvent !== false) {
       const mappedTouchEvent = mapEventPropToEvent(touchEvent);
       const doc = ownerDocument(nodeRef.current);
@@ -15239,7 +15237,7 @@ function ClickAwayListener(props) {
   if (mouseEvent !== false) {
     childrenProps[mouseEvent] = createHandleSynthetic(mouseEvent);
   }
-  React$I.useEffect(() => {
+  React$H.useEffect(() => {
     if (mouseEvent !== false) {
       const mappedMouseEvent = mapEventPropToEvent(mouseEvent);
       const doc = ownerDocument(nodeRef.current);
@@ -15250,10 +15248,10 @@ function ClickAwayListener(props) {
     }
     return void 0;
   }, [handleClickAway, mouseEvent]);
-  return /* @__PURE__ */ React$I.cloneElement(children, childrenProps);
+  return /* @__PURE__ */ React$H.cloneElement(children, childrenProps);
 }
 
-const React$H = await importShared('react');
+const React$G = await importShared('react');
 const isDynamicSupport = typeof globalCss({}) === "function";
 const html = (theme, enableColorScheme) => ({
   WebkitFontSmoothing: "antialiased",
@@ -15367,7 +15365,7 @@ function CssBaseline(inProps) {
     children,
     enableColorScheme = false
   } = props;
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(React$H.Fragment, {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(React$G.Fragment, {
     children: [isDynamicSupport && /* @__PURE__ */ jsxRuntimeExports.jsx(GlobalStyles, {
       enableColorScheme
     }), !isDynamicSupport && !enableColorScheme && /* @__PURE__ */ jsxRuntimeExports.jsx("span", {
@@ -15598,7 +15596,7 @@ class ModalManager {
   }
 }
 
-const React$G = await importShared('react');
+const React$F = await importShared('react');
 const candidatesSelector = ["input", "select", "textarea", "a[href]", "button", "[tabindex]", "audio[controls]", "video[controls]", '[contenteditable]:not([contenteditable="false"])'].join(",");
 function getTabIndex(node) {
   const tabindexAttr = parseInt(node.getAttribute("tabindex") || "", 10);
@@ -15663,22 +15661,22 @@ function FocusTrap(props) {
     isEnabled = defaultIsEnabled,
     open
   } = props;
-  const ignoreNextEnforceFocus = React$G.useRef(false);
-  const sentinelStart = React$G.useRef(null);
-  const sentinelEnd = React$G.useRef(null);
-  const nodeToRestore = React$G.useRef(null);
-  const reactFocusEventTarget = React$G.useRef(null);
-  const activated = React$G.useRef(false);
-  const rootRef = React$G.useRef(null);
+  const ignoreNextEnforceFocus = React$F.useRef(false);
+  const sentinelStart = React$F.useRef(null);
+  const sentinelEnd = React$F.useRef(null);
+  const nodeToRestore = React$F.useRef(null);
+  const reactFocusEventTarget = React$F.useRef(null);
+  const activated = React$F.useRef(false);
+  const rootRef = React$F.useRef(null);
   const handleRef = useForkRef(getReactElementRef(children), rootRef);
-  const lastKeydown = React$G.useRef(null);
-  React$G.useEffect(() => {
+  const lastKeydown = React$F.useRef(null);
+  React$F.useEffect(() => {
     if (!open || !rootRef.current) {
       return;
     }
     activated.current = !disableAutoFocus;
   }, [disableAutoFocus, open]);
-  React$G.useEffect(() => {
+  React$F.useEffect(() => {
     if (!open || !rootRef.current) {
       return;
     }
@@ -15701,7 +15699,7 @@ function FocusTrap(props) {
       }
     };
   }, [open]);
-  React$G.useEffect(() => {
+  React$F.useEffect(() => {
     if (!open || !rootRef.current) {
       return;
     }
@@ -15790,13 +15788,13 @@ function FocusTrap(props) {
     }
     activated.current = true;
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(React$G.Fragment, {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(React$F.Fragment, {
     children: [/* @__PURE__ */ jsxRuntimeExports.jsx("div", {
       tabIndex: open ? 0 : -1,
       onFocus: handleFocusSentinel,
       ref: sentinelStart,
       "data-testid": "sentinelStart"
-    }), /* @__PURE__ */ React$G.cloneElement(children, {
+    }), /* @__PURE__ */ React$F.cloneElement(children, {
       ref: handleRef,
       onFocus
     }), /* @__PURE__ */ jsxRuntimeExports.jsx("div", {
@@ -15808,7 +15806,7 @@ function FocusTrap(props) {
   });
 }
 
-const React$F = await importShared('react');
+const React$E = await importShared('react');
 function getContainer(container) {
   return typeof container === 'function' ? container() : container;
 }
@@ -15835,11 +15833,11 @@ function useModal(parameters) {
   } = parameters;
 
   // @ts-ignore internal logic
-  const modal = React$F.useRef({});
-  const mountNodeRef = React$F.useRef(null);
-  const modalRef = React$F.useRef(null);
+  const modal = React$E.useRef({});
+  const mountNodeRef = React$E.useRef(null);
+  const modalRef = React$E.useRef(null);
   const handleRef = useForkRef(modalRef, rootRef);
-  const [exited, setExited] = React$F.useState(!open);
+  const [exited, setExited] = React$E.useState(!open);
   const hasTransition = getHasTransition(children);
   let ariaHiddenProp = true;
   if (parameters['aria-hidden'] === 'false' || parameters['aria-hidden'] === false) {
@@ -15882,15 +15880,15 @@ function useModal(parameters) {
       ariaHidden(modalRef.current, ariaHiddenProp);
     }
   });
-  const handleClose = React$F.useCallback(() => {
+  const handleClose = React$E.useCallback(() => {
     manager.remove(getModal(), ariaHiddenProp);
   }, [ariaHiddenProp]);
-  React$F.useEffect(() => {
+  React$E.useEffect(() => {
     return () => {
       handleClose();
     };
   }, [handleClose]);
-  React$F.useEffect(() => {
+  React$E.useEffect(() => {
     if (open) {
       handleOpen();
     } else if (!hasTransition || !closeAfterTransition) {
@@ -15998,7 +15996,7 @@ function getModalUtilityClass(slot) {
 }
 generateUtilityClasses('MuiModal', ['root', 'hidden', 'backdrop']);
 
-const React$E = await importShared('react');
+const React$D = await importShared('react');
 const useUtilityClasses$q = (ownerState) => {
   const {
     open,
@@ -16044,7 +16042,7 @@ const ModalBackdrop = styled(Backdrop, {
 })({
   zIndex: -1
 });
-const Modal = /* @__PURE__ */ React$E.forwardRef(function Modal2(inProps, ref) {
+const Modal = /* @__PURE__ */ React$D.forwardRef(function Modal2(inProps, ref) {
   const props = useDefaultProps({
     name: "MuiModal",
     props: inProps
@@ -16178,13 +16176,13 @@ const Modal = /* @__PURE__ */ React$E.forwardRef(function Modal2(inProps, ref) {
         disableRestoreFocus,
         isEnabled: isTopModal,
         open,
-        children: /* @__PURE__ */ React$E.cloneElement(children, childProps)
+        children: /* @__PURE__ */ React$D.cloneElement(children, childProps)
       })]
     })
   });
 });
 
-const React$D = await importShared('react');
+const React$C = await importShared('react');
 const useUtilityClasses$p = (ownerState) => {
   const {
     classes,
@@ -16437,7 +16435,7 @@ const FilledInputInput = styled(InputBaseInput, {
     }
   }]
 })));
-const FilledInput = /* @__PURE__ */ React$D.forwardRef(function FilledInput2(inProps, ref) {
+const FilledInput = /* @__PURE__ */ React$C.forwardRef(function FilledInput2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiFilledInput"
@@ -16498,7 +16496,7 @@ function getFormControlUtilityClasses(slot) {
 }
 generateUtilityClasses('MuiFormControl', ['root', 'marginNone', 'marginNormal', 'marginDense', 'fullWidth', 'disabled']);
 
-const React$C = await importShared('react');
+const React$B = await importShared('react');
 const useUtilityClasses$o = (ownerState) => {
   const {
     classes,
@@ -16555,7 +16553,7 @@ const FormControlRoot = styled("div", {
     }
   }]
 });
-const FormControl = /* @__PURE__ */ React$C.forwardRef(function FormControl2(inProps, ref) {
+const FormControl = /* @__PURE__ */ React$B.forwardRef(function FormControl2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiFormControl"
@@ -16590,10 +16588,10 @@ const FormControl = /* @__PURE__ */ React$C.forwardRef(function FormControl2(inP
     variant
   };
   const classes = useUtilityClasses$o(ownerState);
-  const [adornedStart, setAdornedStart] = React$C.useState(() => {
+  const [adornedStart, setAdornedStart] = React$B.useState(() => {
     let initialAdornedStart = false;
     if (children) {
-      React$C.Children.forEach(children, (child) => {
+      React$B.Children.forEach(children, (child) => {
         if (!isMuiElement(child, ["Input", "Select"])) {
           return;
         }
@@ -16605,10 +16603,10 @@ const FormControl = /* @__PURE__ */ React$C.forwardRef(function FormControl2(inP
     }
     return initialAdornedStart;
   });
-  const [filled, setFilled] = React$C.useState(() => {
+  const [filled, setFilled] = React$B.useState(() => {
     let initialFilled = false;
     if (children) {
-      React$C.Children.forEach(children, (child) => {
+      React$B.Children.forEach(children, (child) => {
         if (!isMuiElement(child, ["Input", "Select"])) {
           return;
         }
@@ -16619,20 +16617,20 @@ const FormControl = /* @__PURE__ */ React$C.forwardRef(function FormControl2(inP
     }
     return initialFilled;
   });
-  const [focusedState, setFocused] = React$C.useState(false);
+  const [focusedState, setFocused] = React$B.useState(false);
   if (disabled && focusedState) {
     setFocused(false);
   }
   const focused = visuallyFocused !== void 0 && !disabled ? visuallyFocused : focusedState;
   let registerEffect;
-  React$C.useRef(false);
-  const onFilled = React$C.useCallback(() => {
+  React$B.useRef(false);
+  const onFilled = React$B.useCallback(() => {
     setFilled(true);
   }, []);
-  const onEmpty = React$C.useCallback(() => {
+  const onEmpty = React$B.useCallback(() => {
     setFilled(false);
   }, []);
-  const childContext = React$C.useMemo(() => {
+  const childContext = React$B.useMemo(() => {
     return {
       adornedStart,
       setAdornedStart,
@@ -16676,7 +16674,7 @@ function getFormHelperTextUtilityClasses(slot) {
 const formHelperTextClasses = generateUtilityClasses('MuiFormHelperText', ['root', 'error', 'disabled', 'sizeSmall', 'sizeMedium', 'contained', 'focused', 'filled', 'required']);
 
 var _span$2;
-const React$B = await importShared('react');
+const React$A = await importShared('react');
 const useUtilityClasses$n = (ownerState) => {
   const {
     classes,
@@ -16735,7 +16733,7 @@ const FormHelperTextRoot = styled("p", {
     }
   }]
 })));
-const FormHelperText = /* @__PURE__ */ React$B.forwardRef(function FormHelperText2(inProps, ref) {
+const FormHelperText = /* @__PURE__ */ React$A.forwardRef(function FormHelperText2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiFormHelperText"
@@ -16795,7 +16793,7 @@ function getFormLabelUtilityClasses(slot) {
 }
 const formLabelClasses = generateUtilityClasses('MuiFormLabel', ['root', 'colorSecondary', 'focused', 'disabled', 'error', 'filled', 'required', 'asterisk']);
 
-const React$A = await importShared('react');
+const React$z = await importShared('react');
 const useUtilityClasses$m = (ownerState) => {
   const {
     classes,
@@ -16860,7 +16858,7 @@ const AsteriskComponent = styled("span", {
     color: (theme.vars || theme).palette.error.main
   }
 })));
-const FormLabel = /* @__PURE__ */ React$A.forwardRef(function FormLabel2(inProps, ref) {
+const FormLabel = /* @__PURE__ */ React$z.forwardRef(function FormLabel2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiFormLabel"
@@ -16909,7 +16907,7 @@ const FormLabel = /* @__PURE__ */ React$A.forwardRef(function FormLabel2(inProps
   });
 });
 
-const React$z = await importShared('react');
+const React$y = await importShared('react');
 function getScale(value) {
   return `scale(${value}, ${value ** 2})`;
 }
@@ -16924,7 +16922,7 @@ const styles = {
   }
 };
 const isWebKit154 = typeof navigator !== "undefined" && /^((?!chrome|android).)*(safari|mobile)/i.test(navigator.userAgent) && /(os |version\/)15(.|_)4/i.test(navigator.userAgent);
-const Grow = /* @__PURE__ */ React$z.forwardRef(function Grow2(props, ref) {
+const Grow = /* @__PURE__ */ React$y.forwardRef(function Grow2(props, ref) {
   const {
     addEndListener,
     appear = true,
@@ -16944,9 +16942,9 @@ const Grow = /* @__PURE__ */ React$z.forwardRef(function Grow2(props, ref) {
     ...other
   } = props;
   const timer = useTimeout();
-  const autoTimeout = React$z.useRef();
+  const autoTimeout = React$y.useRef();
   const theme = useTheme();
-  const nodeRef = React$z.useRef(null);
+  const nodeRef = React$y.useRef(null);
   const handleRef = useForkRef(nodeRef, getReactElementRef(children), ref);
   const normalizedTransitionCallback = (callback) => (maybeIsAppearing) => {
     if (callback) {
@@ -17052,7 +17050,7 @@ const Grow = /* @__PURE__ */ React$z.forwardRef(function Grow2(props, ref) {
       ownerState,
       ...restChildProps
     }) => {
-      return /* @__PURE__ */ React$z.cloneElement(children, {
+      return /* @__PURE__ */ React$y.cloneElement(children, {
         style: {
           opacity: 0,
           transform: getScale(0.75),
@@ -17071,7 +17069,7 @@ if (Grow) {
   Grow.muiSupportAuto = true;
 }
 
-const React$y = await importShared('react');
+const React$x = await importShared('react');
 const useUtilityClasses$l = (ownerState) => {
   const {
     classes,
@@ -17188,7 +17186,7 @@ const InputInput = styled(InputBaseInput, {
   slot: "Input",
   overridesResolver: inputOverridesResolver
 })({});
-const Input = /* @__PURE__ */ React$y.forwardRef(function Input2(inProps, ref) {
+const Input = /* @__PURE__ */ React$x.forwardRef(function Input2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiInput"
@@ -17239,7 +17237,7 @@ function getInputLabelUtilityClasses(slot) {
 }
 generateUtilityClasses('MuiInputLabel', ['root', 'focused', 'disabled', 'error', 'required', 'asterisk', 'formControl', 'sizeSmall', 'shrink', 'animated', 'standard', 'filled', 'outlined']);
 
-const React$x = await importShared('react');
+const React$w = await importShared('react');
 const useUtilityClasses$k = (ownerState) => {
   const {
     classes,
@@ -17396,7 +17394,7 @@ const InputLabelRoot = styled(FormLabel, {
     }
   }]
 })));
-const InputLabel = /* @__PURE__ */ React$x.forwardRef(function InputLabel2(inProps, ref) {
+const InputLabel = /* @__PURE__ */ React$w.forwardRef(function InputLabel2(inProps, ref) {
   const props = useDefaultProps({
     name: "MuiInputLabel",
     props: inProps
@@ -17445,7 +17443,7 @@ function getLinearProgressUtilityClass(slot) {
 }
 generateUtilityClasses('MuiLinearProgress', ['root', 'colorPrimary', 'colorSecondary', 'determinate', 'indeterminate', 'buffer', 'query', 'dashed', 'dashedColorPrimary', 'dashedColorSecondary', 'bar', 'bar1', 'bar2', 'barColorPrimary', 'barColorSecondary', 'bar1Indeterminate', 'bar1Determinate', 'bar1Buffer', 'bar2Indeterminate', 'bar2Buffer']);
 
-const React$w = await importShared('react');
+const React$v = await importShared('react');
 const TRANSITION_DURATION = 4;
 const indeterminate1Keyframe = keyframes`
   0% {
@@ -17761,7 +17759,7 @@ const LinearProgressBar2 = styled("span", {
     }
   }]
 })));
-const LinearProgress = /* @__PURE__ */ React$w.forwardRef(function LinearProgress2(inProps, ref) {
+const LinearProgress = /* @__PURE__ */ React$v.forwardRef(function LinearProgress2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiLinearProgress"
@@ -17829,16 +17827,16 @@ const LinearProgress = /* @__PURE__ */ React$w.forwardRef(function LinearProgres
   });
 });
 
-const React$v = await importShared('react');
+const React$u = await importShared('react');
 
-const ListContext = /* @__PURE__ */ React$v.createContext({});
+const ListContext = /* @__PURE__ */ React$u.createContext({});
 
 function getListUtilityClass(slot) {
   return generateUtilityClass('MuiList', slot);
 }
 generateUtilityClasses('MuiList', ['root', 'padding', 'dense', 'subheader']);
 
-const React$u = await importShared('react');
+const React$t = await importShared('react');
 const useUtilityClasses$i = (ownerState) => {
   const {
     classes,
@@ -17882,7 +17880,7 @@ const ListRoot = styled("ul", {
     }
   }]
 });
-const List = /* @__PURE__ */ React$u.forwardRef(function List2(inProps, ref) {
+const List = /* @__PURE__ */ React$t.forwardRef(function List2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiList"
@@ -17896,7 +17894,7 @@ const List = /* @__PURE__ */ React$u.forwardRef(function List2(inProps, ref) {
     subheader,
     ...other
   } = props;
-  const context = React$u.useMemo(() => ({
+  const context = React$t.useMemo(() => ({
     dense
   }), [dense]);
   const ownerState = {
@@ -17919,7 +17917,7 @@ const List = /* @__PURE__ */ React$u.forwardRef(function List2(inProps, ref) {
   });
 });
 
-const React$t = await importShared('react');
+const React$s = await importShared('react');
 function nextItem(list, item, disableListWrap) {
   if (list === item) {
     return list.firstChild;
@@ -17975,7 +17973,7 @@ function moveFocus(list, currentFocus, disableListWrap, disabledItemsFocusable, 
   }
   return false;
 }
-const MenuList = /* @__PURE__ */ React$t.forwardRef(function MenuList2(props, ref) {
+const MenuList = /* @__PURE__ */ React$s.forwardRef(function MenuList2(props, ref) {
   const {
     // private
     // eslint-disable-next-line react/prop-types
@@ -17990,8 +17988,8 @@ const MenuList = /* @__PURE__ */ React$t.forwardRef(function MenuList2(props, re
     variant = "selectedMenu",
     ...other
   } = props;
-  const listRef = React$t.useRef(null);
-  const textCriteriaRef = React$t.useRef({
+  const listRef = React$s.useRef(null);
+  const textCriteriaRef = React$s.useRef({
     keys: [],
     repeating: true,
     previousKeyMatched: true,
@@ -18002,7 +18000,7 @@ const MenuList = /* @__PURE__ */ React$t.forwardRef(function MenuList2(props, re
       listRef.current.focus();
     }
   }, [autoFocus]);
-  React$t.useImperativeHandle(actions, () => ({
+  React$s.useImperativeHandle(actions, () => ({
     adjustStyleForScrollbar: (containerElement, {
       direction
     }) => {
@@ -18066,8 +18064,8 @@ const MenuList = /* @__PURE__ */ React$t.forwardRef(function MenuList2(props, re
   };
   const handleRef = useForkRef(listRef, ref);
   let activeItemIndex = -1;
-  React$t.Children.forEach(children, (child, index) => {
-    if (!/* @__PURE__ */ React$t.isValidElement(child)) {
+  React$s.Children.forEach(children, (child, index) => {
+    if (!/* @__PURE__ */ React$s.isValidElement(child)) {
       if (activeItemIndex === index) {
         activeItemIndex += 1;
         if (activeItemIndex >= children.length) {
@@ -18090,7 +18088,7 @@ const MenuList = /* @__PURE__ */ React$t.forwardRef(function MenuList2(props, re
       }
     }
   });
-  const items = React$t.Children.map(children, (child, index) => {
+  const items = React$s.Children.map(children, (child, index) => {
     if (index === activeItemIndex) {
       const newChildProps = {};
       if (autoFocusItem) {
@@ -18099,7 +18097,7 @@ const MenuList = /* @__PURE__ */ React$t.forwardRef(function MenuList2(props, re
       if (child.props.tabIndex === void 0 && variant === "selectedMenu") {
         newChildProps.tabIndex = 0;
       }
-      return /* @__PURE__ */ React$t.cloneElement(child, newChildProps);
+      return /* @__PURE__ */ React$s.cloneElement(child, newChildProps);
     }
     return child;
   });
@@ -18119,7 +18117,7 @@ function getPopoverUtilityClass(slot) {
 }
 generateUtilityClasses('MuiPopover', ['root', 'paper']);
 
-const React$s = await importShared('react');
+const React$r = await importShared('react');
 function getOffsetTop(rect, vertical) {
   let offset = 0;
   if (typeof vertical === "number") {
@@ -18178,7 +18176,7 @@ const PopoverPaper = styled(Paper, {
   // We disable the focus ring for mouse, touch and keyboard users.
   outline: 0
 });
-const Popover = /* @__PURE__ */ React$s.forwardRef(function Popover2(inProps, ref) {
+const Popover = /* @__PURE__ */ React$r.forwardRef(function Popover2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiPopover"
@@ -18214,7 +18212,7 @@ const Popover = /* @__PURE__ */ React$s.forwardRef(function Popover2(inProps, re
     disableScrollLock = false,
     ...other
   } = props;
-  const paperRef = React$s.useRef();
+  const paperRef = React$r.useRef();
   const ownerState = {
     ...props,
     anchorOrigin,
@@ -18227,7 +18225,7 @@ const Popover = /* @__PURE__ */ React$s.forwardRef(function Popover2(inProps, re
     TransitionProps
   };
   const classes = useUtilityClasses$h(ownerState);
-  const getAnchorOffset = React$s.useCallback(() => {
+  const getAnchorOffset = React$r.useCallback(() => {
     if (anchorReference === "anchorPosition") {
       return anchorPosition;
     }
@@ -18239,13 +18237,13 @@ const Popover = /* @__PURE__ */ React$s.forwardRef(function Popover2(inProps, re
       left: anchorRect.left + getOffsetLeft(anchorRect, anchorOrigin.horizontal)
     };
   }, [anchorEl, anchorOrigin.horizontal, anchorOrigin.vertical, anchorPosition, anchorReference]);
-  const getTransformOrigin = React$s.useCallback((elemRect) => {
+  const getTransformOrigin = React$r.useCallback((elemRect) => {
     return {
       vertical: getOffsetTop(elemRect, transformOrigin.vertical),
       horizontal: getOffsetLeft(elemRect, transformOrigin.horizontal)
     };
   }, [transformOrigin.horizontal, transformOrigin.vertical]);
-  const getPositioningStyle = React$s.useCallback((element) => {
+  const getPositioningStyle = React$r.useCallback((element) => {
     const elemRect = {
       width: element.offsetWidth,
       height: element.offsetHeight
@@ -18290,8 +18288,8 @@ const Popover = /* @__PURE__ */ React$s.forwardRef(function Popover2(inProps, re
       transformOrigin: getTransformOriginValue(elemTransformOrigin)
     };
   }, [anchorEl, anchorReference, getAnchorOffset, getTransformOrigin, marginThreshold]);
-  const [isPositioned, setIsPositioned] = React$s.useState(open);
-  const setPositioningStyles = React$s.useCallback(() => {
+  const [isPositioned, setIsPositioned] = React$r.useState(open);
+  const setPositioningStyles = React$r.useCallback(() => {
     const element = paperRef.current;
     if (!element) {
       return;
@@ -18306,7 +18304,7 @@ const Popover = /* @__PURE__ */ React$s.forwardRef(function Popover2(inProps, re
     element.style.transformOrigin = positioning.transformOrigin;
     setIsPositioned(true);
   }, [getPositioningStyle]);
-  React$s.useEffect(() => {
+  React$r.useEffect(() => {
     if (disableScrollLock) {
       window.addEventListener("scroll", setPositioningStyles);
     }
@@ -18318,17 +18316,17 @@ const Popover = /* @__PURE__ */ React$s.forwardRef(function Popover2(inProps, re
   const handleExited = () => {
     setIsPositioned(false);
   };
-  React$s.useEffect(() => {
+  React$r.useEffect(() => {
     if (open) {
       setPositioningStyles();
     }
   });
-  React$s.useImperativeHandle(action, () => open ? {
+  React$r.useImperativeHandle(action, () => open ? {
     updatePosition: () => {
       setPositioningStyles();
     }
   } : null, [open, setPositioningStyles]);
-  React$s.useEffect(() => {
+  React$r.useEffect(() => {
     if (!open) {
       return void 0;
     }
@@ -18442,7 +18440,7 @@ function getMenuUtilityClass(slot) {
 }
 generateUtilityClasses('MuiMenu', ['root', 'paper', 'list']);
 
-const React$r = await importShared('react');
+const React$q = await importShared('react');
 const RTL_ORIGIN = {
   vertical: "top",
   horizontal: "right"
@@ -18485,7 +18483,7 @@ const MenuMenuList = styled(MenuList, {
   // We disable the focus ring for mouse, touch and keyboard users.
   outline: 0
 });
-const Menu = /* @__PURE__ */ React$r.forwardRef(function Menu2(inProps, ref) {
+const Menu = /* @__PURE__ */ React$q.forwardRef(function Menu2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiMenu"
@@ -18524,7 +18522,7 @@ const Menu = /* @__PURE__ */ React$r.forwardRef(function Menu2(inProps, ref) {
   };
   const classes = useUtilityClasses$g(ownerState);
   const autoFocusItem = autoFocus && !disableAutoFocusItem && open;
-  const menuListActionsRef = React$r.useRef(null);
+  const menuListActionsRef = React$q.useRef(null);
   const handleEntering = (element, isAppearing) => {
     if (menuListActionsRef.current) {
       menuListActionsRef.current.adjustStyleForScrollbar(element, {
@@ -18544,8 +18542,8 @@ const Menu = /* @__PURE__ */ React$r.forwardRef(function Menu2(inProps, ref) {
     }
   };
   let activeItemIndex = -1;
-  React$r.Children.map(children, (child, index) => {
-    if (!/* @__PURE__ */ React$r.isValidElement(child)) {
+  React$q.Children.map(children, (child, index) => {
+    if (!/* @__PURE__ */ React$q.isValidElement(child)) {
       return;
     }
     if (!child.props.disabled) {
@@ -18643,7 +18641,7 @@ function getNativeSelectUtilityClasses(slot) {
 }
 const nativeSelectClasses = generateUtilityClasses('MuiNativeSelect', ['root', 'select', 'multiple', 'filled', 'outlined', 'standard', 'disabled', 'icon', 'iconOpen', 'iconFilled', 'iconOutlined', 'iconStandard', 'nativeInput', 'error']);
 
-const React$q = await importShared('react');
+const React$p = await importShared('react');
 const useUtilityClasses$f = (ownerState) => {
   const {
     classes,
@@ -18787,7 +18785,7 @@ const NativeSelectIcon = styled(StyledSelectIcon, {
     return [styles.icon, ownerState.variant && styles[`icon${capitalize(ownerState.variant)}`], ownerState.open && styles.iconOpen];
   }
 })({});
-const NativeSelectInput = /* @__PURE__ */ React$q.forwardRef(function NativeSelectInput2(props, ref) {
+const NativeSelectInput = /* @__PURE__ */ React$p.forwardRef(function NativeSelectInput2(props, ref) {
   const {
     className,
     disabled,
@@ -18804,7 +18802,7 @@ const NativeSelectInput = /* @__PURE__ */ React$q.forwardRef(function NativeSele
     error
   };
   const classes = useUtilityClasses$f(ownerState);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(React$q.Fragment, {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(React$p.Fragment, {
     children: [/* @__PURE__ */ jsxRuntimeExports.jsx(NativeSelectSelect, {
       ownerState,
       className: clsx(classes.select, className),
@@ -18941,7 +18939,7 @@ function NotchedOutline(props) {
   });
 }
 
-const React$p = await importShared('react');
+const React$o = await importShared('react');
 const useUtilityClasses$e = (ownerState) => {
   const {
     classes
@@ -19103,7 +19101,7 @@ const OutlinedInputInput = styled(InputBaseInput, {
     }
   }]
 })));
-const OutlinedInput = /* @__PURE__ */ React$p.forwardRef(function OutlinedInput2(inProps, ref) {
+const OutlinedInput = /* @__PURE__ */ React$o.forwardRef(function OutlinedInput2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiOutlinedInput"
@@ -19152,7 +19150,7 @@ const OutlinedInput = /* @__PURE__ */ React$p.forwardRef(function OutlinedInput2
       slotProps
     },
     additionalProps: {
-      label: label != null && label !== "" && fcs.required ? /* @__PURE__ */ jsxRuntimeExports.jsxs(React$p.Fragment, {
+      label: label != null && label !== "" && fcs.required ? /* @__PURE__ */ jsxRuntimeExports.jsxs(React$o.Fragment, {
         children: [label, " ", "*"]
       }) : label
     }
@@ -19199,7 +19197,7 @@ function getSelectUtilityClasses(slot) {
 const selectClasses = generateUtilityClasses('MuiSelect', ['root', 'select', 'multiple', 'filled', 'outlined', 'standard', 'disabled', 'focused', 'icon', 'iconOpen', 'iconFilled', 'iconOutlined', 'iconStandard', 'nativeInput', 'error']);
 
 var _span;
-const React$o = await importShared('react');
+const React$n = await importShared('react');
 const SelectSelect = styled(StyledSelectSelect, {
   name: "MuiSelect",
   slot: "Select",
@@ -19283,7 +19281,7 @@ const useUtilityClasses$d = (ownerState) => {
   };
   return composeClasses(slots, getSelectUtilityClasses, classes);
 };
-const SelectInput = /* @__PURE__ */ React$o.forwardRef(function SelectInput2(props, ref) {
+const SelectInput = /* @__PURE__ */ React$n.forwardRef(function SelectInput2(props, ref) {
   const {
     "aria-describedby": ariaDescribedby,
     "aria-label": ariaLabel,
@@ -19329,40 +19327,40 @@ const SelectInput = /* @__PURE__ */ React$o.forwardRef(function SelectInput2(pro
     default: defaultOpen,
     name: "Select"
   });
-  const inputRef = React$o.useRef(null);
-  const displayRef = React$o.useRef(null);
-  const [displayNode, setDisplayNode] = React$o.useState(null);
+  const inputRef = React$n.useRef(null);
+  const displayRef = React$n.useRef(null);
+  const [displayNode, setDisplayNode] = React$n.useState(null);
   const {
     current: isOpenControlled
-  } = React$o.useRef(openProp != null);
-  const [menuMinWidthState, setMenuMinWidthState] = React$o.useState();
+  } = React$n.useRef(openProp != null);
+  const [menuMinWidthState, setMenuMinWidthState] = React$n.useState();
   const handleRef = useForkRef(ref, inputRefProp);
-  const handleDisplayRef = React$o.useCallback((node) => {
+  const handleDisplayRef = React$n.useCallback((node) => {
     displayRef.current = node;
     if (node) {
       setDisplayNode(node);
     }
   }, []);
   const anchorElement = displayNode?.parentNode;
-  React$o.useImperativeHandle(handleRef, () => ({
+  React$n.useImperativeHandle(handleRef, () => ({
     focus: () => {
       displayRef.current.focus();
     },
     node: inputRef.current,
     value
   }), [value]);
-  React$o.useEffect(() => {
+  React$n.useEffect(() => {
     if (defaultOpen && openState && displayNode && !isOpenControlled) {
       setMenuMinWidthState(autoWidth ? null : anchorElement.clientWidth);
       displayRef.current.focus();
     }
   }, [displayNode, autoWidth]);
-  React$o.useEffect(() => {
+  React$n.useEffect(() => {
     if (autoFocus) {
       displayRef.current.focus();
     }
   }, [autoFocus]);
-  React$o.useEffect(() => {
+  React$n.useEffect(() => {
     if (!labelId) {
       return void 0;
     }
@@ -19404,7 +19402,7 @@ const SelectInput = /* @__PURE__ */ React$o.forwardRef(function SelectInput2(pro
   const handleClose = (event) => {
     update(false, event);
   };
-  const childrenArray = React$o.Children.toArray(children);
+  const childrenArray = React$n.Children.toArray(children);
   const handleChange = (event) => {
     const child = childrenArray.find((childItem) => childItem.props.value === event.target.value);
     if (child === void 0) {
@@ -19497,7 +19495,7 @@ const SelectInput = /* @__PURE__ */ React$o.forwardRef(function SelectInput2(pro
     }
   }
   const items = childrenArray.map((child) => {
-    if (!/* @__PURE__ */ React$o.isValidElement(child)) {
+    if (!/* @__PURE__ */ React$n.isValidElement(child)) {
       return null;
     }
     let selected;
@@ -19515,7 +19513,7 @@ const SelectInput = /* @__PURE__ */ React$o.forwardRef(function SelectInput2(pro
         displaySingle = child.props.children;
       }
     }
-    return /* @__PURE__ */ React$o.cloneElement(child, {
+    return /* @__PURE__ */ React$n.cloneElement(child, {
       "aria-selected": selected ? "true" : "false",
       onClick: handleItemClick(child),
       onKeyUp: (event) => {
@@ -19579,7 +19577,7 @@ const SelectInput = /* @__PURE__ */ React$o.forwardRef(function SelectInput2(pro
     ...typeof MenuProps.slotProps?.list === "function" ? MenuProps.slotProps.list(ownerState) : MenuProps.slotProps?.list
   };
   const listboxId = useId();
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(React$o.Fragment, {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(React$n.Fragment, {
     children: [/* @__PURE__ */ jsxRuntimeExports.jsx(SelectSelect, {
       as: "div",
       ref: handleDisplayRef,
@@ -19665,7 +19663,7 @@ const SelectInput = /* @__PURE__ */ React$o.forwardRef(function SelectInput2(pro
   });
 });
 
-const React$n = await importShared('react');
+const React$m = await importShared('react');
 const useUtilityClasses$c = (ownerState) => {
   const {
     classes
@@ -19687,7 +19685,7 @@ const styledRootConfig = {
 const StyledInput = styled(Input, styledRootConfig)("");
 const StyledOutlinedInput = styled(OutlinedInput, styledRootConfig)("");
 const StyledFilledInput = styled(FilledInput, styledRootConfig)("");
-const Select = /* @__PURE__ */ React$n.forwardRef(function Select2(inProps, ref) {
+const Select = /* @__PURE__ */ React$m.forwardRef(function Select2(inProps, ref) {
   const props = useDefaultProps({
     name: "MuiSelect",
     props: inProps
@@ -19747,8 +19745,8 @@ const Select = /* @__PURE__ */ React$n.forwardRef(function Select2(inProps, ref)
     })
   }[variant];
   const inputComponentRef = useForkRef(ref, getReactElementRef(InputComponent));
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(React$n.Fragment, {
-    children: /* @__PURE__ */ React$n.cloneElement(InputComponent, {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(React$m.Fragment, {
+    children: /* @__PURE__ */ React$m.cloneElement(InputComponent, {
       // Most of the logic is implemented in `SelectInput`.
       // The `Select` component is a simple API wrapper to expose something better to play with.
       inputComponent,
@@ -19800,7 +19798,7 @@ function areArraysEqual(array1, array2, itemComparer = (a, b) => a === b) {
   return array1.length === array2.length && array1.every((value, index) => itemComparer(value, array2[index]));
 }
 
-const React$m = await importShared('react');
+const React$l = await importShared('react');
 const INTENTIONAL_DRAG_COUNT_THRESHOLD = 2;
 function getNewValue(currentValue, step, direction, min, max) {
   return direction === 1 ? Math.min(currentValue + step, max) : Math.max(currentValue - step, min);
@@ -19967,16 +19965,16 @@ function useSlider(parameters) {
     tabIndex,
     value: valueProp
   } = parameters;
-  const touchId = React$m.useRef(undefined);
+  const touchId = React$l.useRef(undefined);
   // We can't use the :active browser pseudo-classes.
   // - The active state isn't triggered when clicking on the rail.
   // - The active state isn't transferred when inversing a range slider.
-  const [active, setActive] = React$m.useState(-1);
-  const [open, setOpen] = React$m.useState(-1);
-  const [dragging, setDragging] = React$m.useState(false);
-  const moveCount = React$m.useRef(0);
+  const [active, setActive] = React$l.useState(-1);
+  const [open, setOpen] = React$l.useState(-1);
+  const [dragging, setDragging] = React$l.useState(false);
+  const moveCount = React$l.useRef(0);
   // lastChangedValue is updated whenever onChange is triggered.
-  const lastChangedValue = React$m.useRef(null);
+  const lastChangedValue = React$l.useRef(null);
   const [valueDerived, setValueState] = useControlled({
     controlled: valueProp,
     default: defaultValue ?? min,
@@ -20007,8 +20005,8 @@ function useSlider(parameters) {
     value: min + step * index
   })) : marksProp || [];
   const marksValues = marks.map(mark => mark.value);
-  const [focusedThumbIndex, setFocusedThumbIndex] = React$m.useState(-1);
-  const sliderRef = React$m.useRef(null);
+  const [focusedThumbIndex, setFocusedThumbIndex] = React$l.useState(-1);
+  const sliderRef = React$l.useRef(null);
   const handleRef = useForkRef(ref, sliderRef);
   const createHandleHiddenInputFocus = otherHandlers => event => {
     const index = Number(event.currentTarget.getAttribute('data-index'));
@@ -20155,7 +20153,7 @@ function useSlider(parameters) {
     // @ts-ignore
     changeValue(event, event.target.valueAsNumber);
   };
-  const previousIndex = React$m.useRef(undefined);
+  const previousIndex = React$l.useRef(undefined);
   let axis = orientation;
   if (isRtl && orientation === 'horizontal') {
     axis += '-reverse';
@@ -20319,14 +20317,14 @@ function useSlider(parameters) {
       passive: true
     });
   });
-  const stopListening = React$m.useCallback(() => {
+  const stopListening = React$l.useCallback(() => {
     const doc = ownerDocument(sliderRef.current);
     doc.removeEventListener('mousemove', handleTouchMove);
     doc.removeEventListener('mouseup', handleTouchEnd);
     doc.removeEventListener('touchmove', handleTouchMove);
     doc.removeEventListener('touchend', handleTouchEnd);
   }, [handleTouchEnd, handleTouchMove]);
-  React$m.useEffect(() => {
+  React$l.useEffect(() => {
     const {
       current: slider
     } = sliderRef;
@@ -20338,7 +20336,7 @@ function useSlider(parameters) {
       stopListening();
     };
   }, [stopListening, handleTouchStart]);
-  React$m.useEffect(() => {
+  React$l.useEffect(() => {
     if (disabled) {
       stopListening();
     }
@@ -20497,7 +20495,7 @@ function getSliderUtilityClass(slot) {
 }
 const sliderClasses = generateUtilityClasses('MuiSlider', ['root', 'active', 'colorPrimary', 'colorSecondary', 'colorError', 'colorInfo', 'colorSuccess', 'colorWarning', 'disabled', 'dragging', 'focusVisible', 'mark', 'markActive', 'marked', 'markLabel', 'markLabelActive', 'rail', 'sizeSmall', 'thumb', 'thumbColorPrimary', 'thumbColorSecondary', 'thumbColorError', 'thumbColorSuccess', 'thumbColorInfo', 'thumbColorWarning', 'track', 'trackInverted', 'trackFalse', 'thumbSizeSmall', 'valueLabel', 'valueLabelOpen', 'valueLabelCircle', 'valueLabelLabel', 'vertical']);
 
-const React$l = await importShared('react');
+const React$k = await importShared('react');
 const useValueLabelClasses = (props) => {
   const {
     open
@@ -20519,9 +20517,9 @@ function SliderValueLabel$1(props) {
   if (!children) {
     return null;
   }
-  return /* @__PURE__ */ React$l.cloneElement(children, {
+  return /* @__PURE__ */ React$k.cloneElement(children, {
     className: children.props.className
-  }, /* @__PURE__ */ jsxRuntimeExports.jsxs(React$l.Fragment, {
+  }, /* @__PURE__ */ jsxRuntimeExports.jsxs(React$k.Fragment, {
     children: [children.props.children, /* @__PURE__ */ jsxRuntimeExports.jsx("span", {
       className: clsx(classes.offset, className),
       "aria-hidden": true,
@@ -20536,7 +20534,7 @@ function SliderValueLabel$1(props) {
   }));
 }
 
-const React$k = await importShared('react');
+const React$j = await importShared('react');
 function Identity(x) {
   return x;
 }
@@ -21042,7 +21040,7 @@ const useUtilityClasses$b = (ownerState) => {
 const Forward = ({
   children
 }) => children;
-const Slider = /* @__PURE__ */ React$k.forwardRef(function Slider2(inputProps, ref) {
+const Slider = /* @__PURE__ */ React$j.forwardRef(function Slider2(inputProps, ref) {
   const props = useDefaultProps({
     props: inputProps,
     name: "MuiSlider"
@@ -21231,7 +21229,7 @@ const Slider = /* @__PURE__ */ React$k.forwardRef(function Slider2(inputProps, r
       } else {
         markActive = track === "normal" && (range ? mark.value >= values[0] && mark.value <= values[values.length - 1] : mark.value <= values[0]) || track === "inverted" && (range ? mark.value <= values[0] || mark.value >= values[values.length - 1] : mark.value >= values[0]);
       }
-      return /* @__PURE__ */ jsxRuntimeExports.jsxs(React$k.Fragment, {
+      return /* @__PURE__ */ jsxRuntimeExports.jsxs(React$j.Fragment, {
         children: [/* @__PURE__ */ jsxRuntimeExports.jsx(MarkSlot, {
           "data-index": index,
           ...markProps,
@@ -21299,7 +21297,7 @@ const Slider = /* @__PURE__ */ React$k.forwardRef(function Slider2(inputProps, r
   });
 });
 
-const React$j = await importShared('react');
+const React$i = await importShared('react');
 function useSnackbar(parameters = {}) {
   const {
     autoHideDuration = null,
@@ -21309,7 +21307,7 @@ function useSnackbar(parameters = {}) {
     resumeHideDuration
   } = parameters;
   const timerAutoHide = useTimeout();
-  React$j.useEffect(() => {
+  React$i.useEffect(() => {
     if (!open) {
       return undefined;
     }
@@ -21341,7 +21339,7 @@ function useSnackbar(parameters = {}) {
       handleClose(null, 'timeout');
     });
   });
-  React$j.useEffect(() => {
+  React$i.useEffect(() => {
     if (open) {
       setAutoHideTimer(autoHideDuration);
     }
@@ -21357,7 +21355,7 @@ function useSnackbar(parameters = {}) {
 
   // Restart the timer when the user is no longer interacting with the Snackbar
   // or when the window is shown back.
-  const handleResume = React$j.useCallback(() => {
+  const handleResume = React$i.useCallback(() => {
     if (autoHideDuration != null) {
       setAutoHideTimer(resumeHideDuration != null ? resumeHideDuration : autoHideDuration * 0.5);
     }
@@ -21382,7 +21380,7 @@ function useSnackbar(parameters = {}) {
     onMouseLeaveCallback?.(event);
     handleResume();
   };
-  React$j.useEffect(() => {
+  React$i.useEffect(() => {
     // TODO: window global should be refactored here
     if (!disableWindowBlurListener && open) {
       window.addEventListener('focus', handleResume);
@@ -21422,7 +21420,7 @@ function getSnackbarContentUtilityClass(slot) {
 }
 generateUtilityClasses('MuiSnackbarContent', ['root', 'message', 'action']);
 
-const React$i = await importShared('react');
+const React$h = await importShared('react');
 const useUtilityClasses$a = (ownerState) => {
   const {
     classes
@@ -21472,7 +21470,7 @@ const SnackbarContentAction = styled("div", {
   paddingLeft: 16,
   marginRight: -8
 });
-const SnackbarContent = /* @__PURE__ */ React$i.forwardRef(function SnackbarContent2(inProps, ref) {
+const SnackbarContent = /* @__PURE__ */ React$h.forwardRef(function SnackbarContent2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiSnackbarContent"
@@ -21510,7 +21508,7 @@ function getSnackbarUtilityClass(slot) {
 }
 generateUtilityClasses('MuiSnackbar', ['root', 'anchorOriginTopCenter', 'anchorOriginBottomCenter', 'anchorOriginTopRight', 'anchorOriginBottomRight', 'anchorOriginTopLeft', 'anchorOriginBottomLeft']);
 
-const React$h = await importShared('react');
+const React$g = await importShared('react');
 const useUtilityClasses$9 = (ownerState) => {
   const {
     classes,
@@ -21595,7 +21593,7 @@ const SnackbarRoot = styled("div", {
     }
   }]
 })));
-const Snackbar = /* @__PURE__ */ React$h.forwardRef(function Snackbar2(inProps, ref) {
+const Snackbar = /* @__PURE__ */ React$g.forwardRef(function Snackbar2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiSnackbar"
@@ -21657,7 +21655,7 @@ const Snackbar = /* @__PURE__ */ React$h.forwardRef(function Snackbar2(inProps, 
   } = useSnackbar({
     ...ownerState
   });
-  const [exited, setExited] = React$h.useState(true);
+  const [exited, setExited] = React$g.useState(true);
   const handleExited = (node) => {
     setExited(true);
     if (onExited) {
@@ -21762,16 +21760,16 @@ const Snackbar = /* @__PURE__ */ React$h.forwardRef(function Snackbar2(inProps, 
   });
 });
 
-const React$g = await importShared('react');
+const React$f = await importShared('react');
 
-const TableContext = /* @__PURE__ */ React$g.createContext();
+const TableContext = /* @__PURE__ */ React$f.createContext();
 
 function getTableUtilityClass(slot) {
   return generateUtilityClass('MuiTable', slot);
 }
 generateUtilityClasses('MuiTable', ['root', 'stickyHeader']);
 
-const React$f = await importShared('react');
+const React$e = await importShared('react');
 const useUtilityClasses$8 = (ownerState) => {
   const {
     classes,
@@ -21815,7 +21813,7 @@ const TableRoot = styled("table", {
   }]
 })));
 const defaultComponent$3 = "table";
-const Table = /* @__PURE__ */ React$f.forwardRef(function Table2(inProps, ref) {
+const Table = /* @__PURE__ */ React$e.forwardRef(function Table2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiTable"
@@ -21836,7 +21834,7 @@ const Table = /* @__PURE__ */ React$f.forwardRef(function Table2(inProps, ref) {
     stickyHeader
   };
   const classes = useUtilityClasses$8(ownerState);
-  const table = React$f.useMemo(() => ({
+  const table = React$e.useMemo(() => ({
     padding,
     size,
     stickyHeader
@@ -21854,16 +21852,16 @@ const Table = /* @__PURE__ */ React$f.forwardRef(function Table2(inProps, ref) {
   });
 });
 
-const React$e = await importShared('react');
+const React$d = await importShared('react');
 
-const Tablelvl2Context = /* @__PURE__ */ React$e.createContext();
+const Tablelvl2Context = /* @__PURE__ */ React$d.createContext();
 
 function getTableBodyUtilityClass(slot) {
   return generateUtilityClass('MuiTableBody', slot);
 }
 generateUtilityClasses('MuiTableBody', ['root']);
 
-const React$d = await importShared('react');
+const React$c = await importShared('react');
 const useUtilityClasses$7 = (ownerState) => {
   const {
     classes
@@ -21883,7 +21881,7 @@ const tablelvl2$1 = {
   variant: "body"
 };
 const defaultComponent$2 = "tbody";
-const TableBody = /* @__PURE__ */ React$d.forwardRef(function TableBody2(inProps, ref) {
+const TableBody = /* @__PURE__ */ React$c.forwardRef(function TableBody2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiTableBody"
@@ -21916,7 +21914,7 @@ function getTableCellUtilityClass(slot) {
 }
 const tableCellClasses = generateUtilityClasses('MuiTableCell', ['root', 'head', 'body', 'footer', 'sizeSmall', 'sizeMedium', 'paddingCheckbox', 'paddingNone', 'alignLeft', 'alignCenter', 'alignRight', 'alignJustify', 'stickyHeader']);
 
-const React$c = await importShared('react');
+const React$b = await importShared('react');
 const useUtilityClasses$6 = (ownerState) => {
   const {
     classes,
@@ -22049,7 +22047,7 @@ const TableCellRoot = styled("td", {
     }
   }]
 })));
-const TableCell = /* @__PURE__ */ React$c.forwardRef(function TableCell2(inProps, ref) {
+const TableCell = /* @__PURE__ */ React$b.forwardRef(function TableCell2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiTableCell"
@@ -22065,8 +22063,8 @@ const TableCell = /* @__PURE__ */ React$c.forwardRef(function TableCell2(inProps
     variant: variantProp,
     ...other
   } = props;
-  const table = React$c.useContext(TableContext);
-  const tablelvl2 = React$c.useContext(Tablelvl2Context);
+  const table = React$b.useContext(TableContext);
+  const tablelvl2 = React$b.useContext(Tablelvl2Context);
   const isHeadCell = tablelvl2 && tablelvl2.variant === "head";
   let component;
   if (componentProp) {
@@ -22112,7 +22110,7 @@ function getTableContainerUtilityClass(slot) {
 }
 generateUtilityClasses('MuiTableContainer', ['root']);
 
-const React$b = await importShared('react');
+const React$a = await importShared('react');
 const useUtilityClasses$5 = (ownerState) => {
   const {
     classes
@@ -22129,7 +22127,7 @@ const TableContainerRoot = styled("div", {
   width: "100%",
   overflowX: "auto"
 });
-const TableContainer = /* @__PURE__ */ React$b.forwardRef(function TableContainer2(inProps, ref) {
+const TableContainer = /* @__PURE__ */ React$a.forwardRef(function TableContainer2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiTableContainer"
@@ -22158,7 +22156,7 @@ function getTableHeadUtilityClass(slot) {
 }
 generateUtilityClasses('MuiTableHead', ['root']);
 
-const React$a = await importShared('react');
+const React$9 = await importShared('react');
 const useUtilityClasses$4 = (ownerState) => {
   const {
     classes
@@ -22178,7 +22176,7 @@ const tablelvl2 = {
   variant: "head"
 };
 const defaultComponent$1 = "thead";
-const TableHead = /* @__PURE__ */ React$a.forwardRef(function TableHead2(inProps, ref) {
+const TableHead = /* @__PURE__ */ React$9.forwardRef(function TableHead2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiTableHead"
@@ -22211,7 +22209,7 @@ function getTableRowUtilityClass(slot) {
 }
 const tableRowClasses = generateUtilityClasses('MuiTableRow', ['root', 'selected', 'hover', 'head', 'footer']);
 
-const React$9 = await importShared('react');
+const React$8 = await importShared('react');
 const useUtilityClasses$3 = (ownerState) => {
   const {
     classes,
@@ -22253,7 +22251,7 @@ const TableRowRoot = styled("tr", {
   }
 })));
 const defaultComponent = "tr";
-const TableRow = /* @__PURE__ */ React$9.forwardRef(function TableRow2(inProps, ref) {
+const TableRow = /* @__PURE__ */ React$8.forwardRef(function TableRow2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiTableRow"
@@ -22265,7 +22263,7 @@ const TableRow = /* @__PURE__ */ React$9.forwardRef(function TableRow2(inProps, 
     selected = false,
     ...other
   } = props;
-  const tablelvl2 = React$9.useContext(Tablelvl2Context);
+  const tablelvl2 = React$8.useContext(Tablelvl2Context);
   const ownerState = {
     ...props,
     component,
@@ -22290,7 +22288,7 @@ function getTextFieldUtilityClass(slot) {
 }
 generateUtilityClasses('MuiTextField', ['root']);
 
-const React$8 = await importShared('react');
+const React$7 = await importShared('react');
 const variantComponent = {
   standard: Input,
   filled: FilledInput,
@@ -22309,7 +22307,7 @@ const TextFieldRoot = styled(FormControl, {
   name: "MuiTextField",
   slot: "Root"
 })({});
-const TextField = /* @__PURE__ */ React$8.forwardRef(function TextField2(inProps, ref) {
+const TextField = /* @__PURE__ */ React$7.forwardRef(function TextField2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiTextField"
@@ -22491,13 +22489,13 @@ function getToggleButtonUtilityClass(slot) {
 }
 const toggleButtonClasses = generateUtilityClasses('MuiToggleButton', ['root', 'disabled', 'selected', 'standard', 'primary', 'secondary', 'sizeSmall', 'sizeMedium', 'sizeLarge', 'fullWidth']);
 
-const React$7 = await importShared('react');
-
-const ToggleButtonGroupContext = /* @__PURE__ */ React$7.createContext({});
-
 const React$6 = await importShared('react');
 
-const ToggleButtonGroupButtonContext = /* @__PURE__ */ React$6.createContext(void 0);
+const ToggleButtonGroupContext = /* @__PURE__ */ React$6.createContext({});
+
+const React$5 = await importShared('react');
+
+const ToggleButtonGroupButtonContext = /* @__PURE__ */ React$5.createContext(void 0);
 
 // Determine if the toggle button value matches, or is contained in, the
 // candidate group value.
@@ -22511,7 +22509,7 @@ function isValueSelected(value, candidate) {
   return value === candidate;
 }
 
-const React$5 = await importShared('react');
+const React$4 = await importShared('react');
 const useUtilityClasses$1 = (ownerState) => {
   const {
     classes,
@@ -22614,12 +22612,12 @@ const ToggleButtonRoot = styled(ButtonBase, {
     }
   }]
 })));
-const ToggleButton = /* @__PURE__ */ React$5.forwardRef(function ToggleButton2(inProps, ref) {
+const ToggleButton = /* @__PURE__ */ React$4.forwardRef(function ToggleButton2(inProps, ref) {
   const {
     value: contextValue,
     ...contextProps
-  } = React$5.useContext(ToggleButtonGroupContext);
-  const toggleButtonGroupButtonContextPositionClassName = React$5.useContext(ToggleButtonGroupButtonContext);
+  } = React$4.useContext(ToggleButtonGroupContext);
+  const toggleButtonGroupButtonContextPositionClassName = React$4.useContext(ToggleButtonGroupButtonContext);
   const resolvedProps = resolveProps({
     ...contextProps,
     selected: isValueSelected(inProps.value, contextValue)
@@ -22683,7 +22681,7 @@ function getToggleButtonGroupUtilityClass(slot) {
 }
 const toggleButtonGroupClasses = generateUtilityClasses('MuiToggleButtonGroup', ['root', 'selected', 'horizontal', 'vertical', 'disabled', 'grouped', 'groupedHorizontal', 'groupedVertical', 'fullWidth', 'firstButton', 'lastButton', 'middleButton']);
 
-const React$4 = await importShared('react');
+const React$3 = await importShared('react');
 const useUtilityClasses = (ownerState) => {
   const {
     classes,
@@ -22784,7 +22782,7 @@ const ToggleButtonGroupRoot = styled("div", {
     }
   }]
 })));
-const ToggleButtonGroup = /* @__PURE__ */ React$4.forwardRef(function ToggleButtonGroup2(inProps, ref) {
+const ToggleButtonGroup = /* @__PURE__ */ React$3.forwardRef(function ToggleButtonGroup2(inProps, ref) {
   const props = useDefaultProps({
     props: inProps,
     name: "MuiToggleButtonGroup"
@@ -22810,7 +22808,7 @@ const ToggleButtonGroup = /* @__PURE__ */ React$4.forwardRef(function ToggleButt
     size
   };
   const classes = useUtilityClasses(ownerState);
-  const handleChange = React$4.useCallback((event, buttonValue) => {
+  const handleChange = React$3.useCallback((event, buttonValue) => {
     if (!onChange) {
       return;
     }
@@ -22824,13 +22822,13 @@ const ToggleButtonGroup = /* @__PURE__ */ React$4.forwardRef(function ToggleButt
     }
     onChange(event, newValue);
   }, [onChange, value]);
-  const handleExclusiveChange = React$4.useCallback((event, buttonValue) => {
+  const handleExclusiveChange = React$3.useCallback((event, buttonValue) => {
     if (!onChange) {
       return;
     }
     onChange(event, value === buttonValue ? null : buttonValue);
   }, [onChange, value]);
-  const context = React$4.useMemo(() => ({
+  const context = React$3.useMemo(() => ({
     className: classes.grouped,
     onChange: exclusive ? handleExclusiveChange : handleChange,
     value,
@@ -22873,12 +22871,12 @@ const ToggleButtonGroup = /* @__PURE__ */ React$4.forwardRef(function ToggleButt
   });
 });
 
-const {useState: useState$f} = await importShared('react');
+const {useState: useState$e} = await importShared('react');
 const LoginPage = ({ onLoginSuccess }) => {
-  const [username, setUsername] = useState$f("");
-  const [password, setPassword] = useState$f("");
-  const [loading, setLoading] = useState$f(false);
-  const [error, setError] = useState$f("");
+  const [username, setUsername] = useState$e("");
+  const [password, setPassword] = useState$e("");
+  const [loading, setLoading] = useState$e(false);
+  const [error, setError] = useState$e("");
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -23040,13 +23038,6 @@ const LoginPage = ({ onLoginSuccess }) => {
       )
     }
   );
-};
-
-const ProtectedRoute = ({ token, children }) => {
-  if (!token) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(Navigate, { to: "/login", replace: true });
-  }
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children });
 };
 
 const Analytics = createSvgIcon(/*#__PURE__*/jsxRuntimeExports.jsx("path", {
@@ -37622,11 +37613,11 @@ var leafletSrc = {exports: {}};
 var leafletSrcExports = leafletSrc.exports;
 const L$1 = /*@__PURE__*/getDefaultExportFromCjs(leafletSrcExports);
 
-const {useEffect: useEffect$n,useRef: useRef$d} = await importShared('react');
+const {useEffect: useEffect$m,useRef: useRef$d} = await importShared('react');
 
 function useAttribution(map, attribution) {
     const attributionRef = useRef$d(attribution);
-    useEffect$n(function updateAttribution() {
+    useEffect$m(function updateAttribution() {
         if (attribution !== attributionRef.current && map.attributionControl != null) {
             if (attributionRef.current != null) {
                 map.attributionControl.removeAttribution(attributionRef.current);
@@ -37640,15 +37631,6 @@ function useAttribution(map, attribution) {
         map,
         attribution
     ]);
-}
-
-function updateCircle(layer, props, prevProps) {
-    if (props.center !== prevProps.center) {
-        layer.setLatLng(props.center);
-    }
-    if (props.radius != null && props.radius !== prevProps.radius) {
-        layer.setRadius(props.radius);
-    }
 }
 
 const {createContext,use} = await importShared('react');
@@ -37675,8 +37657,8 @@ function useLeafletContext() {
     return context;
 }
 
-const React$3 = await importShared('react');
-const {forwardRef: forwardRef$2,useEffect: useEffect$m,useImperativeHandle: useImperativeHandle$2,useState: useState$e} = React$3;
+const React$2 = await importShared('react');
+const {forwardRef: forwardRef$2,useEffect: useEffect$l,useImperativeHandle: useImperativeHandle$2,useState: useState$d} = React$2;
 
 const {createPortal} = await importShared('react-dom');
 function createContainerComponent(useElement) {
@@ -37684,7 +37666,7 @@ function createContainerComponent(useElement) {
         const { instance, context } = useElement(props).current;
         useImperativeHandle$2(forwardedRef, ()=>instance);
         const { children } = props;
-        return children == null ? null : /*#__PURE__*/ React$3.createElement(LeafletContext, {
+        return children == null ? null : /*#__PURE__*/ React$2.createElement(LeafletContext, {
             value: context
         }, children);
     }
@@ -37692,11 +37674,11 @@ function createContainerComponent(useElement) {
 }
 function createDivOverlayComponent(useElement) {
     function OverlayComponent(props, forwardedRef) {
-        const [isOpen, setOpen] = useState$e(false);
+        const [isOpen, setOpen] = useState$d(false);
         const { instance } = useElement(props, setOpen).current;
         useImperativeHandle$2(forwardedRef, ()=>instance);
         // biome-ignore lint/correctness/useExhaustiveDependencies: update overlay when children change
-        useEffect$m(function updateOverlay() {
+        useEffect$l(function updateOverlay() {
             if (isOpen) {
                 instance.update();
             }
@@ -37720,11 +37702,11 @@ function createLeafComponent(useElement) {
     return /*#__PURE__*/ forwardRef$2(LeafComponent);
 }
 
-const {useEffect: useEffect$l,useRef: useRef$c} = await importShared('react');
+const {useEffect: useEffect$k,useRef: useRef$c} = await importShared('react');
 
 function useEventHandlers(element, eventHandlers) {
     const eventHandlersRef = useRef$c(undefined);
-    useEffect$l(function addEventHandlers() {
+    useEffect$k(function addEventHandlers() {
         if (eventHandlers != null) {
             element.instance.on(eventHandlers);
         }
@@ -37760,7 +37742,7 @@ function createDivOverlayHook(useElement, useLifecycle) {
     };
 }
 
-const {useEffect: useEffect$k,useRef: useRef$b} = await importShared('react');
+const {useEffect: useEffect$j,useRef: useRef$b} = await importShared('react');
 
 function createElementObject(instance, context, container) {
     return Object.freeze({
@@ -37782,7 +37764,7 @@ function createElementHook(createElement, updateElement) {
         if (!elementRef.current) elementRef.current = createElement(props, context);
         const propsRef = useRef$b(props);
         const { instance } = elementRef.current;
-        useEffect$k(function updateElementProps() {
+        useEffect$j(function updateElementProps() {
             if (propsRef.current !== props) {
                 updateElement(instance, props, propsRef.current);
                 propsRef.current = props;
@@ -37796,9 +37778,9 @@ function createElementHook(createElement, updateElement) {
     };
 }
 
-const {useEffect: useEffect$j} = await importShared('react');
+const {useEffect: useEffect$i} = await importShared('react');
 function useLayerLifecycle(element, context) {
-    useEffect$j(function addLayer() {
+    useEffect$i(function addLayer() {
         const container = context.layerContainer ?? context.map;
         container.addLayer(element.instance);
         return function removeLayer() {
@@ -37821,10 +37803,10 @@ function createLayerHook(useElement) {
     };
 }
 
-const {useEffect: useEffect$i,useRef: useRef$a} = await importShared('react');
+const {useEffect: useEffect$h,useRef: useRef$a} = await importShared('react');
 function usePathOptions(element, props) {
     const optionsRef = useRef$a(undefined);
-    useEffect$i(function updatePathOptions() {
+    useEffect$h(function updatePathOptions() {
         if (props.pathOptions !== optionsRef.current) {
             const options = props.pathOptions ?? {};
             element.instance.setStyle(options);
@@ -37877,29 +37859,22 @@ function updateGridLayer(layer, props, prevProps) {
     }
 }
 
-const {useEffect: useEffect$h} = await importShared('react');
+const {useEffect: useEffect$g} = await importShared('react');
 
 function useMap() {
     return useLeafletContext().map;
 }
 
-const Circle = createPathComponent(function createCircle({ center, children: _c, ...options }, ctx) {
-    const circle = new leafletSrcExports.Circle(center, options);
-    return createElementObject(circle, extendContext(ctx, {
-        overlayContainer: circle
-    }));
-}, updateCircle);
-
-const React$2 = await importShared('react');
-const {forwardRef: forwardRef$1,useCallback: useCallback$4,useEffect: useEffect$g,useImperativeHandle: useImperativeHandle$1,useRef: useRef$9,useState: useState$d} = React$2;
+const React$1 = await importShared('react');
+const {forwardRef: forwardRef$1,useCallback: useCallback$4,useEffect: useEffect$f,useImperativeHandle: useImperativeHandle$1,useRef: useRef$9,useState: useState$c} = React$1;
 
 function MapContainerComponent({ bounds, boundsOptions, center, children, className, id, placeholder, style, whenReady, zoom, ...options }, forwardedRef) {
-    const [props] = useState$d({
+    const [props] = useState$c({
         className,
         id,
         style
     });
-    const [context, setContext] = useState$d(null);
+    const [context, setContext] = useState$c(null);
     const mapInstanceRef = useRef$9(undefined);
     useImperativeHandle$1(forwardedRef, ()=>context?.map ?? null, [
         context
@@ -37920,17 +37895,17 @@ function MapContainerComponent({ bounds, boundsOptions, center, children, classN
             setContext(createLeafletContext(map));
         }
     }, []);
-    useEffect$g(()=>{
+    useEffect$f(()=>{
         return ()=>{
             context?.map.remove();
         };
     }, [
         context
     ]);
-    const contents = context ? /*#__PURE__*/ React$2.createElement(LeafletContext, {
+    const contents = context ? /*#__PURE__*/ React$1.createElement(LeafletContext, {
         value: context
     }, children) : placeholder ?? null;
-    return /*#__PURE__*/ React$2.createElement("div", {
+    return /*#__PURE__*/ React$1.createElement("div", {
         ...props,
         ref: mapRef
     }, contents);
@@ -37986,13 +37961,13 @@ const Polyline = createPathComponent(function createPolyline({ positions, ...opt
     }
 });
 
-const {useEffect: useEffect$f} = await importShared('react');
+const {useEffect: useEffect$e} = await importShared('react');
 
 const Popup = createOverlayComponent(function createPopup(props, context) {
     const popup = new leafletSrcExports.Popup(props, context.overlayContainer);
     return createElementObject(popup, context);
 }, function usePopupLifecycle(element, context, { position }, setOpen) {
-    useEffect$f(function addPopup() {
+    useEffect$e(function addPopup() {
         const { instance } = element;
         function onPopupOpen(event) {
             if (event.popup === instance) {
@@ -38045,160 +38020,6 @@ const TileLayer = createTileLayerComponent(function createTileLayer({ url, ...op
         layer.setUrl(url);
     }
 });
-
-const React$1 = await importShared('react');
-const {useEffect: useEffect$e,useState: useState$c,useMemo} = React$1;
-const destinationPoint = (lat, lng, distanceKm, bearing) => {
-  const R = 6371;
-  const δ = distanceKm / R;
-  const θ = bearing * Math.PI / 180;
-  const φ1 = lat * Math.PI / 180;
-  const λ1 = lng * Math.PI / 180;
-  const sinφ2 = Math.sin(φ1) * Math.cos(δ) + Math.cos(φ1) * Math.sin(δ) * Math.cos(θ);
-  const φ2 = Math.asin(sinφ2);
-  const y = Math.sin(θ) * Math.sin(δ) * Math.cos(φ1);
-  const x = Math.cos(δ) - Math.sin(φ1) * sinφ2;
-  const λ2 = λ1 + Math.atan2(y, x);
-  return [φ2 * 180 / Math.PI, (λ2 * 180 / Math.PI + 540) % 360 - 180];
-};
-const CardinalDirections = ({ center, zoom }) => {
-  if (zoom < 10) return null;
-  const [centerLat, centerLng] = center;
-  const cardinalPoints = [
-    { degree: 0, label: "N" },
-    { degree: 90, label: "E" },
-    { degree: 180, label: "S" },
-    { degree: 270, label: "W" }
-  ];
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: cardinalPoints.map(({ degree, label }) => {
-    const position = destinationPoint(centerLat, centerLng, 10.5, degree);
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Marker,
-      {
-        position,
-        interactive: false,
-        icon: L$1.divIcon({
-          className: "cardinal-direction",
-          html: `
-                <div style="
-                  color: black;
-                  font-weight: 800;
-                  font-size: 14px;
-                  font-family: 'Arial Black', sans-serif;
-                ">${label}</div>
-              `,
-          iconSize: [40, 40]
-        })
-      },
-      label
-    );
-  }) });
-};
-const DistanceMarkings = ({ center, radiusKm, zoom }) => {
-  if (zoom < 12) return null;
-  const [centerLat, centerLng] = center;
-  let spacing;
-  if (radiusKm > 9) {
-    spacing = zoom < 13 ? 30 : zoom < 14 ? 20 : zoom < 16 ? 5 : zoom < 18 ? 1 : 0.5;
-  } else if (radiusKm > 7) {
-    spacing = zoom < 13 ? 45 : zoom < 14 ? 20 : zoom < 16 ? 10 : zoom < 18 ? 2 : 1;
-  } else if (radiusKm > 4) {
-    spacing = zoom < 13 ? 90 : zoom < 14 ? 30 : zoom < 16 ? 20 : zoom < 18 ? 10 : 2;
-  } else {
-    spacing = zoom < 13 ? 90 : zoom < 14 ? 45 : zoom < 16 ? 30 : zoom < 18 ? 20 : 10;
-  }
-  const markers = [];
-  for (let deg = 0; deg < 360; deg += spacing) {
-    const pos = destinationPoint(centerLat, centerLng, radiusKm, deg);
-    markers.push(
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Marker,
-        {
-          position: pos,
-          interactive: false,
-          icon: L$1.divIcon({
-            className: "distance-marking",
-            html: `
-      <div style="
-        background: transparent;
-        color: black;
-        font-weight: 700;
-        font-size: 14px;
-        font-family: 'Courier New', monospace;
-        white-space: nowrap;
-      ">${radiusKm}km</div>
-    `,
-            iconSize: [50, 24],
-            iconAnchor: [25, 12]
-          })
-        },
-        `${radiusKm}-${deg}`
-      )
-    );
-  }
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: markers });
-};
-const RadarComponent = ({
-  center,
-  radius,
-  radarActive,
-  systemActive
-}) => {
-  const [centerLat, centerLng] = center;
-  const map = useMap();
-  const [zoom, setZoom] = useState$c(map.getZoom());
-  useEffect$e(() => {
-    const handleZoom = () => setZoom(map.getZoom());
-    map.on("zoom", handleZoom);
-    return () => {
-      map.off("zoom", handleZoom);
-    };
-  }, [map]);
-  const radarLines = useMemo(() => {
-    return [0, 90, 180, 270].map((bearing) => [
-      center,
-      destinationPoint(centerLat, centerLng, 10, bearing)
-    ]);
-  }, [center, centerLat, centerLng]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    Array.from({ length: 10 }).map((_, i) => {
-      const radiusKm = i + 1;
-      const radiusMeters = radiusKm * 1e3;
-      return /* @__PURE__ */ jsxRuntimeExports.jsxs(React$1.Fragment, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Circle,
-          {
-            center,
-            radius: radiusMeters,
-            pathOptions: {
-              color: "var(--primary-color)",
-              fillColor: "transparent",
-              fillOpacity: 0,
-              weight: 2,
-              opacity: 0.8,
-              className: `radar-circle radar-circle-${i}`
-            }
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(DistanceMarkings, { center, radiusKm, zoom })
-      ] }, i);
-    }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(CardinalDirections, { center, zoom }),
-    radarLines.map((line, idx) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Polyline,
-      {
-        positions: line,
-        pathOptions: {
-          color: "var(--primary-color)",
-          weight: 2.5,
-          opacity: 0.8,
-          className: "radar-axis-line"
-        }
-      },
-      idx
-    ))
-  ] });
-};
 
 /**
  * @external L.DomUtil
@@ -40160,13 +39981,13 @@ const MapRotateTracker = ({ onBearingChange }) => {
 };
 
 const {useEffect: useEffect$c,useRef: useRef$8} = await importShared('react');
-const MapInformationControls = ({ activeLayer }) => {
+const MapInformationControls = ({ activeLayer, isDarkMode }) => {
   const map = useMap();
   const infoControlRef = useRef$8(null);
   useEffect$c(() => {
     const Info = L$1.Control.extend({
       onAdd: (map2) => {
-        const container = L$1.DomUtil.create("div", "map-info-control leaflet-control");
+        const container = L$1.DomUtil.create("div", `${isDarkMode ? "dark-map-info-control" : "map-info-control"} asim leaflet-control`);
         container.innerHTML = `
           <div class="info-header"><b>Map Information</b></div>
           <div id="map-type"></div>
@@ -40204,7 +40025,7 @@ const MapInformationControls = ({ activeLayer }) => {
       map.off("zoomend", updateZoom);
       map.off("mousemove", updateMousePos);
     };
-  }, [map]);
+  }, [map, isDarkMode]);
   useEffect$c(() => {
     const mapTypeDiv = document.getElementById("map-type");
     if (mapTypeDiv) {
@@ -40285,7 +40106,7 @@ const MapLayerControls = ({
         onClick: toggleDropdown,
         title: "Select Map Type",
         sx: {
-          backgroundColor: "rgba(0,0,0,0.2)",
+          backgroundColor: "white",
           minWidth: "30px !important",
           width: "40px !important",
           height: "40px !important",
@@ -41870,9 +41691,6 @@ const PTZControls = ({
 const {useState: useState$8,useRef: useRef$5,useEffect: useEffect$8} = await importShared('react');
 const getToken = () => {
   const token = sessionStorage.getItem("token");
-  if (!token) {
-    throw new Error("Authentication token not found. Please login again.");
-  }
   return token;
 };
 const FrequencyCheckboxes = ({ frequencies, onFrequencyChange, jammerStatus }) => {
@@ -42490,7 +42308,7 @@ const JammerControlPanel = ({
   ] });
 };
 
-const Compass = ({ bearing, size = 80, position = "bottom-left" }) => {
+const Compass = ({ bearing, size = 80, position = "bottom-left", isDarkMode }) => {
   const getPositionStyles = () => {
     switch (position) {
       case "top-left":
@@ -42513,9 +42331,9 @@ const Compass = ({ bearing, size = 80, position = "bottom-left" }) => {
         ...getPositionStyles(),
         width: size,
         height: size,
-        backgroundColor: "rgba(0, 0, 0, 0.85)",
+        backgroundColor: !isDarkMode ? "white" : "rgba(0, 0, 0, 0.85)",
         borderRadius: "50%",
-        border: "2px solid var(--primary-color)",
+        border: `2px solid ${isDarkMode ? "var(--primary-color)" : "white"}`,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -42531,7 +42349,7 @@ const Compass = ({ bearing, size = 80, position = "bottom-left" }) => {
             width: size - 20,
             height: size - 20,
             borderRadius: "50%",
-            border: "1px solid var(--primary-color)",
+            border: `1px solid ${isDarkMode ? "var(--primary-color)" : "black"}`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center"
@@ -42577,7 +42395,7 @@ const Compass = ({ bearing, size = 80, position = "bottom-left" }) => {
                   left: 2,
                   top: "50%",
                   transform: "translateY(-50%)",
-                  color: "var(--primary-color)",
+                  color: isDarkMode ? "var(--primary-color)" : "black",
                   fontSize: "10px",
                   fontWeight: "bold",
                   fontFamily: "monospace"
@@ -42691,7 +42509,7 @@ const Compass = ({ bearing, size = 80, position = "bottom-left" }) => {
                   bottom: -25,
                   left: "50%",
                   transform: "translateX(-50%)",
-                  backgroundColor: "rgba(0, 0, 0, 0.9)",
+                  backgroundColor: isDarkMode ? "rgba(0, 0, 0, 0.9)" : "white",
                   color: "var(--primary-color)",
                   padding: "2px 8px",
                   borderRadius: 2,
@@ -43246,6 +43064,7 @@ const MapDrawingTools = ({
   onShapeDrawn,
   onShapeEdited,
   onShapeDeleted,
+  isDarkMode,
   defaultMarkerIcon = "default"
 }) => {
   const map = useMap();
@@ -43409,7 +43228,7 @@ const MapDrawingTools = ({
           doneButton.style.cursor = "pointer";
           doneButton.style.border = "1px solid var(--primary-color)";
           doneButton.style.borderRadius = "4px";
-          doneButton.style.backgroundColor = "var(--primary-color)";
+          doneButton.style.backgroundColor = isDarkMode ? "var(--primary-color)" : "white";
           doneButton.style.color = "white";
           doneButton.style.fontWeight = "bold";
           doneButton.onclick = () => {
@@ -43418,7 +43237,7 @@ const MapDrawingTools = ({
           };
           container.appendChild(doneButton);
         }
-        leafletSrcExports.DomUtil.addClass(container, "leaflet-control");
+        leafletSrcExports.DomUtil.addClass(container, "leaflet-control ");
         leafletSrcExports.DomEvent.disableClickPropagation(container);
         return container;
       },
@@ -43770,7 +43589,7 @@ const MapDrawingTools = ({
             iconSelector.style.top = "50%";
             iconSelector.style.left = "50%";
             iconSelector.style.transform = "translate(-50%, -50%)";
-            iconSelector.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+            iconSelector.style.backgroundColor = isDarkMode ? "#21231b" : "#ffffff";
             iconSelector.style.padding = "15px";
             iconSelector.style.border = "1px solid var(--primary-color)";
             iconSelector.style.borderRadius = "8px";
@@ -43944,12 +43763,6 @@ const createDroneIcon$1 = (threatLevel, isDetected, distance) => {
     HIGH: "#F44336",
     CRITICAL: "#D32F2F"
   };
-  const droneEmojis = {
-    LOW: "🛩️",
-    MEDIUM: "🚁",
-    HIGH: "✈️",
-    CRITICAL: "🚀"
-  };
   const pulseAnimation = isDetected ? `
     animation: pulse 1.5s infinite;
     @keyframes pulse {
@@ -43996,7 +43809,9 @@ const createDroneIcon$1 = (threatLevel, isDetected, distance) => {
           border: ${isDetected ? "3px solid #fff" : "2px solid #fff"};
           box-shadow: ${isDetected ? `0 0 20px ${colors[threatLevel]}` : "0 4px 12px rgba(0,0,0,0.4)"};
           ${pulseAnimation}
-        ">${droneEmojis[threatLevel]}</div>
+        ">
+        <img src="/Vector.png" style="width: 70px; height: 70px;" >
+        </div>
         ${isDetected ? `
           <div style="
             position: absolute;
@@ -44053,6 +43868,7 @@ const CesiumMap = ({
   systemActive,
   coneangle,
   coneelevation,
+  isDarkMode,
   jammerStatus
 }) => {
   const [mapLoaded, setMapLoaded] = useState$6(false);
@@ -44081,11 +43897,6 @@ const CesiumMap = ({
   const getToken = () => {
     const token = sessionStorage.getItem("token");
     if (!token) {
-      setSnackbar({
-        open: true,
-        message: "Authentication token not found. Please login again.",
-        severity: "error"
-      });
       throw new Error("No authentication token");
     }
     return token;
@@ -44229,10 +44040,9 @@ const CesiumMap = ({
     }
   }, [drones, radarActive, systemActive, centerLat, centerLng, radius10km]);
   const getTrajectoryPoints = (trajectory) => {
-    return trajectory.points.filter((point) => !isZeroCoordinate$1(point.position[1], point.position[0])).map((point) => [
-      point.position[1],
-      point.position[0]
-    ]);
+    return trajectory.points.filter(
+      (point) => !isZeroCoordinate$1(point.position[1], point.position[0])
+    ).map((point) => [point.position[1], point.position[0]]);
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     Box,
@@ -44288,7 +44098,15 @@ const CesiumMap = ({
             )
           }
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Compass, { bearing: mapBearing, size: 100, position: "bottom-left" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Compass,
+          {
+            bearing: mapBearing,
+            isDarkMode,
+            size: 100,
+            position: "bottom-left"
+          }
+        ),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           MapContainer,
           {
@@ -44300,8 +44118,7 @@ const CesiumMap = ({
             style: {
               height: "100%",
               width: "100%",
-              borderRadius: "8px",
-              border: "2px solid var(--primary-color)"
+              borderRadius: "8px"
             },
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -44310,7 +44127,13 @@ const CesiumMap = ({
                   url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                 }
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(MapInformationControls, { activeLayer }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                MapInformationControls,
+                {
+                  activeLayer,
+                  isDarkMode
+                }
+              ),
               /* @__PURE__ */ jsxRuntimeExports.jsx(MapRotateTracker, { onBearingChange: setMapBearing }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(MapLayerControls, { onLayerChange: setActiveLayer }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(MapDrawingTools, {}),
@@ -44342,41 +44165,18 @@ const CesiumMap = ({
                   trajectory.id
                 );
               }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Circle,
-                {
-                  center: centerPosition,
-                  radius: radius10km,
-                  pathOptions: {
-                    color: "var(--primary-color)",
-                    fillColor: "#000000ff",
-                    fillOpacity: 0.1,
-                    weight: 2,
-                    dashArray: "5, 8"
-                  }
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                RadarComponent,
-                {
-                  center: centerPosition,
-                  radius: radius10km,
-                  radarActive,
-                  systemActive
-                }
-              ),
               drones.map((drone) => {
                 if (isZeroCoordinate$1(drone.position[1], drone.position[0])) {
                   return null;
                 }
                 const isDetected = detectedThreats.includes(drone.id);
-                const actualDistance = calculateDistance(
+                calculateDistance(
                   centerLat,
                   centerLng,
                   drone.position[1],
                   drone.position[0]
                 );
-                const trajectory = trajectories.find((t) => t.id === drone.id);
+                trajectories.find((t) => t.id === drone.id);
                 return /* @__PURE__ */ jsxRuntimeExports.jsx(
                   Marker,
                   {
@@ -44393,7 +44193,7 @@ const CesiumMap = ({
                           color: "white"
                         },
                         children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { style: { color: "#ff0000" }, children: isDetected ? "🚨 DETECTED THREAT" : "🎯 DRONE" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { style: { color: "#ff0000" }, children: "RADIO" }),
                           /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "ID:" }),
                           " ",
@@ -44411,21 +44211,6 @@ const CesiumMap = ({
                             }
                           ),
                           /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "DISTANCE:" }),
-                          " ",
-                          actualDistance.toFixed(0),
-                          "m",
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "SPEED:" }),
-                          " ",
-                          drone.speed.toFixed(1),
-                          "km/h",
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "HEADING:" }),
-                          " ",
-                          drone.heading,
-                          "°",
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "LAT:" }),
                           " ",
                           drone.position[1].toFixed(4),
@@ -44437,13 +44222,7 @@ const CesiumMap = ({
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "DETECTED:" }),
                           " ",
                           drone.detected_at,
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-                          trajectory && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "TRAJECTORY POINTS:" }),
-                            " ",
-                            trajectory.points.length,
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("br", {})
-                          ] })
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("br", {})
                         ]
                       }
                     ) })
@@ -46704,6 +46483,50 @@ const FloatingSpectrumAnalyzer = ({
   );
 };
 
+const statusToThreatLevel = (status) => {
+  switch (status) {
+    case "online":
+      return "LOW";
+    case "warning":
+      return "MEDIUM";
+    case "error":
+      return "HIGH";
+    default:
+      return "LOW";
+  }
+};
+const lastSeenToISO = (lastSeen) => {
+  const now = /* @__PURE__ */ new Date();
+  if (lastSeen.includes("min")) {
+    const mins = parseInt(lastSeen);
+    now.setMinutes(now.getMinutes() - mins);
+  } else if (lastSeen.includes("hr")) {
+    const hrs = parseInt(lastSeen);
+    now.setHours(now.getHours() - hrs);
+  }
+  return now.toISOString();
+};
+const randomInRange = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const mapRadiosToDrones = (radios) => {
+  return radios.map((radio, index) => ({
+    id: `${String(index + 1).padStart(3, "0")}`,
+    image: `https://via.placeholder.com/150?text=${encodeURIComponent(
+      radio.name
+    )}`,
+    position: [
+      radio.lat,
+      radio.lon,
+      randomInRange(800, 2e3)
+      // altitude
+    ],
+    threat_level: statusToThreatLevel(radio.status),
+    distance: randomInRange(800, 5e3),
+    speed: randomInRange(40, 150),
+    heading: randomInRange(0, 360),
+    detected_at: lastSeenToISO(radio.lastSeen)
+  }));
+};
+
 const {useState: useState$1,useEffect: useEffect$1,useCallback,useRef} = await importShared('react');
 const darkTheme = createTheme({
   palette: {
@@ -46740,7 +46563,12 @@ const darkTheme = createTheme({
     }
   }
 });
-const ADSDashboard = ({ setToken, isRadioDispatcherMicroUI }) => {
+const ADSDashboard = ({
+  setToken,
+  isRadioDispatcherMicroUI,
+  radioDevices,
+  isDarkMode
+}) => {
   const [loading, setLoading] = useState$1(false);
   const [error, setError] = useState$1("");
   const [check, setcheck] = useState$1("");
@@ -46801,90 +46629,17 @@ const ADSDashboard = ({ setToken, isRadioDispatcherMicroUI }) => {
   const [detectedDrones, setDetectedDrones] = useState$1([]);
   const [drawingToolsEnabled, setDrawingToolsEnabled] = useState$1(true);
   const Drones = async () => {
-    try {
-      const token = sessionStorage.getItem("token");
-      const response = await fetch(`${drone_data}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token || "219498f3-03f9-41a0-9140-eec5bfe0e311"}`
-        }
-      });
-      const data = await response.json();
-      const drones = data.data.map((drone) => ({
-        id: drone.name,
-        image: drone.image,
-        position: [
-          drone.longitude || 0,
-          drone.latitude || 0,
-          drone.height || 0
-        ],
-        threat_level: "HIGH",
-        distance: drone.distance || 0,
-        speed: drone.speed || 0,
-        heading: Number(drone.direction) || 0,
-        detected_at: drone.created_time || (/* @__PURE__ */ new Date()).toISOString()
-      }));
-      setDetectedDrones(drones);
-    } catch (error2) {
-      console.error("error");
-    }
   };
   useEffect$1(() => {
     Drones();
     const intervalId = setInterval(Drones, 5e3);
     return () => clearInterval(intervalId);
   }, []);
-  const check_dfConnectivity = async () => {
-    try {
-      const token = sessionStorage.getItem("token");
-      const response = await fetch(`${df_connectivity}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token || "219498f3-03f9-41a0-9140-eec5bfe0e311"}`
-        }
-      });
-      const data = await response.json();
-      const check2 = data.data.available;
-      setcheck(check2);
-    } catch (error2) {
-      console.error("error");
-    }
-  };
   useEffect$1(() => {
-    check_dfConnectivity();
-    const intervalId = setInterval(check_dfConnectivity, 5e3);
-    return () => clearInterval(intervalId);
-  }, []);
-  const fetchSpectrumData = async () => {
-    try {
-      const token = sessionStorage.getItem("token");
-      const response = await fetch(`${spectrum_data}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      const json = await response.json();
-      if (!json?.data || !json.data[hardwareSystemId]) {
-        return;
-      }
-      const powerSpectrum = json.data[hardwareSystemId].decodedValues?.powerSpectrum;
-      if (powerSpectrum) {
-        const cleaned = powerSpectrum.map((v) => isFinite(v) ? v : -100);
-        setFft(cleaned);
-      } else {
-      }
-    } catch (err) {
-      console.error("Spectrum API Error:", err);
+    if (radioDevices?.length > 0) {
+      setDetectedDrones(mapRadiosToDrones(radioDevices));
     }
-  };
-  useEffect$1(() => {
-    const interval = setInterval(fetchSpectrumData, 1e3);
-    fetchSpectrumData();
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  }, [radioDevices]);
   const [floatingCards, setFloatingCards] = useState$1([
     {
       id: "system-status",
@@ -47030,8 +46785,14 @@ const ADSDashboard = ({ setToken, isRadioDispatcherMicroUI }) => {
           const settings = JSON.parse(data);
           if (settings.type === "spectrum") {
             const newPosition = {
-              x: Math.max(10, Math.min(window.innerWidth - 410, e.clientX - 200)),
-              y: Math.max(10, Math.min(window.innerHeight - 260, e.clientY - 125))
+              x: Math.max(
+                10,
+                Math.min(window.innerWidth - 410, e.clientX - 200)
+              ),
+              y: Math.max(
+                10,
+                Math.min(window.innerHeight - 260, e.clientY - 125)
+              )
             };
             setFloatingSpectrum({
               visible: true,
@@ -47094,28 +46855,55 @@ const ADSDashboard = ({ setToken, isRadioDispatcherMicroUI }) => {
     document.body.style.cursor = "grabbing";
     document.body.style.userSelect = "none";
   };
-  const updateCardPositionOptimized = useCallback((clientX, clientY) => {
-    if (!dragStateRef.current.isDragging || !dragStateRef.current.draggedCardId) return;
-    const newX = Math.max(10, Math.min(window.innerWidth - 390, clientX - dragStateRef.current.dragOffset.x));
-    const newY = Math.max(10, Math.min(window.innerHeight - 200, clientY - dragStateRef.current.dragOffset.y));
-    const cardElement = document.querySelector(`[data-card-id="${dragStateRef.current.draggedCardId}"]`);
-    if (cardElement) {
-      cardElement.style.left = `${newX}px`;
-      cardElement.style.top = `${newY}px`;
-    }
-  }, []);
-  const handleMouseMove = useCallback((e) => {
-    if (!dragStateRef.current.isDragging) return;
-    updateCardPositionOptimized(e.clientX, e.clientY);
-  }, [updateCardPositionOptimized]);
+  const updateCardPositionOptimized = useCallback(
+    (clientX, clientY) => {
+      if (!dragStateRef.current.isDragging || !dragStateRef.current.draggedCardId)
+        return;
+      const newX = Math.max(
+        10,
+        Math.min(
+          window.innerWidth - 390,
+          clientX - dragStateRef.current.dragOffset.x
+        )
+      );
+      const newY = Math.max(
+        10,
+        Math.min(
+          window.innerHeight - 200,
+          clientY - dragStateRef.current.dragOffset.y
+        )
+      );
+      const cardElement = document.querySelector(
+        `[data-card-id="${dragStateRef.current.draggedCardId}"]`
+      );
+      if (cardElement) {
+        cardElement.style.left = `${newX}px`;
+        cardElement.style.top = `${newY}px`;
+      }
+    },
+    []
+  );
+  const handleMouseMove = useCallback(
+    (e) => {
+      if (!dragStateRef.current.isDragging) return;
+      updateCardPositionOptimized(e.clientX, e.clientY);
+    },
+    [updateCardPositionOptimized]
+  );
   const handleMouseUp = useCallback(() => {
-    if (!dragStateRef.current.isDragging || !dragStateRef.current.draggedCardId) return;
-    const cardElement = document.querySelector(`[data-card-id="${dragStateRef.current.draggedCardId}"]`);
+    if (!dragStateRef.current.isDragging || !dragStateRef.current.draggedCardId)
+      return;
+    const cardElement = document.querySelector(
+      `[data-card-id="${dragStateRef.current.draggedCardId}"]`
+    );
     if (cardElement) {
       const finalX = parseInt(cardElement.style.left);
       const finalY = parseInt(cardElement.style.top);
       if (!isNaN(finalX) && !isNaN(finalY)) {
-        updateCardPosition(dragStateRef.current.draggedCardId, { x: finalX, y: finalY });
+        updateCardPosition(dragStateRef.current.draggedCardId, {
+          x: finalX,
+          y: finalY
+        });
       }
       cardElement.classList.remove("floating-card-dragging");
       cardElement.style.left = "";
@@ -47157,7 +46945,7 @@ const ADSDashboard = ({ setToken, isRadioDispatcherMicroUI }) => {
         return /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { children: "Unknown component" });
     }
   };
-  const leftCardLogs = [
+  [
     {
       id: "system-status",
       title: "System Status",
@@ -47207,24 +46995,30 @@ const ADSDashboard = ({ setToken, isRadioDispatcherMicroUI }) => {
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `${isRadioDispatcherMicroUI ? "" : "App"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `${isRadioDispatcherMicroUI ? "" : "main-container"} `, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `${isRadioDispatcherMicroUI ? "app-header-micro-ui" : "app-header"}`, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "header_data", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { children: "RAPIDEV" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "header_data", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Typography, { variant: "h5", className: "app-title", children: isRadioDispatcherMicroUI ? "RADIO DISPATCHER" : "ANTI-DRONE-SYSTEM" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "header_data", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            onClick: handleLogout,
-            variant: "outlined",
-            sx: {
-              color: "#ff4444",
-              borderColor: "#ff4444",
-              ml: 2,
-              "&:hover": { borderColor: "#ff6666", color: "#ff6666" }
-            },
-            children: "Logout"
-          }
-        ) })
-      ] }),
+      !isRadioDispatcherMicroUI && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          className: `${isRadioDispatcherMicroUI ? "app-header-micro-ui" : "app-header"}`,
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "header_data", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { children: "RAPIDEV" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "header_data", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Typography, { variant: "h5", className: "app-title", children: isRadioDispatcherMicroUI ? "RADIO DISPATCHER" : "ANTI-DRONE-SYSTEM" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "header_data", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                onClick: handleLogout,
+                variant: "outlined",
+                sx: {
+                  color: "#ff4444",
+                  borderColor: "#ff4444",
+                  ml: 2,
+                  "&:hover": { borderColor: "#ff6666", color: "#ff6666" }
+                },
+                children: "Logout"
+              }
+            ) })
+          ]
+        }
+      ),
       isDraggingOver && /* @__PURE__ */ jsxRuntimeExports.jsxs(
         Box,
         {
@@ -47331,34 +47125,47 @@ const ADSDashboard = ({ setToken, isRadioDispatcherMicroUI }) => {
           ]
         }
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `${isRadioDispatcherMicroUI ? "map-container-micro-ui" : "map-container"} `, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-        CesiumMap,
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "div",
         {
-          drones: detectedDrones,
-          systemActive: check,
-          drawingToolsEnabled,
-          coneangle: coneAngle,
-          coneelevation: coneElevation,
-          jammerStatus
+          className: `${isRadioDispatcherMicroUI ? "map-container-micro-ui" : "map-container"} `,
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            CesiumMap,
+            {
+              drones: detectedDrones,
+              systemActive: check,
+              drawingToolsEnabled,
+              isDarkMode,
+              coneangle: coneAngle,
+              coneelevation: coneElevation,
+              jammerStatus
+            }
+          )
         }
-      ) }),
-      floatingSpectrum.visible && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: {
-        position: "fixed",
-        zIndex: 9999,
-        pointerEvents: "auto"
-      }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-        FloatingSpectrumAnalyzer,
+      ),
+      floatingSpectrum.visible && /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "div",
         {
-          spectrumData: fft.length > 0 ? fft : Array(2048).fill(-80),
-          width: 400,
-          height: 250,
-          onClose: () => {
-            setFloatingSpectrum((prev) => ({ ...prev, visible: false }));
+          style: {
+            position: "fixed",
+            zIndex: 9999,
+            pointerEvents: "auto"
           },
-          initialPosition: floatingSpectrum.position,
-          settings: floatingSpectrum.settings
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            FloatingSpectrumAnalyzer,
+            {
+              spectrumData: fft.length > 0 ? fft : Array(2048).fill(-80),
+              width: 400,
+              height: 250,
+              onClose: () => {
+                setFloatingSpectrum((prev) => ({ ...prev, visible: false }));
+              },
+              initialPosition: floatingSpectrum.position,
+              settings: floatingSpectrum.settings
+            }
+          )
         }
-      ) }),
+      ),
       floatingCards.filter((card) => card.visible).map((card) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
         Box,
         {
@@ -47375,7 +47182,14 @@ const ADSDashboard = ({ setToken, isRadioDispatcherMicroUI }) => {
                 className: "floating-card-header",
                 onMouseDown: (e) => handleMouseDown(e, card.id),
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Typography, { variant: "subtitle1", sx: { fontWeight: "bold", color: "var(--primary-color)" }, children: card.title }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Typography,
+                    {
+                      variant: "subtitle1",
+                      sx: { fontWeight: "bold", color: "var(--primary-color)" },
+                      children: card.title
+                    }
+                  ),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(Box, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                     IconButton,
                     {
@@ -47395,27 +47209,16 @@ const ADSDashboard = ({ setToken, isRadioDispatcherMicroUI }) => {
           ]
         },
         card.id
-      )),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `${isRadioDispatcherMicroUI ? "fixed-column-micro-ui" : "fixed-column"} `, children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "column-content", children: leftCardLogs.map((log) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        "div",
-        {
-          className: `${isRadioDispatcherMicroUI ? "column-item-micro-ui" : "column-item"}  ${floatingCards.find((c) => c.id === log.id)?.visible ? "active" : ""}`,
-          onClick: () => toggleCard(log.id),
-          title: log.description,
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "column-item-icon", children: log.icon }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "column-item-info" })
-          ]
-        },
-        log.id
-      )) }) })
+      ))
     ] }) })
   ] });
 };
 
 const {useState,useEffect} = await importShared('react');
 const App = ({
-  isRadioDispatcherMicroUI
+  isRadioDispatcherMicroUI,
+  radioDevices,
+  isDarkMode
 }) => {
   const [token, setToken] = useState(null);
   useEffect(() => {
@@ -47445,10 +47248,13 @@ const App = ({
       Route,
       {
         path: "/dashboard",
-        element: /* @__PURE__ */ jsxRuntimeExports.jsx(ProtectedRoute, { token, children: /* @__PURE__ */ jsxRuntimeExports.jsx(ADSDashboard, { setToken, isRadioDispatcherMicroUI }) })
+        element: (
+          // <ProtectedRoute token={token}>
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ADSDashboard, { setToken, isDarkMode, radioDevices, isRadioDispatcherMicroUI })
+        )
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "*", element: /* @__PURE__ */ jsxRuntimeExports.jsx(Navigate, { to: "/login", replace: true }) })
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "*", element: /* @__PURE__ */ jsxRuntimeExports.jsx(Navigate, { to: "/dashboard", replace: true }) })
   ] }) });
 };
 

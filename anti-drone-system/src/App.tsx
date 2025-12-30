@@ -10,8 +10,10 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ADSDashboard from "./components/ADSDashboard";
 
 const App = ({
-  isRadioDispatcherMicroUI
-} : {isRadioDispatcherMicroUI: boolean}) => {
+  isRadioDispatcherMicroUI,
+  radioDevices,
+  isDarkMode
+} : {isRadioDispatcherMicroUI: boolean ; radioDevices: any , isDarkMode: boolean} ) => {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
@@ -46,14 +48,15 @@ const App = ({
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute token={token}>
-              <ADSDashboard setToken={setToken}  isRadioDispatcherMicroUI={isRadioDispatcherMicroUI} />
-            </ProtectedRoute>
+            // <ProtectedRoute token={token}>
+              <ADSDashboard setToken={setToken} isDarkMode={isDarkMode} radioDevices={radioDevices}  isRadioDispatcherMicroUI={isRadioDispatcherMicroUI} />
+            // </ProtectedRoute>
           }
         />
 
         {/* Catch-all route: redirect to login if path doesn't match */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Router>
   );

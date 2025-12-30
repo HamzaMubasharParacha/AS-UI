@@ -659,149 +659,22 @@ svg.leaflet-image-layer.leaflet-interactive path {
 		print-color-adjust: exact;
 		}
 	}
-/* RadarComponent.css */
- 
-/* RadarComponent.css */
-
-/* Radar sweep line with high z-index */
-.radar-sweep-line {
-  z-index: 1000 !important;
+.map-info-control {
+  color: black !important;
+  background: white !important;
+  border: 1px solid var(--primary-color);
+  border-style: solid;
+  border-color: var(--primary-color);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  min-width: 160px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  user-select: none;
+  line-height: 1.4rem;
+  left: 120px;
 }
-
-/* Radar sweep glow with high z-index */
-.radar-sweep-glow {
-  z-index: 999 !important;
-}
-
-/* Radar circles with high z-index */
-.radar-circle {
-  z-index: 800 !important;
-}
-
-/* Radar axis lines with high z-index */
-.radar-axis-line {
-  z-index: 801 !important;
-}
-
-/* Cardinal directions with high z-index */
-.cardinal-direction {
-  z-index: 900 !important;
-}
-
-/* Distance markings with high z-index */
-.distance-marking {
-  z-index: 901 !important;
-}
-
-/* Ensure the container has proper positioning */
-.leaflet-overlay-pane {
-  z-index: 400;
-}
-
-.leaflet-marker-pane {
-  z-index: 600;
-}
-
-.leaflet-popup-pane {
-  z-index: 700;
-}
- 
-.radar-circle-0,
-.radar-circle-1,
-.radar-circle-2,
-.radar-circle-3,
-.radar-circle-4,
-.radar-circle-5,
-.radar-circle-6,
-.radar-circle-7,
-.radar-circle-8
-.radar-circle-9 {
-  animation-delay: 1.5s;
-}
- 
-@keyframes fadePulse {
-  0%, 100% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
- 
-/* Radar axis lines with high z-index */
-.radar-axis-line {
-  z-index: 801 !important;
-}
-
-/* Cardinal directions with high z-index */
-.cardinal-direction {
-  z-index: 900 !important;
-}
-
-/* Distance markings with high z-index */
-.distance-marking {
-  z-index: 901 !important;
-}
-
-/* Ensure the container has proper positioning */
-.leaflet-overlay-pane {
-  z-index: 400;
-}
-
-.leaflet-marker-pane {
-  z-index: 600;
-}
-
-.leaflet-popup-pane {
-  z-index: 700;
-}
- 
-@keyframes commandPulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.9;
-  }
-}
- 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .radar-circle {
-    stroke-width: 1px;
-  }
- 
-  .radar-sweep-line {
-    stroke-width: 3px;
-  }
-}
- 
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .radar-sweep-line {
-    filter: drop-shadow(0 0 4px rgba(0, 255, 65, 1));
-  }
- 
-  .radius-label div,
-  .degree-marking div,
-  .cardinal-direction div {
-    /* background: rgba(0, 0, 0, 0.95) !important; */
-    background: "transparent" !important;
-    border-width: 2px !important;
-  }
-}
- 
-/* Reduce motion for accessibility */
-@media (prefers-reduced-motion: reduce) {
-  .radar-circle,
-  .command-center-icon,
-  .radar-sweep-line {
-    animation: none;
-  }
-}
- .map-info-control {
+.dark-map-info-control {
   color: white !important;
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid var(--primary-color);
@@ -1213,7 +1086,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .leaflet-control {
   top: 90px !important;
   color: white;
-  background: rgba(0, 0, 0, 0.2) !important;
+  background-color: white !important;
+  /* background: rgba(0, 0, 0, 0.2) !important; */
   border: 1px solid var(--primary-color) !important;
   width: 42px;
 }
@@ -1313,7 +1187,7 @@ body {
   height: 18px;
   display: block;
 
-  background-color: var(--primary-color);
+  background-color: black;
 
   mask-size: contain;
   mask-repeat: no-repeat;
@@ -1554,7 +1428,7 @@ body {
 .fixed-column-micro-ui {
   position: absolute;
   top: 60px;
-  height: calc(100vh - 60px);
+  /* height: calc(100vh - 60px); */
   width: 140px;
   background-color: transparent !important;
   z-index: 2000;
@@ -2104,8 +1978,8 @@ body {
   }
 }/* Dark theme (default) */
 :root {
-  --primary-color: #7bff00;
-  --active-color: #70eb0c;
+  --primary-color: #0f74e7;
+  --active-color: #011985;
   --inactive-color: #d81e1e;
   --sidebar-width: 280px;
   --radius: 12px;

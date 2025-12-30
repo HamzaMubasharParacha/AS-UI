@@ -5,6 +5,7 @@ import "./MapInformationControls.css";
 
 interface MapInformationControlsProps {
   activeLayer?: string;
+  isDarkMode?: boolean;
 }
 
 // Type for the custom Leaflet control
@@ -12,7 +13,7 @@ interface InfoControl extends L.Control {
   _container?: HTMLElement;
 }
 
-const MapInformationControls: React.FC<MapInformationControlsProps> = ({ activeLayer }) => {
+const MapInformationControls: React.FC<MapInformationControlsProps> = ({ activeLayer , isDarkMode }) => {
   const map = useMap();
   const infoControlRef = useRef<InfoControl | null>(null);
 
@@ -20,7 +21,7 @@ const MapInformationControls: React.FC<MapInformationControlsProps> = ({ activeL
     // Create the Leaflet control once
     const Info = L.Control.extend({
       onAdd: (map: L.Map) => {
-        const container = L.DomUtil.create("div", "map-info-control leaflet-control");
+        const container = L.DomUtil.create("div", `${isDarkMode ? 'dark-map-info-control' : 'map-info-control'} asim leaflet-control`);
 
         container.innerHTML = `
           <div class="info-header"><b>Map Information</b></div>
@@ -69,7 +70,7 @@ const MapInformationControls: React.FC<MapInformationControlsProps> = ({ activeL
       map.off("zoomend", updateZoom);
       map.off("mousemove", updateMousePos);
     };
-  }, [map]);
+  }, [map , isDarkMode]);
 
   // Update active layer display whenever it changes
   useEffect(() => {

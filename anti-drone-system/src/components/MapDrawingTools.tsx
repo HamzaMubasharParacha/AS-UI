@@ -35,6 +35,7 @@ interface Shape {
 interface MapDrawingToolsProps {
   onShapeDrawn?: (shape: Shape) => void;
   onShapeEdited?: (shapes: Shape[]) => void;
+  isDarkMode?: boolean;
   onShapeDeleted?: (shapeIds: string[]) => void;
   defaultMarkerIcon?: string;
 }
@@ -43,6 +44,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
   onShapeDrawn,
   onShapeEdited,
   onShapeDeleted,
+  isDarkMode, 
   defaultMarkerIcon = "default",
 }) => {
   const map = useMap();
@@ -273,7 +275,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
           doneButton.style.cursor = "pointer";
           doneButton.style.border = "1px solid var(--primary-color)";
           doneButton.style.borderRadius = "4px";
-          doneButton.style.backgroundColor = "var(--primary-color)";
+          doneButton.style.backgroundColor = isDarkMode ?  "var(--primary-color)" : "white";
           doneButton.style.color = "white";
           doneButton.style.fontWeight = "bold";
 
@@ -286,7 +288,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
         }
 
         // Prevent map events when interacting with control
-        L.DomUtil.addClass(container, "leaflet-control");
+        L.DomUtil.addClass(container, "leaflet-control ");
         L.DomEvent.disableClickPropagation(container);
 
         return container;
@@ -765,7 +767,7 @@ const MapDrawingTools: React.FC<MapDrawingToolsProps> = ({
             iconSelector.style.top = "50%";
             iconSelector.style.left = "50%";
             iconSelector.style.transform = "translate(-50%, -50%)";
-            iconSelector.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+            iconSelector.style.backgroundColor = isDarkMode ? "#21231b" : "#ffffff";
             iconSelector.style.padding = "15px";
             iconSelector.style.border = "1px solid var(--primary-color)";
             iconSelector.style.borderRadius = "8px";

@@ -20,9 +20,9 @@ interface JammerControlPanelProps {
 // Enhanced getToken function with fallback
 const getToken = () => {
   const token = sessionStorage.getItem("token");
-  if (!token) {
-    throw new Error("Authentication token not found. Please login again.");
-  }
+  // if (!token) {
+  //   throw new Error("Authentication token not found. Please login again.");
+  // }
   return token;
 };
 

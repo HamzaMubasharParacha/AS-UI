@@ -17,6 +17,7 @@ import "leaflet-rotate";
 import { MapRotateTracker } from "../utils/MapRotateTracker";
 import MapInformationControls from "./MapInformationControls";
 import MapLayerControls from "./MapLayerControls";
+import droneIcon from "/Vector.png";
 import JammerControlPanel from "./JammerControlPanel";
 import Compass from "./Compass";
 import MapDrawingTools from "./MapDrawingTools";
@@ -157,6 +158,7 @@ interface CesiumMapProps {
   systemActive: string;
   drawingToolsEnabled?: boolean;
   coneangle: number;
+  isDarkMode: boolean;
   coneelevation: number;
   jammerStatus: string;
 }
@@ -259,7 +261,9 @@ const createDroneIcon = (
               : "0 4px 12px rgba(0,0,0,0.4)"
           };
           ${pulseAnimation}
-        ">${droneEmojis[threatLevel as keyof typeof droneEmojis]}</div>
+        ">
+        <img src="/Vector.png" style="width: 70px; height: 70px;" >
+        </div>
         ${
           isDetected
             ? `
@@ -334,6 +338,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   systemActive,
   coneangle,
   coneelevation,
+  isDarkMode,
   jammerStatus,
 }) => {
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -372,11 +377,11 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   const getToken = () => {
     const token = sessionStorage.getItem("token");
     if (!token) {
-      setSnackbar({
-        open: true,
-        message: "Authentication token not found. Please login again.",
-        severity: "error",
-      });
+      // setSnackbar({
+      //   open: true,
+      //   message: "Authentication token not found. Please login again.",
+      //   severity: "error",
+      // });
       throw new Error("No authentication token");
     }
     return token;
@@ -500,7 +505,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
       return updatedTrajectories.filter((trajectory) => {
         // Check if drone is currently in the drones list
         const droneExists = drones.find((d) => d.id === trajectory.id);
-        
+
         if (droneExists) {
           // Drone is currently active, keep trajectory
           return true;
@@ -521,11 +526,11 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
         return prevTrajectories.filter((trajectory) => {
           // Check if drone is currently active
           const droneExists = drones.find((d) => d.id === trajectory.id);
-          
+
           if (droneExists) {
             return true; // Keep trajectory for active drones
           }
-          
+
           // Check if trajectory is older than 15 seconds
           const timeSinceLastSeen = now - trajectory.lastSeenTime;
           return timeSinceLastSeen < 15000; // 15 seconds
@@ -562,11 +567,10 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
   ): [number, number][] => {
     // Filter out any 0.0 coordinates from the trajectory points
     return trajectory.points
-      .filter(point => !isZeroCoordinate(point.position[1], point.position[0]))
-      .map((point) => [
-        point.position[1],
-        point.position[0],
-      ]);
+      .filter(
+        (point) => !isZeroCoordinate(point.position[1], point.position[0])
+      )
+      .map((point) => [point.position[1], point.position[0]]);
   };
 
   return (
@@ -621,7 +625,12 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
       </Snackbar>
 
       {/* Compass Component */}
-      <Compass bearing={mapBearing} size={100} position="bottom-left" />
+      <Compass
+        bearing={mapBearing}
+        isDarkMode={isDarkMode}
+        size={100}
+        position="bottom-left"
+      />
 
       {/* Leaflet Map with Satellite Imagery */}
       <MapContainer
@@ -634,7 +643,6 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           height: "100%",
           width: "100%",
           borderRadius: "8px",
-          border: "2px solid var(--primary-color)",
         }}
       >
         {/* Offline Tile Layer */}
@@ -643,7 +651,10 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           }
         />
-        <MapInformationControls activeLayer={activeLayer} />
+        <MapInformationControls
+          activeLayer={activeLayer}
+          isDarkMode={isDarkMode}
+        />
         <MapRotateTracker onBearingChange={setMapBearing} />
         <MapLayerControls onLayerChange={setActiveLayer} />
         <MapDrawingTools></MapDrawingTools>
@@ -661,7 +672,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             const points = getTrajectoryPoints(trajectory);
             // Only render trajectory if we have at least 2 valid points
             if (points.length < 2) return null;
-            
+
             return (
               <Polyline
                 key={trajectory.id}
@@ -681,7 +692,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
           })}
         {/* GEOGRAPHICALLY FIXED 10km Coverage Circle */}
 
-        <Circle
+        {/* <Circle
           center={centerPosition}
           radius={radius10km}
           pathOptions={{
@@ -691,20 +702,21 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
             weight: 2,
             dashArray: "5, 8",
           }}
-        />
-        <RadarComponent
+        /> */}
+        {/* <RadarComponent
           center={centerPosition}
           radius={radius10km}
           radarActive={radarActive}
           systemActive={systemActive}
-        />
+        /> */}
+
         {/* Drone Markers */}
         {drones.map((drone) => {
           // Skip rendering marker if coordinates are 0.0
           if (isZeroCoordinate(drone.position[1], drone.position[0])) {
             return null;
           }
-          
+
           const isDetected = detectedThreats.includes(drone.id);
           const actualDistance = calculateDistance(
             centerLat,
@@ -732,9 +744,7 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
                     color: "white",
                   }}
                 >
-                  <strong style={{ color: "#ff0000" }}>
-                    {isDetected ? "🚨 DETECTED THREAT" : "🎯 DRONE"}
-                  </strong>
+                  <strong style={{ color: "#ff0000" }}>RADIO</strong>
                   <br />
                   <strong>ID:</strong> {drone.id}
                   <br />
@@ -754,23 +764,23 @@ const CesiumMap: React.FC<CesiumMapProps> = ({
                     {drone.threat_level}
                   </span>
                   <br />
-                  <strong>DISTANCE:</strong> {actualDistance.toFixed(0)}m<br />
+                  {/* <strong>DISTANCE:</strong> {actualDistance.toFixed(0)}m<br />
                   <strong>SPEED:</strong> {drone.speed.toFixed(1)}km/h
                   <br />
-                  <strong>HEADING:</strong> {drone.heading}°<br />
+                  <strong>HEADING:</strong> {drone.heading}°<br /> */}
                   <strong>LAT:</strong> {drone.position[1].toFixed(4)}
                   <br />
                   <strong>LNG:</strong> {drone.position[0].toFixed(4)}
                   <br />
                   <strong>DETECTED:</strong> {drone.detected_at}
                   <br />
-                  {trajectory && (
+                  {/* {trajectory && (
                     <>
                       <strong>TRAJECTORY POINTS:</strong>{" "}
                       {trajectory.points.length}
                       <br />
                     </>
-                  )}
+                  )} */}
                 </div>
               </Popup>
             </Marker>

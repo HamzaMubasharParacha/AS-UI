@@ -107,7 +107,7 @@ const MapLayerControls: React.FC<MapLayerControlsProps> = ({
         onClick={toggleDropdown}
         title="Select Map Type"
         sx={{
-          backgroundColor: "rgba(0,0,0,0.2)",
+          backgroundColor:  "white",
           minWidth: "30px !important",
           width: "40px !important",
           height: "40px !important",

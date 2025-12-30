@@ -20,10 +20,10 @@ interface AntennaPositionRequest {
 
 // Get authentication token
 const getToken = (): string => {
-  const token = sessionStorage.getItem("token");
-  if (!token) {
-    throw new Error("Authentication token not found. Please login again.");
-  }
+  const token = sessionStorage.getItem("token") || "";
+  // if (!token) {
+  //   throw new Error("Authentication token not found. Please login again.");
+  // }
   return token;
 };
 

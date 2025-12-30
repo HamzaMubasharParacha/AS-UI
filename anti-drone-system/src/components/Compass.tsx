@@ -4,8 +4,9 @@ import { Box, Typography } from "@mui/material";
 const Compass: React.FC<{
   bearing: number;
   size?: number;
+  isDarkMode?: boolean;
   position?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
-}> = ({ bearing, size = 80, position = "bottom-left" }) => {
+}> = ({ bearing, size = 80, position = "bottom-left", isDarkMode }) => {
   const getPositionStyles = () => {
     switch (position) {
       case "top-left":
@@ -28,9 +29,9 @@ const Compass: React.FC<{
         ...getPositionStyles(),
         width: size,
         height: size,
-        backgroundColor: "rgba(0, 0, 0, 0.85)",
+        backgroundColor: !isDarkMode ? "white" : "rgba(0, 0, 0, 0.85)",
         borderRadius: "50%",
-        border: "2px solid var(--primary-color)",
+        border: `2px solid ${isDarkMode ? "var(--primary-color)" : "white"}`,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -46,7 +47,7 @@ const Compass: React.FC<{
           width: size - 20,
           height: size - 20,
           borderRadius: "50%",
-          border: "1px solid var(--primary-color)",
+          border: `1px solid ${isDarkMode ? "var(--primary-color)" : "black"}`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -87,7 +88,7 @@ const Compass: React.FC<{
             left: 2,
             top: "50%",
             transform: "translateY(-50%)",
-            color: "var(--primary-color)",
+            color: isDarkMode ?  "var(--primary-color)" : 'black',
             fontSize: "10px",
             fontWeight: "bold",
             fontFamily: "monospace",
@@ -193,7 +194,7 @@ const Compass: React.FC<{
             bottom: -25,
             left: "50%",
             transform: "translateX(-50%)",
-            backgroundColor: "rgba(0, 0, 0, 0.9)",
+            backgroundColor: isDarkMode? "rgba(0, 0, 0, 0.9)" : "white",
             color: "var(--primary-color)",
             padding: "2px 8px",
             borderRadius: 2,
