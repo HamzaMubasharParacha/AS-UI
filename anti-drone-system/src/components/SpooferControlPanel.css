@@ -1,0 +1,79 @@
+/* SpooferControlPanel.css */
+
+.spoofer-control-panel {
+  position: absolute;
+  bottom: 10px;
+  right: 380px;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  font-family: "monospace";
+  font-size: 11px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--primary-color);
+  z-index: 1005;
+  min-width: 200px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.spoofer-control-panel:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* Status indicator animation */
+@keyframes statusPulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.spoofer-status-active {
+  animation: statusPulse 1.5s infinite;
+  color: #ff4444 !important;
+}
+
+.spoofer-status-starting,
+.spoofer-status-stopping {
+  animation: statusPulse 1s infinite;
+  color: #ffaa00 !important;
+}
+
+.spoofer-status-idle {
+  color: var(--primary-color) !important;
+}
+
+/* PTZ Controls */
+.ptz-controls {
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .spoofer-control-panel {
+    min-width: 180px;
+    padding: 12px;
+    bottom: 5px;
+    right: 5px;
+    font-size: 10px;
+  }
+}

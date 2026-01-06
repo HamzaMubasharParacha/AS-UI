@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Typography, Box, IconButton, Button, Snackbar, Alert } from "@mui/material";
+import {
+  Typography,
+  Box,
+  IconButton,
+  Button,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import {
   Dashboard,
   Radar,
@@ -16,7 +23,15 @@ import SystemStatus from "./SystemStatus";
 import SpectrumAnalyzer from "./SpectrumAnalyzer";
 import FloatingSpectrumAnalyzer from "./FloatingSpectrumAnalyzer";
 import "../ADSDashboard.css";
-import { drone_data, logout, df_connectivity, cone_angle, spectrum_data, hardwareSystemId } from "../api/config";
+import {
+  drone_data,
+  logout,
+  df_connectivity,
+  cone_angle,
+  spectrum_data,
+  hardwareSystemId,
+  discoverSpoofer,
+} from "../api/config";
 
 interface DashboardProps {
   setToken: (token: string | null) => void;
@@ -92,17 +107,18 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   const [error, setError] = useState("");
   const [check, setcheck] = useState("");
   const [fft, setFft] = useState<number[]>([]);
-  
+  const [spooferConnected, setSpooferConnected] = useState(false);
+
   // Use refs for better performance
   const dragStateRef = useRef({
     isDragging: false,
     draggedCardId: null as string | null,
     dragOffset: { x: 0, y: 0 },
-    startPosition: { x: 0, y: 0 }
+    startPosition: { x: 0, y: 0 },
   });
- 
+
   const cardsRef = useRef<FloatingCard[]>([]);
-  
+
   // Floating spectrum analyzer state
   const [floatingSpectrum, setFloatingSpectrum] = useState<{
     visible: boolean;
@@ -116,7 +132,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     };
   }>({
     visible: false,
-    position: { x: 100, y: 100 }
+    position: { x: 100, y: 100 },
   });
 
   // Drag and drop state
@@ -126,13 +142,8 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
-    severity: "info" as "success" | "error" | "info" | "warning"
+    severity: "info" as "success" | "error" | "info" | "warning",
   });
-
-  // DEBUG: Log when floating spectrum state changes
-  useEffect(() => {
-    // console.log("Floating spectrum state changed:", floatingSpectrum);
-  }, [floatingSpectrum]);
 
   const handleLogout = async () => {
     setLoading(true);
@@ -174,9 +185,11 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     try {
       const token = sessionStorage.getItem("token");
       const response = await fetch(`${drone_data}`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          Authorization: `Bearer ${token || "219498f3-03f9-41a0-9140-eec5bfe0e311"}`,
+          Authorization: `Bearer ${
+            token || "219498f3-03f9-41a0-9140-eec5bfe0e311"
+          }`,
         },
       });
       const data = await response.json();
@@ -206,14 +219,15 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     return () => clearInterval(intervalId);
   }, []);
 
-  
   const check_dfConnectivity = async () => {
     try {
       const token = sessionStorage.getItem("token");
       const response = await fetch(`${df_connectivity}`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          Authorization: `Bearer ${token || "219498f3-03f9-41a0-9140-eec5bfe0e311"}`,
+          Authorization: `Bearer ${
+            token || "219498f3-03f9-41a0-9140-eec5bfe0e311"
+          }`,
         },
       });
       const data = await response.json();
@@ -224,9 +238,49 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     }
   };
 
+  const check_spooferConnectivity = async () => {
+    try {
+      // const token = sessionStorage.getItem("token");
+      const response = await fetch(`${discoverSpoofer}`, {
+        method: "POST",
+        headers: {
+          // Authorization: `Bearer ${token || "219498f3-03f9-41a0-9140-eec5bfe0e311"}`,
+        },
+      });
+      const data = await response.json();
+      const id = data.data;
+      console.log("id type:", typeof id);
+      console.log("id:", id);
+      console.log("id[0]:", id?.[0]);
+
+      // ADD THIS: More detailed logging
+      console.log("Is id null/undefined?", id == null);
+      console.log("Is id array?", Array.isArray(id));
+      console.log("Length if array:", id?.length);
+      console.log("id[0] == 0?", id?.[0] == 0);
+
+      // Fixed check: Only set to true if id[0] is NOT 0
+      if (id && Array.isArray(id) && id.length > 0 && id[0] !== 0) {
+        console.log("Spoofer detected:", id[0]);
+        setSpooferConnected(true);
+      } else {
+        console.log("No spoofer detected or spoofer disconnected");
+        setSpooferConnected(false);
+      }
+    } catch (error) {
+      console.error("error");
+    }
+  };
+
   useEffect(() => {
     check_dfConnectivity();
     const intervalId = setInterval(check_dfConnectivity, 5000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    check_spooferConnectivity();
+    const intervalId = setInterval(check_spooferConnectivity, 5000);
     return () => clearInterval(intervalId);
   }, []);
 
@@ -248,11 +302,14 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
         return;
       }
 
-      const powerSpectrum = json.data[hardwareSystemId].decodedValues?.powerSpectrum;
+      const powerSpectrum =
+        json.data[hardwareSystemId].decodedValues?.powerSpectrum;
 
       if (powerSpectrum) {
         // console.log("Power spectrum found, length:", powerSpectrum.length);
-        const cleaned = powerSpectrum.map((v: number) => isFinite(v) ? v : -100);
+        const cleaned = powerSpectrum.map((v: number) =>
+          isFinite(v) ? v : -100
+        );
         setFft(cleaned);
       } else {
         // console.log("No power spectrum in response");
@@ -266,7 +323,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   useEffect(() => {
     const interval = setInterval(fetchSpectrumData, 1000);
     fetchSpectrumData(); // Initial fetch
-    
+
     return () => {
       clearInterval(interval);
     };
@@ -314,12 +371,12 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
   const [coneAngle, setConeAngle] = useState<number>(0);
   const [coneElevation, setConeElevation] = useState<number>(0);
   const [jammerStatus, setjammerStatus] = useState("");
-  
+
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
         const token = sessionStorage.getItem("token");
-        
+
         if (!token) {
           console.warn("No token available for cone angle fetch");
           return;
@@ -341,7 +398,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        const jam_data = await response.json(); 
+        const jam_data = await response.json();
         setConeAngle(jam_data.data.ptz_azimuth);
         setConeElevation(jam_data.data.ptz_elevation);
         setjammerStatus(jam_data.data.is_connected);
@@ -363,24 +420,33 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     countermeasures: "OFFLINE",
     communications: "OFFLINE",
   });
-  
- useEffect(() => {
-  if (check !== "") {
-    const radarStatus = check ? "ONLINE" : "OFFLINE";
-    setSystemStatus(prev => ({
+
+  useEffect(() => {
+    console.log("check:", check);
+    console.log("jammerStatus:", jammerStatus);
+    console.log("spooferConnected:", spooferConnected);
+
+    if (check !== "") {
+      const radarStatus = check ? "ONLINE" : "OFFLINE";
+      setSystemStatus((prev) => ({
+        ...prev,
+        countermeasures: radarStatus,
+      }));
+    }
+    if (jammerStatus !== "") {
+      const jammer = jammerStatus ? "ONLINE" : "OFFLINE";
+      setSystemStatus((prev) => ({
+        ...prev,
+        radar: jammer,
+      }));
+    }
+
+    const spoofer = spooferConnected ? "ONLINE" : "OFFLINE";
+    setSystemStatus((prev) => ({
       ...prev,
-      countermeasures: radarStatus
+      communications: spoofer,
     }));
-  }
-  if (jammerStatus !== "") {
-    const jammer = jammerStatus ? "ONLINE" : "OFFLINE";
-    setSystemStatus(prev => ({
-      ...prev,
-      radar: jammer
-    }));
-  }
-}, [check, jammerStatus]);
- 
+  }, [check, jammerStatus, spooferConnected]);
 
   const activeThreat = detectedDrones.find(
     (drone) =>
@@ -426,7 +492,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       e.preventDefault();
       setIsDraggingOver(true);
       setDragPosition({ x: e.clientX, y: e.clientY });
-      
+
       // Show drop hint if we're over the map area
       if (e.clientX > 250 && e.clientX < window.innerWidth - 250) {
         setShowDropHint(true);
@@ -437,8 +503,12 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
 
     const handleGlobalDragLeave = (e: DragEvent) => {
       // Only reset if we're leaving the window entirely
-      if (e.clientX <= 0 || e.clientY <= 0 || 
-          e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
+      if (
+        e.clientX <= 0 ||
+        e.clientY <= 0 ||
+        e.clientX >= window.innerWidth ||
+        e.clientY >= window.innerHeight
+      ) {
         setIsDraggingOver(false);
         setShowDropHint(false);
       }
@@ -450,38 +520,43 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       setShowDropHint(false);
 
       try {
-        const data = e.dataTransfer?.getData('application/json');
-        
+        const data = e.dataTransfer?.getData("application/json");
+
         if (data) {
           const settings = JSON.parse(data);
-          
-          if (settings.type === 'spectrum') {
+
+          if (settings.type === "spectrum") {
             const newPosition = {
-              x: Math.max(10, Math.min(window.innerWidth - 410, e.clientX - 200)),
-              y: Math.max(10, Math.min(window.innerHeight - 260, e.clientY - 125))
+              x: Math.max(
+                10,
+                Math.min(window.innerWidth - 410, e.clientX - 200)
+              ),
+              y: Math.max(
+                10,
+                Math.min(window.innerHeight - 260, e.clientY - 125)
+              ),
             };
-            
-            
+
             setFloatingSpectrum({
               visible: true,
               position: newPosition,
-              settings
+              settings,
             });
-            
+
             setSnackbar({
               open: true,
               message: "Spectrum Analyzer added to main screen",
-              severity: "success"
+              severity: "success",
             });
           }
         } else {
         }
       } catch (error) {
-        console.error('Error parsing drag data:', error);
+        console.error("Error parsing drag data:", error);
         setSnackbar({
           open: true,
           message: "Failed to add Spectrum Analyzer",
-          severity: "error"
+          severity: "error",
         });
       }
     };
@@ -492,107 +567,137 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
     };
 
     // Add global event listeners
-    document.addEventListener('dragover', handleGlobalDragOver);
-    document.addEventListener('dragleave', handleGlobalDragLeave);
-    document.addEventListener('drop', handleGlobalDrop);
-    document.addEventListener('dragend', handleGlobalDragEnd);
+    document.addEventListener("dragover", handleGlobalDragOver);
+    document.addEventListener("dragleave", handleGlobalDragLeave);
+    document.addEventListener("drop", handleGlobalDrop);
+    document.addEventListener("dragend", handleGlobalDragEnd);
 
     return () => {
-      document.removeEventListener('dragover', handleGlobalDragOver);
-      document.removeEventListener('dragleave', handleGlobalDragLeave);
-      document.removeEventListener('drop', handleGlobalDrop);
-      document.removeEventListener('dragend', handleGlobalDragEnd);
+      document.removeEventListener("dragover", handleGlobalDragOver);
+      document.removeEventListener("dragleave", handleGlobalDragLeave);
+      document.removeEventListener("drop", handleGlobalDrop);
+      document.removeEventListener("dragend", handleGlobalDragEnd);
     };
   }, []);
 
   // INSTANT DRAG START for floating cards
   const handleMouseDown = (e: React.MouseEvent, cardId: string) => {
-    if (!(e.target as HTMLElement).closest('.floating-card-header')) {
+    if (!(e.target as HTMLElement).closest(".floating-card-header")) {
       return;
     }
-    
+
     e.preventDefault();
     e.stopPropagation();
-    
+
     const cardElement = e.currentTarget as HTMLElement;
     const rect = cardElement.getBoundingClientRect();
-    
+
     dragStateRef.current = {
       isDragging: true,
       draggedCardId: cardId,
       dragOffset: {
         x: e.clientX - rect.left,
-        y: e.clientY - rect.top
+        y: e.clientY - rect.top,
       },
       startPosition: {
         x: rect.left,
-        y: rect.top
-      }
+        y: rect.top,
+      },
     };
 
     // Add dragging class immediately
-    cardElement.classList.add('floating-card-dragging');
-    
+    cardElement.classList.add("floating-card-dragging");
+
     // Set cursor immediately
-    document.body.style.cursor = 'grabbing';
-    document.body.style.userSelect = 'none';
+    document.body.style.cursor = "grabbing";
+    document.body.style.userSelect = "none";
   };
 
   // SMOOTH DRAGGING - Immediate response for floating cards
-  const updateCardPositionOptimized = useCallback((clientX: number, clientY: number) => {
-    if (!dragStateRef.current.isDragging || !dragStateRef.current.draggedCardId) return;
+  const updateCardPositionOptimized = useCallback(
+    (clientX: number, clientY: number) => {
+      if (
+        !dragStateRef.current.isDragging ||
+        !dragStateRef.current.draggedCardId
+      )
+        return;
 
-    const newX = Math.max(10, Math.min(window.innerWidth - 390, clientX - dragStateRef.current.dragOffset.x));
-    const newY = Math.max(10, Math.min(window.innerHeight - 200, clientY - dragStateRef.current.dragOffset.y));
+      const newX = Math.max(
+        10,
+        Math.min(
+          window.innerWidth - 390,
+          clientX - dragStateRef.current.dragOffset.x
+        )
+      );
+      const newY = Math.max(
+        10,
+        Math.min(
+          window.innerHeight - 200,
+          clientY - dragStateRef.current.dragOffset.y
+        )
+      );
 
-    // Update the DOM directly for immediate response
-    const cardElement = document.querySelector(`[data-card-id="${dragStateRef.current.draggedCardId}"]`) as HTMLElement;
-    if (cardElement) {
-      cardElement.style.left = `${newX}px`;
-      cardElement.style.top = `${newY}px`;
-    }
-  }, []);
+      // Update the DOM directly for immediate response
+      const cardElement = document.querySelector(
+        `[data-card-id="${dragStateRef.current.draggedCardId}"]`
+      ) as HTMLElement;
+      if (cardElement) {
+        cardElement.style.left = `${newX}px`;
+        cardElement.style.top = `${newY}px`;
+      }
+    },
+    []
+  );
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!dragStateRef.current.isDragging) return;
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!dragStateRef.current.isDragging) return;
 
-    // Immediate update without waiting for animation frame for better responsiveness
-    updateCardPositionOptimized(e.clientX, e.clientY);
-  }, [updateCardPositionOptimized]);
+      // Immediate update without waiting for animation frame for better responsiveness
+      updateCardPositionOptimized(e.clientX, e.clientY);
+    },
+    [updateCardPositionOptimized]
+  );
 
   // Clean up drag state
   const handleMouseUp = useCallback(() => {
-    if (!dragStateRef.current.isDragging || !dragStateRef.current.draggedCardId) return;
+    if (!dragStateRef.current.isDragging || !dragStateRef.current.draggedCardId)
+      return;
 
     // Get final position from DOM
-    const cardElement = document.querySelector(`[data-card-id="${dragStateRef.current.draggedCardId}"]`) as HTMLElement;
+    const cardElement = document.querySelector(
+      `[data-card-id="${dragStateRef.current.draggedCardId}"]`
+    ) as HTMLElement;
     if (cardElement) {
       const finalX = parseInt(cardElement.style.left);
       const finalY = parseInt(cardElement.style.top);
 
       // Only update React state if position actually changed
       if (!isNaN(finalX) && !isNaN(finalY)) {
-        updateCardPosition(dragStateRef.current.draggedCardId, { x: finalX, y: finalY });
+        updateCardPosition(dragStateRef.current.draggedCardId, {
+          x: finalX,
+          y: finalY,
+        });
       }
 
       // Remove dragging class
-      cardElement.classList.remove('floating-card-dragging');
-      
+      cardElement.classList.remove("floating-card-dragging");
+
       // Reset inline styles to let React control the position
-      cardElement.style.left = '';
-      cardElement.style.top = '';
+      cardElement.style.left = "";
+      cardElement.style.top = "";
     }
 
     // Reset cursor and selection
-    document.body.style.cursor = '';
-    document.body.style.userSelect = '';
+    document.body.style.cursor = "";
+    document.body.style.userSelect = "";
 
     // Reset drag state
     dragStateRef.current = {
       isDragging: false,
       draggedCardId: null,
       dragOffset: { x: 0, y: 0 },
-      startPosition: { x: 0, y: 0 }
+      startPosition: { x: 0, y: 0 },
     };
   }, []);
 
@@ -604,12 +709,12 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       }
     };
 
-    document.addEventListener('mousemove', handleGlobalMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleGlobalMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      document.removeEventListener('mousemove', handleGlobalMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleGlobalMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [handleMouseMove, handleMouseUp]);
 
@@ -661,7 +766,8 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       id: "spectrum-analyzer",
       title: "Spectrum Analyzer",
       lastActivity:
-        floatingCards.find((c) => c.id === "spectrum-analyzer")?.lastActivity || "",
+        floatingCards.find((c) => c.id === "spectrum-analyzer")?.lastActivity ||
+        "",
       description: "Full spectrum analyzer with waterfall",
       icon: <Analytics />,
     },
@@ -673,23 +779,25 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
-        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <Alert 
-          severity={snackbar.severity} 
-          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
         >
           {snackbar.message}
         </Alert>
       </Snackbar>
-      
+
       <div className="App">
         {/* Main Container */}
         <div className="main-container">
           {/* Application Header */}
           <div className="app-header">
-            <div className="header_data"><h2>RAPIDEV</h2></div>
+            <div className="header_data">
+              <h2>RAPIDEV</h2>
+            </div>
             <div className="header_data">
               <Typography variant="h5" className="app-title">
                 ANTI-DRONE-SYSTEM
@@ -744,17 +852,17 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
                   "@keyframes pulse": {
                     "0%": {
                       transform: "scale(1)",
-                      opacity: 0.7
+                      opacity: 0.7,
                     },
                     "50%": {
                       transform: "scale(1.1)",
-                      opacity: 1
+                      opacity: 1,
                     },
                     "100%": {
                       transform: "scale(1)",
-                      opacity: 0.7
-                    }
-                  }
+                      opacity: 0.7,
+                    },
+                  },
                 }}
               >
                 <Typography
@@ -819,23 +927,26 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
               coneangle={coneAngle}
               coneelevation={coneElevation}
               jammerStatus={jammerStatus}
+              spooferStatus={spooferConnected}
             />
           </div>
 
           {/* Floating Spectrum Analyzer (when dragged from spectrum tab) */}
           {floatingSpectrum.visible && (
-            <div style={{
-              position: 'fixed',
-              zIndex: 9999,
-              pointerEvents: 'auto'
-            }}>
+            <div
+              style={{
+                position: "fixed",
+                zIndex: 9999,
+                pointerEvents: "auto",
+              }}
+            >
               <FloatingSpectrumAnalyzer
                 spectrumData={fft.length > 0 ? fft : Array(2048).fill(-80)}
                 width={400}
                 height={250}
                 onClose={() => {
                   // console.log("Closing floating spectrum");
-                  setFloatingSpectrum(prev => ({ ...prev, visible: false }));
+                  setFloatingSpectrum((prev) => ({ ...prev, visible: false }));
                 }}
                 initialPosition={floatingSpectrum.position}
                 settings={floatingSpectrum.settings}
@@ -859,11 +970,14 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
                 }}
               >
                 {/* Header with drag handlers */}
-                <Box 
+                <Box
                   className="floating-card-header"
                   onMouseDown={(e) => handleMouseDown(e, card.id)}
                 >
-                  <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "var(--primary-color)" }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: "bold", color: "var(--primary-color)" }}
+                  >
                     {card.title}
                   </Typography>
                   <Box>
@@ -901,8 +1015,7 @@ const ADSDashboard: React.FC<DashboardProps> = ({ setToken }) => {
                   title={log.description}
                 >
                   <div className="column-item-icon">{log.icon}</div>
-                  <div className="column-item-info">
-                  </div>
+                  <div className="column-item-info"></div>
                 </div>
               ))}
             </div>

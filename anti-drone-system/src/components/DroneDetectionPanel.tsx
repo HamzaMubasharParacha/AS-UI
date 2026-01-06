@@ -831,9 +831,10 @@ const DroneDetectionPanel = () => {
               <MapContainer
                 center={[33.6464, 72.999]} // Default center
                 zoom={14}
+                zoomControl={false}
+                rotate={true}
+                rotateControl={false}
                 style={{ width: "100%", height: "100%", borderRadius: "10px" }}
-                scrollWheelZoom={true}
-                zoomControl={true}
                 ref={mapRef}
               >
                 {/* OpenStreetMap Tile Layer */}

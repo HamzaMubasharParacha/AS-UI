@@ -11,6 +11,12 @@ export const azimuth = `${BASE_URL}/jammer/1/command`;
 export const df_connectivity = `${BASE_URL}/df/connectivity`;
 // export const detectedDrones = `http://192.168.100.102:8080/api/df/drones/1/list`;
 export const detectedDrones = `http://192.168.100.102:8080/api/df/drones/1/list/paginated?page=0&size=500`;
+export const discoverSpoofer = `http://192.168.100.102:8086/api/v1/spoofers/discover`;
+export const forceLand = `http://192.168.100.102:8086/api/v1/spoofer/force-land`;
+export const decept = `http://192.168.100.102:8086/api/v1/spoofer/decept`;
+export const pause_decept = `http://192.168.100.102:8086/api/v1/spoofer/decept/pause/2`;
+export const resume_decept = `http://192.168.100.102:8086/api/v1/spoofer/decept/resume/2`;
+export const stop_decept = `http://192.168.100.102:8086/api/v1/spoofer/decept/stop/2`;
 
 export const hardwareSystemId = 1;
 export const sensorId = 1;
